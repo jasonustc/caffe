@@ -1,5 +1,8 @@
 ## General
 
+# Visual Studio files
+caffe/
+
 # Compiled Object files
 *.slo
 *.lo
