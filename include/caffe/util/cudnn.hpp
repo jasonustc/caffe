@@ -7,6 +7,8 @@
 #include "caffe/common.hpp"
 #include "caffe/proto/caffe.pb.h"
 
+//#define cudnnTensor4dDescriptor_t cudnnTensorDescriptor_t //added by qing li
+
 #define CUDNN_CHECK(condition) \
   do { \
     cudnnStatus_t status = condition; \

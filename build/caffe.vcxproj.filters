@@ -219,7 +219,7 @@
     <ClCompile Include="..\src\caffe\proto\caffe.pb.cc">
       <Filter>src\proto</Filter>
     </ClCompile>
-    <ClCompile Include="..\examples\mnist\convert_mnist_data.cpp" />
+    <ClCompile Include="..\tools\caffe.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">

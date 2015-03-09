@@ -10,5 +10,8 @@ Steps:
 2. Configure the environment variables: $BOOST_1_56_0, $OPENCV_2_4_9
 3. Compile the caffe.sln in VS2013
 
+Notes:
+1. Currently Caffe works with cuDNN_v1, not cuDNN_v2
+
 You need copy 
 More details at https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9
