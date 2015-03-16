@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-
-GPU_ID=0
+cd ../../
+GPU_ID=1
 WEIGHTS=\
 ./models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel
 DATA_DIR=./examples/coco_caption/h5_data/
