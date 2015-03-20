@@ -3,4 +3,8 @@
   <PropertyGroup>
     <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommandArguments>"D:\Users\v-yipan\Gopro\deep\youtube_dataset\gopro_videos-15_classes_train_fea_path_list_32frames_input.txt" "D:\Users\v-yipan\Gopro\deep\youtube_dataset\gopro_videos-15_classes_train_pair_list_32frames_input.txt" test_ld 4096 1</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>
