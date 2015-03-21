@@ -551,6 +551,70 @@ class MultinomialLogisticLossLayer : public LossLayer<Dtype> {
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
 };
 
+//added by qing li, used in video highlight
+template <typename Dtype>
+class PairwiseRankingHingeLossLayer : public LossLayer<Dtype> {
+public:
+	explicit PairwiseRankingHingeLossLayer(const LayerParameter& param)
+		: LossLayer<Dtype>(param), diff_() {}
+	virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+
+	virtual inline int ExactNumBottomBlobs() const { return 2; }
+	
+	virtual inline const char* type() const { return "PairwiseRankingHingeLoss"; }
+	/**
+	* Unlike most loss layers, in the PairwiseRankingHingeLossLayer we can backpropagate
+	* to the first two inputs.
+	*/
+	virtual inline bool AllowForceBackward(const int bottom_index) const {
+		return bottom_index != 2;
+	}
+
+protected:
+	/// @copydoc PairwiseRankingHingeLossLayer
+	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+	virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+
+	/**
+	* @brief Computes the PairwiseRankingHinge error gradient w.r.t. the inputs.
+	*
+	* Computes the gradients with respect to the two input vectors (bottom[0] and
+	* bottom[1]), but not the similarity label (bottom[2]).
+	*
+	* @param top output Blob vector (length 1), providing the error gradient with
+	*      respect to the outputs
+	*   -# @f$ (1 \times 1 \times 1 \times 1) @f$
+	*      This Blob's diff will simply contain the loss_weight* @f$ \lambda @f$,
+	*      as @f$ \lambda @f$ is the coefficient of this layer's output
+	*      @f$\ell_i@f$ in the overall Net loss
+	*      @f$ E = \lambda_i \ell_i + \mbox{other loss terms}@f$; hence
+	*      @f$ \frac{\partial E}{\partial \ell_i} = \lambda_i @f$.
+	*      (*Assuming that this top Blob is not used as a bottom (input) by any
+	*      other layer of the Net.)
+	* @param propagate_down see Layer::Backward.
+	* @param bottom input Blob vector (length 2)
+	*   -# @f$ (N \times C \times 1 \times 1) @f$
+	*      the features @f$a@f$; Backward fills their diff with
+	*      gradients if propagate_down[0]
+	*   -# @f$ (N \times C \times 1 \times 1) @f$
+	*      the features @f$b@f$; Backward fills their diff with gradients if
+	*      propagate_down[1]
+	*/
+	virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+		const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+	virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+		const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+
+	Blob<Dtype> diff_;  // cached for backward pass
+	Blob<Dtype> dist_sq_;  // cached for backward pass
+	Blob<Dtype> diff_sq_;  // tmp storage for gpu forward pass
+	Blob<Dtype> summer_vec_;  // tmp storage for gpu forward pass
+};
+
+
 /**
  * @brief Computes the cross-entropy (logistic) loss @f$
  *          E = \frac{-1}{n} \sum\limits_{n=1}^N \left[
