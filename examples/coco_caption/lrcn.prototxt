@@ -761,7 +761,8 @@ layer {
   bottom: "target_sentence"
   top: "accuracy"
   include { phase: TEST }
-  loss_param {
+  accuracy_param {
+    axis: 2
     ignore_label: -1
   }
 }
