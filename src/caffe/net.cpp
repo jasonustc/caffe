@@ -468,9 +468,11 @@ Dtype Net<Dtype>::ForwardFromTo(int start, int end) {
       InputDebugInfo(i);
     }
   }
+  //LOG(INFO) << "START:" << start << "->" << end;
   for (int i = start; i <= end; ++i) {
     // LOG(ERROR) << "Forwarding " << layer_names_[i];
     layers_[i]->Reshape(bottom_vecs_[i], top_vecs_[i]);
+	//LOG(INFO) << "FLAG i="<<i<<" Layer:"<<layer_names_[i];
     Dtype layer_loss = layers_[i]->Forward(bottom_vecs_[i], top_vecs_[i]);
     loss += layer_loss;
     if (debug_info_) { ForwardDebugInfo(i); }
@@ -491,6 +493,7 @@ Dtype Net<Dtype>::ForwardTo(int end) {
 template <typename Dtype>
 const vector<Blob<Dtype>*>& Net<Dtype>::ForwardPrefilled(Dtype* loss) {
   if (loss != NULL) {
+
     *loss = ForwardFromTo(0, layers_.size() - 1);
   } else {
     ForwardFromTo(0, layers_.size() - 1);
@@ -727,7 +730,21 @@ void Net<Dtype>::ToProto(NetParameter* param, bool write_diff) const {
     param->add_input(blob_names_[net_input_blob_indices_[i]]);
   }
   DLOG(INFO) << "Serializing " << layers_.size() << " layers";
+
   for (int i = 0; i < layers_.size(); ++i) {
+	  bool no_need_snapshot = true;
+	  vector<int> param_list = param_id_vecs_[i];
+	  for (int j = 0; j < param_list.size(); j++)
+	  {
+		  int param_idx = param_list[j];
+		  if (param_owners_[param_idx]<0)
+		  {
+			  no_need_snapshot = false;
+			  break;
+		  }
+	  }
+
+
     LayerParameter* layer_param = param->add_layer();
     for (int j = 0; j < bottom_id_vecs_[i].size(); ++j) {
       layer_param->add_bottom(blob_names_[bottom_id_vecs_[i][j]]);
@@ -735,6 +752,13 @@ void Net<Dtype>::ToProto(NetParameter* param, bool write_diff) const {
     for (int j = 0; j < top_id_vecs_[i].size(); ++j) {
       layer_param->add_top(blob_names_[top_id_vecs_[i][j]]);
     }
+
+
+	  if (no_need_snapshot)
+	  {
+		  //LOG(INFO) << "no need snapshot parameter, sharing paramter with others";
+		  continue;
+	  }
     layers_[i]->ToProto(layer_param, write_diff);
   }
 }

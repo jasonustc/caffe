@@ -259,7 +259,7 @@ message ParamSpec {
 // NOTE
 // Update the next available ID when you add a new LayerParameter field.
 //
-// LayerParameter next available layer-specific ID: 133 (last added: Pairwise_Ranking_Hinge_Loss)
+// LayerParameter next available layer-specific ID: 132 (last added: Pairwise_Ranking_Hinge_Loss)
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -312,7 +312,6 @@ message LayerParameter {
   optional DummyDataParameter dummy_data_param = 109;
   optional EltwiseParameter eltwise_param = 110;
   optional ExpParameter exp_param = 111;
-  optional FeaturePoolingParameter feature_pooling_param=131;
   optional HDF5DataParameter hdf5_data_param = 112;
   optional HDF5OutputParameter hdf5_output_param = 113;
   optional HingeLossParameter hinge_loss_param = 114;
@@ -322,7 +321,7 @@ message LayerParameter {
   optional LRNParameter lrn_param = 118;
   optional MemoryDataParameter memory_data_param = 119;
   optional MVNParameter mvn_param = 120;
-  optional PairwiseRankingHingeLossParameter pairwise_ranking_hinge_loss_param=132;
+  optional PairwiseRankingHingeLossParameter pairwise_ranking_hinge_loss_param=131;
   optional PoolingParameter pooling_param = 121;
   optional PowerParameter power_param = 122;
   optional PythonParameter python_param = 130;
@@ -503,10 +502,6 @@ message ExpParameter {
   optional float base = 1 [default = -1.0];
   optional float scale = 2 [default = 1.0];
   optional float shift = 3 [default = 0.0];
-}
-
-// Message that stores parameters used by FeaturePoolingLayer
-message FeaturePoolingParameter {
 }
 
 // Message that stores parameters used by HDF5DataLayer

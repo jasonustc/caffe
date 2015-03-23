@@ -336,13 +336,7 @@
     <CudaCompile Include="..\src\caffe\util\math_functions.cu">
       <Filter>src\util</Filter>
     </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\feature_pooling_layer.cu">
-      <Filter>src\layers</Filter>
-    </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\cudnn_pooling_layer.cu">
-      <Filter>src\layers</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\pairwise_ranking_hinge_loss_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
   </ItemGroup>
