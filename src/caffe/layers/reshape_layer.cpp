@@ -6,18 +6,13 @@
 namespace caffe {
 
 template <typename Dtype>
-void ReshapeLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top) {
-  top[0]->Reshape(this->layer_param_.reshape_param().shape());
-  top[0]->ShareData(*bottom[0]);
-  top[0]->ShareDiff(*bottom[0]);
-}
-
-template <typename Dtype>
 void ReshapeLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
+  top[0]->Reshape(this->layer_param_.reshape_param().shape());
   CHECK_EQ(top[0]->count(), bottom[0]->count())
      << "new shape must have the same count as input";
+  top[0]->ShareData(*bottom[0]);
+  top[0]->ShareDiff(*bottom[0]);
 }
 
 INSTANTIATE_CLASS(ReshapeLayer);
