@@ -244,6 +244,15 @@
     <ClCompile Include="..\src\caffe\layers\frames_roll_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\feature_pooling_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\pairwise_ranking_hinge_loss_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\prelu_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
@@ -364,6 +373,9 @@
       <Filter>src\layers</Filter>
     </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\recurrent_layer.cu">
+      <Filter>src\layers</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\src\caffe\layers\prelu_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
   </ItemGroup>

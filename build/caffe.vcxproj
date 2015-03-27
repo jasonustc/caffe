@@ -46,6 +46,7 @@
     <ClCompile Include="..\src\caffe\layers\embed_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\euclidean_loss_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\exp_layer.cpp" />
+    <ClCompile Include="..\src\caffe\layers\feature_pooling_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\flatten_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\frames_roll_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\hdf5_data_layer.cpp" />
@@ -63,8 +64,10 @@
     <ClCompile Include="..\src\caffe\layers\multinomial_logistic_loss_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\mvn_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\neuron_layer.cpp" />
+    <ClCompile Include="..\src\caffe\layers\pairwise_ranking_hinge_loss_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\pooling_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\power_layer.cpp" />
+    <ClCompile Include="..\src\caffe\layers\prelu_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\recurrent_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\relu_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\reshape_layer.cpp" />
@@ -122,6 +125,7 @@
     <CudaCompile Include="..\src\caffe\layers\mvn_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\pooling_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\power_layer.cu" />
+    <CudaCompile Include="..\src\caffe\layers\prelu_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\recurrent_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\relu_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\sigmoid_cross_entropy_loss_layer.cu" />

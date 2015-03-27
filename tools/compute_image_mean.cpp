@@ -88,13 +88,13 @@ int main(int argc, char** argv) {
       }
     }
     ++count;
-    if (count % 10000 == 0) {
+    if (count % 1000 == 0) {
       LOG(INFO) << "Processed " << count << " files.";
     }
     cursor->Next();
   }
 
-  if (count % 10000 != 0) {
+  if (count % 1000 != 0) {
     LOG(INFO) << "Processed " << count << " files.";
   }
   for (int i = 0; i < sum_blob.data_size(); ++i) {

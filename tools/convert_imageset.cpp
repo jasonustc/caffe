@@ -23,6 +23,11 @@
 #include "caffe/util/io.hpp"
 #include "caffe/util/rng.hpp"
 
+//port for win32
+#ifdef _MSC_VER
+#define snprintf sprintf_s
+#endif
+
 using namespace caffe;  // NOLINT(build/namespaces)
 using std::pair;
 using boost::scoped_ptr;
@@ -86,6 +91,14 @@ int main(int argc, char** argv) {
 
   int resize_height = std::max<int>(0, FLAGS_resize_height);
   int resize_width = std::max<int>(0, FLAGS_resize_width);
+  if (resize_height > 0 && resize_width > 0)
+  {
+	  LOG(INFO) << "Resize images: resize_width=" << resize_width << ",resize_height=" << resize_height;
+  }
+  else
+  {
+	  LOG(INFO) << "No resize images.";
+  }
 
   // Create new DB
   scoped_ptr<db::DB> db(db::GetDB(FLAGS_backend));

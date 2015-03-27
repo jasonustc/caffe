@@ -231,9 +231,7 @@ void Solver<Dtype>::Step(int iters) {
             loss_msg_stream << " (* " << loss_weight
                             << " = " << loss_weight * result_vec[k] << " loss)";
           }
-          LOG(INFO) << "    Train net output #"
-              << score_index++ << ": " << output_name << " = "
-              << result_vec[k] << loss_msg_stream.str();
+          LOG(INFO) << "    Train net output #" << score_index++ << ": " << output_name << " = "<< result_vec[k] << loss_msg_stream.str();
         }
       }
     }
@@ -585,17 +583,24 @@ void SGDSolver<Dtype>::SnapshotSolverState(SolverState* state) {
   for (int i = 0; i < history_.size(); ++i) {
     // Add history
     BlobProto* history_blob = state->add_history();
+	if (net_->param_owners()[i]>=0)
+	{
+		continue;
+	}
     history_[i]->ToProto(history_blob);
   }
 }
 
 template <typename Dtype>
 void SGDSolver<Dtype>::RestoreSolverState(const SolverState& state) {
-  CHECK_EQ(state.history_size(), history_.size())
-      << "Incorrect length of history blobs.";
+  CHECK_EQ(state.history_size(), history_.size())<< "Incorrect length of history blobs.";
+	
   LOG(INFO) << "SGDSolver: restoring history";
   for (int i = 0; i < history_.size(); ++i) {
-    history_[i]->FromProto(state.history(i));
+	  int param_idx = i;
+	  if (net_->param_owners()[i]>=0)
+		  param_idx = net_->param_owners()[i];
+	  history_[i]->FromProto(state.history(param_idx));
   }
 }
 

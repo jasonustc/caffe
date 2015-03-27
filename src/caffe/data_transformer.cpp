@@ -44,7 +44,9 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
 
   const int crop_size = param_.crop_size();
   const Dtype scale = param_.scale();
-  const bool do_mirror = param_.mirror() && Rand(2);
+  bool do_mirror = param_.mirror() && Rand(2);
+  if (phase_ == TEST)
+	  do_mirror = param_.mirror();// added by qing li, when testing, mirror is not random
   const bool has_mean_file = param_.has_mean_file();
   const bool has_uint8 = data.size() > 0;
   const bool has_mean_values = mean_values_.size() > 0;
@@ -84,8 +86,36 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
       h_off = Rand(datum_height - crop_size + 1);
       w_off = Rand(datum_width - crop_size + 1);
     } else {
-      h_off = (datum_height - crop_size) / 2;
-      w_off = (datum_width - crop_size) / 2;
+		
+	// modified by qing li
+		int crop_position = param_.crop_position();
+		//LOG(INFO) << "crop_position:" << crop_position << '\n';
+		//crop_position = 0;
+		switch (crop_position)
+		{
+		case 1: //left-up
+			h_off = 0;
+			w_off = 0;
+			break;
+		case 2: //right-up
+			h_off = 0;
+			w_off = datum_width - crop_size;
+			break;
+		case 3: //left-down
+			h_off = datum_height - crop_size;
+			w_off = 0;
+			break;
+		case 4: //right-down
+			h_off = datum_height - crop_size;
+			w_off = datum_width - crop_size;
+			break;
+		case 0: // crop on center
+		default:
+			h_off = (datum_height - crop_size) / 2;
+			w_off = (datum_width - crop_size) / 2;
+			break;
+		}
+     
     }
   }
 
@@ -214,7 +244,9 @@ void DataTransformer<Dtype>::Transform(const cv::Mat& cv_img,
 
   const int crop_size = param_.crop_size();
   const Dtype scale = param_.scale();
-  const bool do_mirror = param_.mirror() && Rand(2);
+  bool do_mirror = param_.mirror() && Rand(2);
+  if (phase_ == TEST)
+	  do_mirror = param_.mirror();// added by qing li, when testing, mirror is not random
   const bool has_mean_file = param_.has_mean_file();
   const bool has_mean_values = mean_values_.size() > 0;
 
@@ -250,10 +282,39 @@ void DataTransformer<Dtype>::Transform(const cv::Mat& cv_img,
     if (phase_ == TRAIN) {
       h_off = Rand(img_height - crop_size + 1);
       w_off = Rand(img_width - crop_size + 1);
-    } else {
-      h_off = (img_height - crop_size) / 2;
-      w_off = (img_width - crop_size) / 2;
-    }
+	}
+	else {
+		
+		// modified by qing li
+		int crop_position = param_.crop_position();
+		//LOG(INFO) << "crop_position:" << crop_position << '\n';
+		//crop_position = 0;
+
+		switch (crop_position)
+		{
+		case 1: //left-up
+			h_off = 0;
+			w_off = 0;
+			break;
+		case 2: //right-up
+			h_off = 0;
+			w_off = img_width - crop_size;
+			break;
+		case 3: //left-down
+			h_off = img_height - crop_size;
+			w_off = 0;
+			break;
+		case 4: //right-down
+			h_off = img_height - crop_size;
+			w_off = img_width - crop_size;
+			break;
+		case 0: // crop on center
+		default:
+			h_off = (img_height - crop_size) / 2;
+			w_off = (img_width - crop_size) / 2;
+			break;
+		}
+	}
     cv::Rect roi(w_off, h_off, crop_size, crop_size);
     cv_cropped_img = cv_img(roi);
   } else {
@@ -315,7 +376,9 @@ void DataTransformer<Dtype>::Transform(Blob<Dtype>* input_blob,
 
   const int crop_size = param_.crop_size();
   const Dtype scale = param_.scale();
-  const bool do_mirror = param_.mirror() && Rand(2);
+  bool do_mirror = param_.mirror() && Rand(2);
+  if (phase_ == TEST)
+	  do_mirror = param_.mirror();// added by qing li, when testing, mirror is not random
   const bool has_mean_file = param_.has_mean_file();
   const bool has_mean_values = mean_values_.size() > 0;
 
@@ -329,8 +392,35 @@ void DataTransformer<Dtype>::Transform(Blob<Dtype>* input_blob,
       h_off = Rand(input_height - crop_size + 1);
       w_off = Rand(input_width - crop_size + 1);
     } else {
-      h_off = (input_height - crop_size) / 2;
-      w_off = (input_width - crop_size) / 2;
+		
+		// modified by qing li
+		int crop_position = param_.crop_position();
+		//LOG(INFO) << "crop_position:" << crop_position << '\n';
+		//crop_position = 0;
+		switch (crop_position)
+		{
+		case 1: //left-up
+			h_off = 0;
+			w_off = 0;
+			break;
+		case 2: //right-up
+			h_off = 0;
+			w_off = input_width - crop_size;
+			break;
+		case 3: //left-down
+			h_off = input_height - crop_size;
+			w_off = 0;
+			break;
+		case 4: //right-down
+			h_off = input_height - crop_size;
+			w_off = input_width - crop_size;
+			break;
+		case 0: // crop on center
+		default:
+			h_off = (input_height - crop_size) / 2;
+			w_off = (input_width - crop_size) / 2;
+			break;
+		}
     }
   } else {
     CHECK_EQ(input_height, height);

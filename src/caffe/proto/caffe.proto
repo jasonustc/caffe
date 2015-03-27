@@ -260,7 +260,7 @@ message ParamSpec {
 // NOTE
 // Update the next available ID when you add a new LayerParameter field.
 //
-// LayerParameter next available layer-specific ID: 137 (last added:FramesRoll)
+// LayerParameter next available layer-specific ID: 138 (last added: Pairwise_Ranking_Hinge_Loss)
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -324,6 +324,7 @@ message LayerParameter {
   optional LRNParameter lrn_param = 118;
   optional MemoryDataParameter memory_data_param = 119;
   optional MVNParameter mvn_param = 120;
+  optional PairwiseRankingHingeLossParameter pairwise_ranking_hinge_loss_param=137;
   optional PoolingParameter pooling_param = 121;
   optional PowerParameter power_param = 122;
   optional PReLUParameter prelu_param = 131;
@@ -351,6 +352,8 @@ message TransformationParameter {
   optional bool mirror = 2 [default = false];
   // Specify if we would like to randomly crop an image.
   optional uint32 crop_size = 3 [default = 0];
+  //added by qing li, only useful for feature extraction, 0=center, 1=left-up, 2=right-up, 3=left-down, 4=right-down
+  optional uint32 crop_position = 6 [default = 0];
   // mean_file and mean_value cannot be specified at the same time
   optional string mean_file = 4;
   // if specified can be repeated once (would substract it from all the channels)
@@ -654,6 +657,12 @@ message MVNParameter {
 
   // This parameter can be set to true to perform DNN-like MVN
   optional bool across_channels = 2 [default = false];
+}
+
+// Message that stores parameters used by PairwiseRankingHingeLossLayer
+message PairwiseRankingHingeLossParameter {
+  //margin for dissimilar pair
+  optional float margin = 1 [default = 1.0];
 }
 
 // Message that stores parameters used by PoolingLayer
