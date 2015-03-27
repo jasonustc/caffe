@@ -307,6 +307,50 @@ class RNNLayer : public RecurrentLayer<Dtype> {
   virtual void OutputBlobNames(vector<string>* names) const;
 };
 
+/**
+* @brief Added by qing li, Like reshape_layer, unroll video to frames, and generate continuing indicators used by recurrent layers
+*/
+template <typename Dtype>
+class VideoUnrollLayer : public Layer<Dtype> {
+public:
+	explicit VideoUnrollLayer(const LayerParameter& param)
+		: Layer<Dtype>(param){}
+	virtual void Reshape(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+	
+	virtual inline const char* type() const { return "VideoUnroll"; }
+	virtual inline int ExactNumBottomBlobs() const { return 1; }
+	virtual inline int ExactNumTopBlobs() const { return 2; }
+
+protected:
+	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top){}
+	virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top){}
+	virtual void Backward_cpu(const vector<Blob<Dtype>*>& top, const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom){}
+	virtual void Backward_gpu(const vector<Blob<Dtype>*>&  top, const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom){}
+
+};
+
+/**
+* @brief Added by qing li, Like reshape_layer, roll frames to video, and generate continuing indicators used by recurrent layers
+*/
+template <typename Dtype>
+class FramesRollLayer : public Layer<Dtype> {
+public:
+	explicit FramesRollLayer(const LayerParameter& param)
+		: Layer<Dtype>(param){}
+	virtual void Reshape(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+
+	virtual inline const char* type() const { return "FramesRoll"; }
+	virtual inline int ExactNumBottomBlobs() const { return 1; }
+	virtual inline int ExactNumTopBlobs() const { return 2; }
+
+protected:
+	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top){}
+	virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top){}
+	virtual void Backward_cpu(const vector<Blob<Dtype>*>& top, const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom){}
+	virtual void Backward_gpu(const vector<Blob<Dtype>*>&  top, const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom){}
+
+};
+
 }  // namespace caffe
 
 #endif  // CAFFE_SEQUENCE_LAYERS_HPP_

@@ -238,6 +238,12 @@
     <ClCompile Include="..\src\caffe\layers\rnn_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\video_unroll_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\frames_roll_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
@@ -448,6 +454,9 @@
     </ClInclude>
     <ClInclude Include="..\src\caffe\proto\caffe.pb.h">
       <Filter>src\proto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\caffe\sequence_layers.hpp">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
