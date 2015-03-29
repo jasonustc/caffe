@@ -51,7 +51,16 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
   const bool has_uint8 = data.size() > 0;
   const bool has_mean_values = mean_values_.size() > 0;
 
-  CHECK_GT(datum_channels, 0);
+  //added by qing li
+  const int crop_by_time_length = param_.crop_by_time_length();
+  bool do_mirror_by_time = param_.mirror_by_time()&&Rand(2);
+  if (phase_ == TEST)
+	  do_mirror_by_time = param_.mirror_by_time();
+  const int time_unit = param_.time_unit();
+  
+
+  //CHECK_GT(datum_channels, 0);
+  CHECK_GE(datum_channels, crop_by_time_length*time_unit);
   CHECK_GE(datum_height, crop_size);
   CHECK_GE(datum_width, crop_size);
 
@@ -73,21 +82,27 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
     }
   }
 
+  // modified by qing li
   int height = datum_height;
   int width = datum_width;
-
   int h_off = 0;
   int w_off = 0;
   if (crop_size) {
     height = crop_size;
     width = crop_size;
+	if (param_.has_crop_position() == false)
+	{
+		DLOG(INFO) << "random crop on spatial.";
+	    h_off = Rand(datum_height - crop_size + 1);
+        w_off = Rand(datum_width - crop_size + 1);
+	}
     // We only do random crop when we do training.
-    if (phase_ == TRAIN) {
-      h_off = Rand(datum_height - crop_size + 1);
-      w_off = Rand(datum_width - crop_size + 1);
-    } else {
-		
-	// modified by qing li
+    //if (phase_ == TRAIN) {
+    //  h_off = Rand(datum_height - crop_size + 1);
+    //  w_off = Rand(datum_width - crop_size + 1);
+    //} 
+	else {
+		DLOG(INFO) << "fixed crop on spatial.";
 		int crop_position = param_.crop_position();
 		//LOG(INFO) << "crop_position:" << crop_position << '\n';
 		//crop_position = 0;
@@ -110,25 +125,67 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
 			w_off = datum_width - crop_size;
 			break;
 		case 0: // crop on center
-		default:
 			h_off = (datum_height - crop_size) / 2;
 			w_off = (datum_width - crop_size) / 2;
 			break;
+		default:
+			break;
 		}
-     
     }
   }
 
+  //added by qing li, crop on timeline
+  /*CHECK((datum_channels%time_unit) == 0)
+	  << "datum_channels is not divisible by time_unit";*/
+  int time_length = datum_channels/time_unit;
+  int t_off = 0;
+  if (crop_by_time_length) {
+	  time_length = crop_by_time_length;
+	if (param_.has_crop_by_time_position() == false)
+	{
+		DLOG(INFO) << "random crop on time.";
+		t_off = Rand(datum_channels / time_unit - crop_by_time_length + 1);
+	}
+	else {
+		DLOG(INFO) << "fixed crop on time.";
+		int crop_by_time_position= param_.crop_by_time_position();
+		switch (crop_by_time_position)
+		{
+		case 0: // crop on center
+			t_off = (datum_channels / time_unit - crop_by_time_length) / 2;
+			break;
+		case 1: //begin
+			t_off = 0;
+			break;
+		case -1: //end
+			t_off = datum_channels / time_unit - crop_by_time_length;
+			break;
+		default:
+			break;
+		}
+    }
+  }
+
+  //modified by qing li
   Dtype datum_element;
   int top_index, data_index;
-  for (int c = 0; c < datum_channels; ++c) {
+  int ch_begin = t_off*time_unit;
+  int ch_end = (t_off +time_length)*time_unit;
+  for (int c = ch_begin; c < ch_end; ++c) {
+	  int top_t =(c-ch_begin)/time_unit;
+	  int ch_offset = (c - ch_begin) % time_unit;
+	  if (do_mirror_by_time)
+	  {
+		  top_t = crop_by_time_length - 1 - top_t;
+	  }
+	  int top_c = top_t*time_unit + ch_offset;
     for (int h = 0; h < height; ++h) {
       for (int w = 0; w < width; ++w) {
         data_index = (c * datum_height + h_off + h) * datum_width + w_off + w;
         if (do_mirror) {
-          top_index = (c * height + h) * width + (width - 1 - w);
+          top_index = (top_c * height + h) * width + (width - 1 - w);
         } else {
-          top_index = (c * height + h) * width + w;
+          top_index = (top_c * height + h) * width + w;
         }
         if (has_uint8) {
           datum_element =
@@ -164,7 +221,9 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
   const int width = transformed_blob->width();
   const int num = transformed_blob->num();
 
-  CHECK_EQ(channels, datum_channels);
+  //modified by qing li, to support cropping on timeline
+  //CHECK_EQ(channels, datum_channels);
+  CHECK_GE(datum_channels, channels);
   CHECK_LE(height, datum_height);
   CHECK_LE(width, datum_width);
   CHECK_GE(num, 1);

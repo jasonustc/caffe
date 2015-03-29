@@ -9,7 +9,7 @@ namespace caffe {
 template <typename Dtype>
 void FramesRollLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
-	CHECK((bottom.size() == 2) && (this->layer_param_.frames_roll_param().frames_per_video() > 0)) 
+	CHECK(!((bottom.size() == 2) && (this->layer_param_.frames_roll_param().frames_per_video() > 0))) 
 		<< "Cannot simultaneously input frames per video and set the frames per video param ";
 	int frames_per_video = this->layer_param_.frames_roll_param().frames_per_video();
 	if (bottom.size() == 2)

@@ -72,6 +72,7 @@ void convert_dataset(const char* video2feature_list_filename, const char* video_
 	char key[kMaxKeyLength];
 	std::string out;
 
+	int count = 0;
 	for (int videoid = 0; videoid < num_videos; ++videoid) {
 		Datum merge_datum;
 		vector<string> feature_list1 = video2feature_list[video_list[videoid]];
@@ -93,16 +94,23 @@ void convert_dataset(const char* video2feature_list_filename, const char* video_
 		merge_datum.SerializeToString(&out);
 		int length = sprintf_s(key, kMaxKeyLength, "%08d", videoid);
 		batch->Put(string(key, length), out);
-		if (videoid% 100 == 0)
+		if ((++count)% 100 == 0)
 		{
-			LOG(INFO) << "videoid:" << videoid;
+			LOG(INFO) << "proccessd:" <<count;
 			db->Write(leveldb::WriteOptions(), batch);
 			delete batch;
 			batch = new leveldb::WriteBatch();
 		}
 	}
 
-	delete batch;
+	//write the last batch
+	if (count % 100 != 0)
+	{
+		LOG(INFO) << "proccessd:" <<count;
+		db->Write(leveldb::WriteOptions(), batch);
+		delete batch;
+	}
+
 	delete db;
 }
 
