@@ -64,7 +64,7 @@ class RecurrentLayer : public Layer<Dtype> {
   virtual void RecurrentOutputBlobNames(vector<string>* names) const = 0;
 
   /**
-   * @brief Fills names with the names of the output blobs, concatenated across
+   * @brief Fills names with the names of the output blobs, AxisPoolingenated across
    *        all timesteps.  Should return a name for each top Blob.
    *        Subclasses should define this -- see RNNLayer and LSTMLayer for
    *        examples.
@@ -101,7 +101,7 @@ class RecurrentLayer : public Layer<Dtype> {
    *      independent streams, its dimensions may be arbitrary.
    *      This is mathematically equivalent to using a time-varying input of
    *      @f$ x'_t = [x_t; x_{static}] @f$ -- i.e., tiling the static input
-   *      across the @f$ T @f$ timesteps and concatenating with the time-varying
+   *      across the @f$ T @f$ timesteps and AxisPoolingenating with the time-varying
    *      input.  Note that if this input is used, all timesteps in a single
    *      batch within a particular one of the @f$ N @f$ streams must share the
    *      same static input, even if the sequence continuation indicators
@@ -319,7 +319,8 @@ public:
 	
 	virtual inline const char* type() const { return "VideoUnroll"; }
 	virtual inline int ExactNumBottomBlobs() const { return 1; }
-	virtual inline int ExactNumTopBlobs() const { return 2; }
+	virtual inline int MinNumTopBlobs() const { return 2; }
+    virtual inline int MaxBottomBlobs() const { return 3; }
 
 protected:
 	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top){}
@@ -340,8 +341,9 @@ public:
 	virtual void Reshape(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
 
 	virtual inline const char* type() const { return "FramesRoll"; }
-	virtual inline int ExactNumBottomBlobs() const { return 1; }
-	virtual inline int ExactNumTopBlobs() const { return 2; }
+	virtual inline int MinNumBottomBlobs() const { return 1; }
+	virtual inline int MaxNumBottomBlobs() const { return 2; }
+	virtual inline int ExactNumTopBlobs() const { return 1; }
 
 protected:
 	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top){}
@@ -350,6 +352,81 @@ protected:
 	virtual void Backward_gpu(const vector<Blob<Dtype>*>&  top, const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom){}
 
 };
+
+/**
+* @brief Takes one blob, pool it on certain axis
+*/
+template <typename Dtype>
+class AxisPoolingLayer : public Layer<Dtype> {
+public:
+	explicit AxisPoolingLayer(const LayerParameter& param)
+		: Layer<Dtype>(param) {}
+	virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+	virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+
+	virtual inline const char* type() const { return "AxisPooling"; }
+	virtual inline int ExactNumBottomBlobs() const { return 1; }
+	virtual inline int ExactNumTopBlobs() const { return 1; }
+
+protected:
+	/**
+	* @param bottom input Blob vector (length 1)
+	* @param top output Blob vector (length 1)
+	*/
+	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+	virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+
+	virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+		const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+	virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+		const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+
+	int pool_axis_;
+	int num_pools_;
+	int pool_input_size_;
+};
+//
+///**
+// * @brief fuse different streams as input to recurrent layer
+//*/
+//template<typename Dtype>
+//class StreamFuseLayer:public Layer<Dtype>
+//{
+//public:
+//	explicit StreamFuseLayer(const LayerParameter& param)
+//		:public Layer<Dtype>(param){}
+//	virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+//	virtual void Reshape(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+//
+//	virtual inline const char* type() const { return "StreamFuse"; }
+//	virtual inline int MinBottomBlobs() const { return 2; }
+//	virtual inline int ExactBottomBlobs() const { return 1; }
+//
+//
+//
+//protected:
+//	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+//	virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+//
+//	virtual void Backward_cpu(const vector<Blob<Dtype>*>& top, const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+//	virtual void Backward_gpu(const vector<Blob<Dtype>*>& top, const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+//
+//};
+//
+//StreamFuseLayer:public Layer<Dtype>::StreamFuseLayer:public Layer<Dtype>()
+//{
+//}
+//
+//StreamFuseLayer:public Layer<Dtype>::~StreamFuseLayer:public Layer<Dtype>()
+//{
+//}
+//
+
+
 
 }  // namespace caffe
 

@@ -5,6 +5,7 @@
 #include "glog/logging.h"
 #include "google/protobuf/text_format.h"
 #include "leveldb/db.h"
+#include "leveldb/write_batch.h"
 #include "stdint.h"
 #include "caffe/util/io.hpp"
 #include "caffe/proto/caffe.pb.h"
@@ -14,23 +15,6 @@ using namespace std;
 using namespace caffe;
 
 
-void read_feature(std::pair<int, int> feature_pair, std::vector<std::string> video2img_list, int dim, caffe::Datum& datum) {
-	
-  std::ifstream feature1(video2img_list[feature_pair.first], std::ios::in);
-  std::ifstream feature2(video2img_list[feature_pair.second], std::ios::in);
-  float value;
-  for(int i=0;i<dim;i++)
-  {
-    feature1>>value;
-	datum.add_float_data(value);
-  }
-
-  for(int i=dim;i<2*dim;i++)
-  {
-    feature2>>value;
-	datum.add_float_data(value);
-  }
-}
 
 void convert_dataset(const char* video2img_list_filename, const char* pair_list_filename,
         const char* db_filename, int resize_width, int resize_height, int shuffle) {
@@ -79,15 +63,20 @@ void convert_dataset(const char* video2img_list_filename, const char* pair_list_
   leveldb::Options options;
   options.create_if_missing = true;
   options.error_if_exists = true;
+  options.write_buffer_size = 256 * 1024 * 1024;
+  options.max_open_files = 2000;
   leveldb::Status status = leveldb::DB::Open(
       options, db_filename, &db);
   CHECK(status.ok()) << "Failed to open leveldb " << db_filename
       << ". Is it already existing?";
 
 
+  leveldb::WriteBatch* batch = new leveldb::WriteBatch();
   const int kMaxKeyLength = 256;
   char key[kMaxKeyLength];
   std::string value;
+
+  int count = 0;
 
   for (int pairid = 0; pairid < num_pairs; ++pairid) {
 	  Datum merge_datum;
@@ -128,11 +117,23 @@ void convert_dataset(const char* video2img_list_filename, const char* pair_list_
 	  merge_datum.set_data(buffer);
 	  merge_datum.SerializeToString(&value);
 	  int length = sprintf_s(key, kMaxKeyLength, "%08d", pairid);
-	  db->Put(leveldb::WriteOptions(), string(key, length), value);
-	  if (pairid % 100==0)
-		  LOG(INFO) << "pairid:" << pairid;
+		batch->Put(string(key, length), value);
+		if ((++count)% 100 == 0)
+		{
+			LOG(INFO) << "proccessd:" <<count;
+			db->Write(leveldb::WriteOptions(), batch);
+			delete batch;
+			batch = new leveldb::WriteBatch();
+		}
   }
     
+	//write the last batch
+	if (count % 100 != 0)
+	{
+		LOG(INFO) << "proccessd:" <<count;
+		db->Write(leveldb::WriteOptions(), batch);
+		delete batch;
+	}
   delete db;
 }
 

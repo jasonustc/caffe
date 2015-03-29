@@ -219,7 +219,6 @@
     <ClCompile Include="..\src\caffe\proto\caffe.pb.cc">
       <Filter>src\proto</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\caffe.cpp" />
     <ClCompile Include="..\src\caffe\layers\embed_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
@@ -253,6 +252,10 @@
     <ClCompile Include="..\src\caffe\layers\prelu_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\axis_pooling_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tools\caffe.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
@@ -376,6 +379,9 @@
       <Filter>src\layers</Filter>
     </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\prelu_layer.cu">
+      <Filter>src\layers</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\src\caffe\layers\axis_pooling_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
   </ItemGroup>

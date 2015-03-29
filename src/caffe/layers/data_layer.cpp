@@ -48,22 +48,45 @@ void DataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
     LOG(INFO) << "Decoding Datum";
   }
   // image
+  // modified by qing li to support inputing a video and make transformation on video level
   int crop_size = this->layer_param_.transform_param().crop_size();
-  if (crop_size > 0) {
-    top[0]->Reshape(this->layer_param_.data_param().batch_size(),
-        datum.channels(), crop_size, crop_size);
-    this->prefetch_data_.Reshape(this->layer_param_.data_param().batch_size(),
-        datum.channels(), crop_size, crop_size);
-    this->transformed_data_.Reshape(1, datum.channels(), crop_size, crop_size);
-  } else {
-    top[0]->Reshape(
-        this->layer_param_.data_param().batch_size(), datum.channels(),
-        datum.height(), datum.width());
-    this->prefetch_data_.Reshape(this->layer_param_.data_param().batch_size(),
-        datum.channels(), datum.height(), datum.width());
-    this->transformed_data_.Reshape(1, datum.channels(),
-      datum.height(), datum.width());
+  int crop_by_time_length = this->layer_param_.transform_param().crop_by_time_length();
+  int real_height=datum.height();
+  int real_width = datum.width();
+  int real_channels=datum.channels();
+  if (crop_size > 0)
+  {
+	  real_height = real_width = crop_size;
   }
+  if (crop_by_time_length > 0)
+  {
+	  int time_unit = this->layer_param_.transform_param().time_unit();
+	  CHECK((datum.channels()%time_unit) == 0)
+		  << "datum_channels is not divisible by time_unit";
+	  real_channels = crop_by_time_length*time_unit;
+  }
+  top[0]->Reshape(this->layer_param_.data_param().batch_size(),
+	  real_channels, real_height, real_width);
+  this->prefetch_data_.Reshape(this->layer_param_.data_param().batch_size(),
+	  real_channels, real_height, real_width);
+  this->transformed_data_.Reshape(1, real_channels, real_height, real_width); 
+	  
+  //int crop_size = this->layer_param_.transform_param().crop_size();
+  //if (crop_size > 0) {
+  //  top[0]->Reshape(this->layer_param_.data_param().batch_size(),
+  //      datum.channels(), crop_size, crop_size);
+  //  this->prefetch_data_.Reshape(this->layer_param_.data_param().batch_size(),
+  //      datum.channels(), crop_size, crop_size);
+  //  this->transformed_data_.Reshape(1, datum.channels(), crop_size, crop_size);
+  //} else {
+  //  top[0]->Reshape(
+  //      this->layer_param_.data_param().batch_size(), datum.channels(),
+  //      datum.height(), datum.width());
+  //  this->prefetch_data_.Reshape(this->layer_param_.data_param().batch_size(),
+  //      datum.channels(), datum.height(), datum.width());
+  //  this->transformed_data_.Reshape(1, datum.channels(),
+  //    datum.height(), datum.width());
+  //}
   LOG(INFO) << "output data size: " << top[0]->num() << ","
       << top[0]->channels() << "," << top[0]->height() << ","
       << top[0]->width();
@@ -89,8 +112,9 @@ void DataLayer<Dtype>::InternalThreadEntry() {
   // Reshape on single input batches for inputs of varying dimension.
   const int batch_size = this->layer_param_.data_param().batch_size();
   const int crop_size = this->layer_param_.transform_param().crop_size();
+  const int crop_by_time_length = this->layer_param_.transform_param().crop_by_time_length();// added by qing li
   bool force_color = this->layer_param_.data_param().force_encoded_color();
-  if (batch_size == 1 && crop_size == 0) {
+  if (batch_size == 1 && crop_size == 0 && crop_by_time_length==0) {
     Datum datum;
     datum.ParseFromString(cursor_->value());
     if (datum.encoded()) {

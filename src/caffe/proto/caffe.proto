@@ -260,7 +260,7 @@ message ParamSpec {
 // NOTE
 // Update the next available ID when you add a new LayerParameter field.
 //
-// LayerParameter next available layer-specific ID: 138 (last added: Pairwise_Ranking_Hinge_Loss)
+// LayerParameter next available layer-specific ID: 139 (last added: axis_pooling)
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -305,6 +305,7 @@ message LayerParameter {
   // The default for the engine is set by the ENGINE switch at compile-time.
   optional AccuracyParameter accuracy_param = 102;
   optional ArgMaxParameter argmax_param = 103;
+  optional AxisPoolingParameter axis_pooling_param=138;
   optional ConcatParameter concat_param = 104;
   optional ContrastiveLossParameter contrastive_loss_param = 105;
   optional ConvolutionParameter convolution_param = 106;
@@ -352,8 +353,19 @@ message TransformationParameter {
   optional bool mirror = 2 [default = false];
   // Specify if we would like to randomly crop an image.
   optional uint32 crop_size = 3 [default = 0];
-  //added by qing li, only useful for feature extraction, 0=center, 1=left-up, 2=right-up, 3=left-down, 4=right-down
-  optional uint32 crop_position = 6 [default = 0];
+  //added by qing li, no=random, 0=center, 1=left-up, 2=right-up, 3=left-down, 4=right-down
+  optional uint32 crop_position = 6;
+
+  //added by qing li, used by crop on timeline, time in channel
+  optional uint32 crop_by_time_length = 7 [default = 0];
+  // no=random, 0=center, 1=begin, -1=end
+  optional int32 crop_by_time_position =8 ;
+  //added by qing li, used by mirror on timeline
+  optional bool mirror_by_time = 9 [default = false];
+  //denote how many form a unit when crop and mirror on timeline
+  optional uint32 time_unit = 10 [default = 3];
+
+
   // mean_file and mean_value cannot be specified at the same time
   optional string mean_file = 4;
   // if specified can be repeated once (would substract it from all the channels)
@@ -400,6 +412,13 @@ message ArgMaxParameter {
   // If true produce pairs (argmax, maxval)
   optional bool out_max_val = 1 [default = false];
   optional uint32 top_k = 2 [default = 1];
+}
+
+message AxisPoolingParameter {
+  // The axis along which to pooling-- may be negative to index from the
+  // end (e.g., -1 for the last axis).  
+  // By default, AxisPoolingLayer pool blob along the "channels" axis (1).
+    optional int32 axis=1 [default = 1];
 }
 
 // Message that stores parameters used by ConcatLayer
