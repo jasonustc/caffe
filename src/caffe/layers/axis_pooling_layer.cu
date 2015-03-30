@@ -13,18 +13,18 @@ namespace caffe {
 		const Dtype* bottom_data = bottom[0]->gpu_data();
 
 		const int bottom_pool_axis = bottom[0]->shape(pool_axis_);
-		caffe_set(top[0]->count(), Dtype(0), top_data);
+		caffe_gpu_set(top[0]->count(), Dtype(0), top_data);
 		for (int n = 0; n <num_pools_; ++n) {
 			for (int i = 0; i < bottom_pool_axis; i++)
 			{
-				caffe_add(pool_input_size_,
+				caffe_gpu_add(pool_input_size_,
 					bottom_data + n * bottom_pool_axis * pool_input_size_ + i*pool_input_size_,
 					top_data + n*pool_input_size_,
 					top_data + n*pool_input_size_
 					);
 			}
 		}
-		caffe_scal(top[0]->count(), Dtype(1) / bottom_pool_axis, top_data);
+		caffe_gpu_scal(top[0]->count(), Dtype(1) / bottom_pool_axis, top_data);
 	}
 
 	template <typename Dtype>
