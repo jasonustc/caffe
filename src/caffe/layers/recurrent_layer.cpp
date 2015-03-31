@@ -207,14 +207,6 @@ void RecurrentLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   unrolled_net_->ForwardPrefilled();
 	const Dtype* top_data = top[0]->cpu_data();
 	const Dtype* bottom_data =bottom[0]->cpu_data();
-	for (int i = 0; i < 10; i++)
-	{
-		LOG(INFO) << top_data[i];
-	}
-	for (int i = 0; i < 10; i++)
-	{
-		LOG(INFO) <<bottom_data[i];
-	}
 }
 
 template <typename Dtype>

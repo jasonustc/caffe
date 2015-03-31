@@ -139,7 +139,7 @@ void RCSLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const
 
 
 	//network scaffolding
-	for (int c = 1; c <= this->C_; c++)
+	for (int c = 0; c < this->C_; c++)
 	{
 		string cs = this->int_to_str(c);
 
