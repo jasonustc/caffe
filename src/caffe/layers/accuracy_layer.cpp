@@ -62,8 +62,8 @@ void AccuracyLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       if (has_ignore_label_ && label_value == ignore_label_) {
         continue;
       }
-      DCHECK_GE(label_value, 0);
-      DCHECK_LT(label_value, num_labels);
+      CHECK_GE(label_value, 0);
+      CHECK_LT(label_value, num_labels);
       // Top-k accuracy
       std::vector<std::pair<Dtype, int> > bottom_data_vector;
       for (int k = 0; k < num_labels; ++k) {

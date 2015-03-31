@@ -260,7 +260,8 @@ message ParamSpec {
 // NOTE
 // Update the next available ID when you add a new LayerParameter field.
 //
-// LayerParameter next available layer-specific ID: 139 (last added: axis_pooling)
+// LayerParameter next available layer-specific ID: 142 (last added:
+// ConstrainIP)
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -309,6 +310,7 @@ message LayerParameter {
   optional ConcatParameter concat_param = 104;
   optional ContrastiveLossParameter contrastive_loss_param = 105;
   optional ConvolutionParameter convolution_param = 106;
+  optional ConstrainIPParameter constrain_ip_param = 141;
   optional DataParameter data_param = 107;
   optional DropoutParameter dropout_param = 108;
   optional DummyDataParameter dummy_data_param = 109;
@@ -336,6 +338,8 @@ message LayerParameter {
   optional SigmoidParameter sigmoid_param = 124;
   optional SoftmaxParameter softmax_param = 125;
   optional SliceParameter slice_param = 126;
+  optional SortParameter sort_param = 140;
+  optional SSDParameter ssd_param = 139;
   optional TanHParameter tanh_param = 127;
   optional ThresholdParameter threshold_param = 128;
   optional VideoUnrollParameter video_unroll_param=135;
@@ -431,6 +435,23 @@ message ConcatParameter {
 
   // DEPRECATED: alias for "axis" -- does not support negative indexing.
   optional uint32 concat_dim = 1 [default = 1];
+}
+
+// Message that stores parameters used by ConstrainIPLayer
+message ConstrainIPParameter{
+  optional uint32 num_output = 1; // The number of outputs for the layer
+  optional bool bias_term = 2 [default = true]; // whether to have bias terms
+  optional FillerParameter weight_filler = 3; // The filler for the weight
+  optional FillerParameter bias_filler = 4; // The filler for the bias
+
+  // The first axis to be lumped into a single inner product computation;
+  // all preceding axes are retained in the output.
+  // May be negative to index from the end (e.g., -1 for the last axis).
+  optional int32 axis = 5 [default = 1];
+
+  // weights of constraint into loss
+  optional float sum1_rate = 6 [default = 0];
+  optional float monotonic_rate = 7 [default = 0];
 }
 
 // Message that stores parameters used by ContrastiveLossLayer
@@ -799,6 +820,26 @@ message SoftmaxParameter {
   // from the end (e.g., -1 for the last axis).
   // Any other axes will be evaluated as independent softmaxes.
   optional int32 axis = 2 [default = 1];
+}
+
+// Message that stores parameters used by SortLayer
+message SortParameter {
+  // The first axis to be lumped into a single sort computation;
+  // all preceding axes are retained in the output.
+  // May be negative to index from the end (e.g., -1 for the last axis).
+  optional int32 axis = 1 [default = 1];
+}
+
+// Message that stores parameters used by SSDLayer
+message SSDParameter {
+  //which axis is category axis, used when slice along which axis
+  optional int32 cate_axis = 1 [default = 1];
+
+  optional FillerParameter weight_filler = 2; // The filler for the weight
+  optional FillerParameter bias_filler = 3; // The filler for the bias
+
+  // Whether to enable displaying debug_info in the unrolled SSD net.
+  optional bool debug_info = 4 [default = false];
 }
 
 // Message that stores parameters used by TanHLayer

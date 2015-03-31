@@ -31,6 +31,7 @@
     <ClCompile Include="..\src\caffe\layers\base_data_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\bnll_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\concat_layer.cpp" />
+    <ClCompile Include="..\src\caffe\layers\constrain_ip_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\contrastive_loss_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\conv_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\cudnn_conv_layer.cpp" />
@@ -79,7 +80,9 @@
     <ClCompile Include="..\src\caffe\layers\slice_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\softmax_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\softmax_loss_layer.cpp" />
+    <ClCompile Include="..\src\caffe\layers\sort_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\split_layer.cpp" />
+    <ClCompile Include="..\src\caffe\layers\ssd_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\tanh_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\threshold_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\video_unroll_layer.cpp" />
@@ -104,6 +107,7 @@
     <CudaCompile Include="..\src\caffe\layers\base_data_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\bnll_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\concat_layer.cu" />
+    <CudaCompile Include="..\src\caffe\layers\constrain_ip_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\contrastive_loss_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\conv_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\cudnn_conv_layer.cu" />
@@ -137,6 +141,7 @@
     <CudaCompile Include="..\src\caffe\layers\softmax_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\softmax_loss_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\split_layer.cu" />
+    <CudaCompile Include="..\src\caffe\layers\ssd_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\tanh_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\threshold_layer.cu" />
     <CudaCompile Include="..\src\caffe\util\im2col.cu" />
@@ -171,6 +176,7 @@
     <ClInclude Include="..\include\caffe\util\mkl_alternate.hpp" />
     <ClInclude Include="..\include\caffe\util\rng.hpp" />
     <ClInclude Include="..\include\caffe\util\upgrade_proto.hpp" />
+    <ClInclude Include="..\include\caffe\video_layers.hpp" />
     <ClInclude Include="..\include\caffe\vision_layers.hpp" />
     <ClInclude Include="..\src\caffe\proto\caffe.pb.h" />
   </ItemGroup>

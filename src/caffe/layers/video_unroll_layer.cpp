@@ -1,7 +1,7 @@
 #include <vector>
 
 #include "caffe/blob.hpp"
-#include "caffe/sequence_layers.hpp"
+#include "caffe/video_layers.hpp"
 #include "caffe/layer.hpp"
 
 namespace caffe {
