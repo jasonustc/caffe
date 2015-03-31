@@ -4,7 +4,11 @@
     <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>train -solver "D:\Desktop\DeepLearnignLibrary\caffe\examples\action_recognition_ucf101\0_test_end2end_frame\lrcn_solver.prototxt"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>train -solver D:\Users\v-liqing\caffe\example\action_recognition_ucf101\end2end_frame\lrcn_solver.prototxt</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommandArguments>train -solver D:\Users\v-liqing\caffe\example\action_recognition_ucf101\end2end_frame\lrcn_solver.prototxt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>
