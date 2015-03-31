@@ -260,8 +260,8 @@ message ParamSpec {
 // NOTE
 // Update the next available ID when you add a new LayerParameter field.
 //
-// LayerParameter next available layer-specific ID: 142 (last added:
-// ConstrainIP)
+// LayerParameter next available layer-specific ID: 144 (last added:
+// RCS)
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -328,10 +328,12 @@ message LayerParameter {
   optional MemoryDataParameter memory_data_param = 119;
   optional MVNParameter mvn_param = 120;
   optional PairwiseRankingHingeLossParameter pairwise_ranking_hinge_loss_param=137;
+  optional PartSortParameter part_sort_param = 142;
   optional PoolingParameter pooling_param = 121;
   optional PowerParameter power_param = 122;
   optional PReLUParameter prelu_param = 131;
   optional PythonParameter python_param = 130;
+  optional RCSParameter rcs_param = 144;
   optional RecurrentParameter recurrent_param = 134;
   optional ReLUParameter relu_param = 123;
   optional ReshapeParameter reshape_param = 133;
@@ -705,6 +707,13 @@ message PairwiseRankingHingeLossParameter {
   optional float margin = 1 [default = 1.0];
 }
 
+message PartSortParameter {
+  // The first axis to be lumped into a single sort computation;
+  // all preceding axes are retained in the output.
+  // May be negative to index from the end (e.g., -1 for the last axis).
+  optional int32 axis =1 [default = 1];
+  optional uint32 first_element = 2;
+}
 // Message that stores parameters used by PoolingLayer
 message PoolingParameter {
   enum PoolMethod {
@@ -747,6 +756,18 @@ message PowerParameter {
 message PythonParameter {
   optional string module = 1;
   optional string layer = 2;
+}
+
+// Message that stores parameters used by RCSLayer
+message RCSParameter {
+  //which axis is category axis, used when slice along which axis
+  optional int32 cate_axis = 1 [default = 1];
+
+  optional FillerParameter weight_filler = 2; // The filler for the weight
+  optional FillerParameter bias_filler = 3; // The filler for the bias
+
+  // Whether to enable displaying debug_info in the unrolled SSD net.
+  optional bool debug_info = 4 [default = false];
 }
 
 // Message that stores parameters used by ReshapeLayer
@@ -840,6 +861,10 @@ message SSDParameter {
 
   // Whether to enable displaying debug_info in the unrolled SSD net.
   optional bool debug_info = 4 [default = false];
+
+  //constrain ip layer parameter
+  optional float constrain_ip_sum1_rate = 5 [default = 0.0];
+  optional float constrain_ip_monotonic_rate = 6 [default = 0.0];
 }
 
 // Message that stores parameters used by TanHLayer

@@ -120,7 +120,7 @@ namespace caffe {
 	};
 	
 	/**
-	* @brief Takes one blob, pool it on certain axis
+	* @brief Takes one blob, sort it on certain axis
 	*/
 	template <typename Dtype>
 	class SortLayer: public Layer<Dtype> {
@@ -214,6 +214,8 @@ namespace caffe {
 		*/
 		int C_;
 		int cate_axis_;
+		Dtype constrain_ip_sum1_rate_;
+		Dtype constrain_ip_monotonic_rate_;
 
 		Blob<Dtype>* x_input_blob_;
 		Blob<Dtype>* x_output_blob_;
@@ -221,10 +223,105 @@ namespace caffe {
 	};
 
 
+	/**
+	* @brief Takes one blob, partially sort it on certain axis
+	*/
+	template <typename Dtype>
+	class PartSortLayer: public Layer<Dtype> {
+	public:
+		explicit PartSortLayer(const LayerParameter& param)
+			: Layer<Dtype>(param) {}
+		virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+		virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+
+		virtual inline const char* type() const { return "PartSort"; }
+		virtual inline int ExactNumBottomBlobs() const { return 1; }
+		virtual inline int ExactNumTopBlobs() const { return 1; }
+
+	protected:
+		/**
+		* @param bottom input Blob vector (length 1)
+		* @param top output Blob vector (length 1)
+		*/
+		virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+		/*virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);*/
+
+		virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+			const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+		/*virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+			const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);*/
+
+		int part_sort_axis_;
+		int first_element_;
+		// back_lookup_[n][i] = the index in the bottom blob of the i_th element of the n_th sample in top blob 
+		vector<vector<int>> back_lookup_;
+	};
+
+	/**
+	* @brief SSD layer = Slice + PartSort + ConstrainIP
+	*
+	* References
+	* [1] Hoai, Minh, and Andrew Zisserman. "Improving human action recognition using score distribution and ranking."
+	*     Proceedings of the Asian Conference on Computer Vision. 2014.
+	*/
+	template <typename Dtype>
+	class RCSLayer : public Layer<Dtype>
+	{
+	public:
+		explicit RCSLayer(const LayerParameter& param)
+			: Layer<Dtype>(param){}
+		virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+		virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+
+		virtual inline const char* type() const { return "RCS"; }
+		virtual inline int ExactNumBottomBlobs() const { return 1; }
+		virtual inline int ExactNumTopBlobs() const { return 1; }
+
+	protected:
+		/**
+		* @brief Fills net_param with the RCS network arcthiecture.
+		*/
+		virtual void FillUnrolledNet(NetParameter* net_param) const;
+
+		/**
+		* TODO: explain the forward pass more carefully
+		*/
+		virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+		virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+		virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+			const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+		virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+			const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+
+		/// @brief A helper function, useful for stringifying category indices.
+		virtual string int_to_str(const int t) const;
+
+		/// @brief A Net to implement the RCS functionality.
+		shared_ptr<Net<Dtype> > unrolled_net_;
+
+
+		/**
+		* @brief The number of categorys in the layer's input
+		*/
+		int C_;
+		int cate_axis_;
+
+		Blob<Dtype>* x_input_blob_;
+		Blob<Dtype>* x_output_blob_;
+
+	};
 
 
 	/**
-	* @brief Added by qing li, Like reshape_layer, unroll video to frames, and generate continuing indicators used by SSD layers
+	* @brief Added by qing li, Like reshape_layer, unroll video to frames, and generate continuing indicators used by RCS layers
 	*/
 	template <typename Dtype>
 	class VideoUnrollLayer : public Layer<Dtype> {

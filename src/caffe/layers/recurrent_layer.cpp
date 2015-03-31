@@ -162,8 +162,11 @@ void RecurrentLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   CHECK_EQ(top.size(), output_blobs_.size());
   for (int i = 0; i < top.size(); ++i) {
     top[i]->ReshapeLike(*output_blobs_[i]);
-    output_blobs_[i]->ShareData(*top[i]);
-    output_blobs_[i]->ShareDiff(*top[i]);
+	  //!!!!
+    //output_blobs_[i]->ShareData(*top[i]); 
+    //output_blobs_[i]->ShareDiff(*top[i]);
+		top[i]->ShareData(*output_blobs_[i]);
+		top[i]->ShareDiff(*output_blobs_[i]);
   }
   x_input_blob_->ShareData(*bottom[0]);
   x_input_blob_->ShareDiff(*bottom[0]);
@@ -202,6 +205,16 @@ void RecurrentLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   }
 
   unrolled_net_->ForwardPrefilled();
+	const Dtype* top_data = top[0]->cpu_data();
+	const Dtype* bottom_data =bottom[0]->cpu_data();
+	for (int i = 0; i < 10; i++)
+	{
+		LOG(INFO) << top_data[i];
+	}
+	for (int i = 0; i < 10; i++)
+	{
+		LOG(INFO) <<bottom_data[i];
+	}
 }
 
 template <typename Dtype>
