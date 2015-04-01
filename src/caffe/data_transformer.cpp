@@ -546,8 +546,10 @@ void DataTransformer<Dtype>::Transform(Blob<Dtype>* input_blob,
 
 template <typename Dtype>
 void DataTransformer<Dtype>::InitRand() {
-  const bool needs_rand = param_.mirror() ||
-      (phase_ == TRAIN && param_.crop_size());
+  /*const bool needs_rand = param_.mirror() ||
+      (phase_ == TRAIN && param_.crop_size());*/
+	//modified by qing li, always initial rand even if not used
+	const bool needs_rand = true; 
   if (needs_rand) {
     const unsigned int rng_seed = caffe_rng_rand();
     rng_.reset(new Caffe::RNG(rng_seed));

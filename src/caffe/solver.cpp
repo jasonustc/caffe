@@ -172,6 +172,9 @@ void Solver<Dtype>::Step(int iters) {
   vector<Dtype> losses;
   Dtype smoothed_loss = 0;
 
+
+	std::ofstream iter_loss("iter_loss"); // added by qing li
+
   for (; iter_ < stop_iter; ++iter_) {
     // zero-init the params
     for (int i = 0; i < net_->params().size(); ++i) {
@@ -201,6 +204,8 @@ void Solver<Dtype>::Step(int iters) {
     net_->set_debug_info(display && param_.debug_info());
     // accumulate the loss and gradient
     Dtype loss = 0;
+
+
     for (int i = 0; i < param_.iter_size(); ++i) {
       loss += net_->ForwardBackward(bottom_vec);
     }
@@ -217,6 +222,8 @@ void Solver<Dtype>::Step(int iters) {
     }
     if (display) {
       LOG(INFO) << "Iteration " << iter_ << ", loss = " << smoothed_loss;
+			iter_loss << "Iteration " << iter_ << ", loss = " << smoothed_loss<<std::endl; //added by qing li
+			iter_loss.flush();
       const vector<Blob<Dtype>*>& result = net_->output_blobs();
       int score_index = 0;
       for (int j = 0; j < result.size(); ++j) {
@@ -231,18 +238,20 @@ void Solver<Dtype>::Step(int iters) {
             loss_msg_stream << " (* " << loss_weight
                             << " = " << loss_weight * result_vec[k] << " loss)";
           }
-          //LOG(INFO) << "    Train net output #" << score_index++ << ": " << output_name << " = "<< result_vec[k] << loss_msg_stream.str();
+          LOG(INFO) << "    Train net output #" << score_index++ << ": " << output_name << " = "<< result_vec[k] << loss_msg_stream.str();
         }
       }
     }
     ComputeUpdateValue();
     net_->Update();
 
+
     // Save a snapshot if needed.
     if (param_.snapshot() && (iter_ + 1) % param_.snapshot() == 0) {
       Snapshot();
     }
   }
+	iter_loss.close(); //added by qing li
 }
 
 template <typename Dtype>
@@ -340,8 +349,8 @@ void Solver<Dtype>::Test(const int test_net_id) {
       loss_msg_stream << " (* " << loss_weight
                       << " = " << loss_weight * mean_score << " loss)";
     }
-    //LOG(INFO) << "    Test net output #" << i << ": " << output_name << " = "
-       // << mean_score << loss_msg_stream.str();
+    LOG(INFO) << "    Test net output #" << i << ": " << output_name << " = "
+        << mean_score << loss_msg_stream.str();
   }
 }
 
