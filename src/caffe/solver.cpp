@@ -231,7 +231,7 @@ void Solver<Dtype>::Step(int iters) {
             loss_msg_stream << " (* " << loss_weight
                             << " = " << loss_weight * result_vec[k] << " loss)";
           }
-          //LOG(INFO) << "    Train net output #" << score_index++ << ": " << output_name << " = "<< result_vec[k] << loss_msg_stream.str();
+          LOG(INFO) << "    Train net output #" << score_index++ << ": " << output_name << " = "<< result_vec[k] << loss_msg_stream.str();
         }
       }
     }
@@ -340,8 +340,8 @@ void Solver<Dtype>::Test(const int test_net_id) {
       loss_msg_stream << " (* " << loss_weight
                       << " = " << loss_weight * mean_score << " loss)";
     }
-    //LOG(INFO) << "    Test net output #" << i << ": " << output_name << " = "
-       // << mean_score << loss_msg_stream.str();
+    LOG(INFO) << "    Test net output #" << i << ": " << output_name << " = "
+        << mean_score << loss_msg_stream.str();
   }
 }
 
