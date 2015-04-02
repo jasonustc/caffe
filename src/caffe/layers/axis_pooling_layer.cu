@@ -69,6 +69,7 @@ namespace caffe {
 		const int bottom_pool_axis = bottom[0]->shape(pool_axis_);
 		caffe_gpu_set(bottom[0]->count(), Dtype(0), bottom_diff);
 		const int* mask = NULL;
+
 		switch (this->layer_param_.axis_pooling_param().pool())
 		{
 		case AxisPoolingParameter_PoolMethod_MAX:
