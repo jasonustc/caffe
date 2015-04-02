@@ -424,7 +424,13 @@ message AxisPoolingParameter {
   // The axis along which to pooling-- may be negative to index from the
   // end (e.g., -1 for the last axis).  
   // By default, AxisPoolingLayer pool blob along the "channels" axis (1).
-    optional int32 axis=1 [default = 1];
+  optional int32 axis=1 [default = 1];
+  enum PoolMethod {
+    MAX = 0;
+    AVE = 1;
+    STOCHASTIC = 2; //not implement
+  }
+  optional PoolMethod pool = 2 [default = MAX]; // The pooling method
 }
 
 // Message that stores parameters used by ConcatLayer
