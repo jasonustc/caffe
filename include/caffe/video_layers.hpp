@@ -53,6 +53,7 @@ namespace caffe {
 		int pool_axis_;
 		int num_pools_;
 		int pool_input_size_;
+		Blob<int> max_idx_;
 	};
 
 	/**

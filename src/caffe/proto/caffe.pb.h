@@ -151,6 +151,26 @@ inline bool ParamSpec_DimCheckMode_Parse(
   return ::google::protobuf::internal::ParseNamedEnum<ParamSpec_DimCheckMode>(
     ParamSpec_DimCheckMode_descriptor(), name, value);
 }
+enum AxisPoolingParameter_PoolMethod {
+  AxisPoolingParameter_PoolMethod_MAX = 0,
+  AxisPoolingParameter_PoolMethod_AVE = 1,
+  AxisPoolingParameter_PoolMethod_STOCHASTIC = 2
+};
+bool AxisPoolingParameter_PoolMethod_IsValid(int value);
+const AxisPoolingParameter_PoolMethod AxisPoolingParameter_PoolMethod_PoolMethod_MIN = AxisPoolingParameter_PoolMethod_MAX;
+const AxisPoolingParameter_PoolMethod AxisPoolingParameter_PoolMethod_PoolMethod_MAX = AxisPoolingParameter_PoolMethod_STOCHASTIC;
+const int AxisPoolingParameter_PoolMethod_PoolMethod_ARRAYSIZE = AxisPoolingParameter_PoolMethod_PoolMethod_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* AxisPoolingParameter_PoolMethod_descriptor();
+inline const ::std::string& AxisPoolingParameter_PoolMethod_Name(AxisPoolingParameter_PoolMethod value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    AxisPoolingParameter_PoolMethod_descriptor(), value);
+}
+inline bool AxisPoolingParameter_PoolMethod_Parse(
+    const ::std::string& name, AxisPoolingParameter_PoolMethod* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<AxisPoolingParameter_PoolMethod>(
+    AxisPoolingParameter_PoolMethod_descriptor(), name, value);
+}
 enum ConvolutionParameter_Engine {
   ConvolutionParameter_Engine_DEFAULT = 0,
   ConvolutionParameter_Engine_CAFFE = 1,
@@ -3550,6 +3570,31 @@ class AxisPoolingParameter : public ::google::protobuf::Message {
 
   // nested types ----------------------------------------------------
 
+  typedef AxisPoolingParameter_PoolMethod PoolMethod;
+  static const PoolMethod MAX = AxisPoolingParameter_PoolMethod_MAX;
+  static const PoolMethod AVE = AxisPoolingParameter_PoolMethod_AVE;
+  static const PoolMethod STOCHASTIC = AxisPoolingParameter_PoolMethod_STOCHASTIC;
+  static inline bool PoolMethod_IsValid(int value) {
+    return AxisPoolingParameter_PoolMethod_IsValid(value);
+  }
+  static const PoolMethod PoolMethod_MIN =
+    AxisPoolingParameter_PoolMethod_PoolMethod_MIN;
+  static const PoolMethod PoolMethod_MAX =
+    AxisPoolingParameter_PoolMethod_PoolMethod_MAX;
+  static const int PoolMethod_ARRAYSIZE =
+    AxisPoolingParameter_PoolMethod_PoolMethod_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  PoolMethod_descriptor() {
+    return AxisPoolingParameter_PoolMethod_descriptor();
+  }
+  static inline const ::std::string& PoolMethod_Name(PoolMethod value) {
+    return AxisPoolingParameter_PoolMethod_Name(value);
+  }
+  static inline bool PoolMethod_Parse(const ::std::string& name,
+      PoolMethod* value) {
+    return AxisPoolingParameter_PoolMethod_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
   // optional int32 axis = 1 [default = 1];
@@ -3559,16 +3604,26 @@ class AxisPoolingParameter : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 axis() const;
   inline void set_axis(::google::protobuf::int32 value);
 
+  // optional .caffe.AxisPoolingParameter.PoolMethod pool = 2 [default = MAX];
+  inline bool has_pool() const;
+  inline void clear_pool();
+  static const int kPoolFieldNumber = 2;
+  inline ::caffe::AxisPoolingParameter_PoolMethod pool() const;
+  inline void set_pool(::caffe::AxisPoolingParameter_PoolMethod value);
+
   // @@protoc_insertion_point(class_scope:caffe.AxisPoolingParameter)
  private:
   inline void set_has_axis();
   inline void clear_has_axis();
+  inline void set_has_pool();
+  inline void clear_has_pool();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
   ::google::protobuf::int32 axis_;
+  int pool_;
   friend void  protobuf_AddDesc_caffe_2eproto();
   friend void protobuf_AssignDesc_caffe_2eproto();
   friend void protobuf_ShutdownFile_caffe_2eproto();
@@ -15057,6 +15112,31 @@ inline void AxisPoolingParameter::set_axis(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:caffe.AxisPoolingParameter.axis)
 }
 
+// optional .caffe.AxisPoolingParameter.PoolMethod pool = 2 [default = MAX];
+inline bool AxisPoolingParameter::has_pool() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void AxisPoolingParameter::set_has_pool() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void AxisPoolingParameter::clear_has_pool() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void AxisPoolingParameter::clear_pool() {
+  pool_ = 0;
+  clear_has_pool();
+}
+inline ::caffe::AxisPoolingParameter_PoolMethod AxisPoolingParameter::pool() const {
+  // @@protoc_insertion_point(field_get:caffe.AxisPoolingParameter.pool)
+  return static_cast< ::caffe::AxisPoolingParameter_PoolMethod >(pool_);
+}
+inline void AxisPoolingParameter::set_pool(::caffe::AxisPoolingParameter_PoolMethod value) {
+  assert(::caffe::AxisPoolingParameter_PoolMethod_IsValid(value));
+  set_has_pool();
+  pool_ = value;
+  // @@protoc_insertion_point(field_set:caffe.AxisPoolingParameter.pool)
+}
+
 // -------------------------------------------------------------------
 
 // ConcatParameter
@@ -22891,6 +22971,11 @@ template <> struct is_proto_enum< ::caffe::ParamSpec_DimCheckMode> : ::google::p
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::caffe::ParamSpec_DimCheckMode>() {
   return ::caffe::ParamSpec_DimCheckMode_descriptor();
+}
+template <> struct is_proto_enum< ::caffe::AxisPoolingParameter_PoolMethod> : ::google::protobuf::internal::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::caffe::AxisPoolingParameter_PoolMethod>() {
+  return ::caffe::AxisPoolingParameter_PoolMethod_descriptor();
 }
 template <> struct is_proto_enum< ::caffe::ConvolutionParameter_Engine> : ::google::protobuf::internal::true_type {};
 template <>
