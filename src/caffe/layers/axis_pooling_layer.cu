@@ -68,7 +68,6 @@ namespace caffe {
 		Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
 		const int bottom_pool_axis = bottom[0]->shape(pool_axis_);
 		caffe_gpu_set(bottom[0]->count(), Dtype(0), bottom_diff);
-
 		const int* mask = NULL;
 		switch (this->layer_param_.axis_pooling_param().pool())
 		{
