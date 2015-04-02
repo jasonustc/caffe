@@ -88,15 +88,15 @@ namespace caffe {
 	template <typename Dtype>
 	void AxisPoolingLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 		const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
-		const Dtype* top_diff = top[0]->cpu_diff();
-		Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
-
-		const int bottom_pool_axis = bottom[0]->shape(pool_axis_);
-
 		if (!propagate_down[0])
 			return;
 
+		const Dtype* top_diff = top[0]->cpu_diff();
+		Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
+		const int bottom_pool_axis = bottom[0]->shape(pool_axis_);
+		caffe_set(bottom[0]->count(), Dtype(0), bottom_diff);
 		const int* mask = NULL; 
+
 		switch (this->layer_param_.axis_pooling_param().pool())
 		{
 		case AxisPoolingParameter_PoolMethod_MAX:
