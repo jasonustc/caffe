@@ -270,6 +270,9 @@
     <ClCompile Include="..\src\caffe\layers\pairwise_ranking_hinge_loss_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\video_label_expand_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
     <ClCompile Include="..\tools\caffe.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -394,9 +397,6 @@
       <Filter>src\layers</Filter>
     </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\prelu_layer.cu">
-      <Filter>src\layers</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\axis_pooling_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\constrain_ip_layer.cu">

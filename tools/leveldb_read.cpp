@@ -18,11 +18,12 @@ int main(int argc, char** argv)
 {
 	::google::InitGoogleLogging(argv[0]);
 
-	if (argc != 3) {
-		LOG(ERROR) << "Usage: leveldb_read input_leveldb output_file";
+	if (argc != 4) {
+		LOG(ERROR) << "Usage: leveldb_read input_leveldb output_file label_output_file";
 		return 1;
 	}
 	FILE* output=fopen(argv[2],"w");
+	FILE* label_output = fopen(argv[3], "w");
 	leveldb::DB* db;
 	leveldb::Options options;
 	options.create_if_missing = false;
@@ -43,10 +44,11 @@ int main(int argc, char** argv)
 	{
 		// just a dummy operation
 		datum.ParseFromString(it->value().ToString());
+		fprintf(label_output, "%d\n", static_cast<int>(datum.label()));
 		const std::string& data = datum.data();
 		int size_in_datum = std::max<int>(datum.data().size(), datum.float_data_size());
-		printf("size:%d\n",size_in_datum);
-		fprintf(output, "%s", it->key().ToString());
+		//printf("size:%d\n",size_in_datum);
+		//fprintf(output, "%s", it->key().ToString());
 		for (int i = 0; i < size_in_datum; ++i)
 		{
 			fprintf(output, "%f ", static_cast<float>(datum.float_data(i)));
@@ -64,6 +66,7 @@ int main(int argc, char** argv)
 		LOG(ERROR) << "Processed " << count << " files.";
 	}
 	fclose(output);
+	fclose(label_output);
 	delete db;
 	return 0;
 }

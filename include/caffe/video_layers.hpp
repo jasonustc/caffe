@@ -42,13 +42,13 @@ namespace caffe {
 		*/
 		virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 			const vector<Blob<Dtype>*>& top);
-		virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
-			const vector<Blob<Dtype>*>& top);
+		/*virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);*/
 
 		virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
 			const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
-		virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
-			const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+		/*virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+			const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);*/
 
 		int pool_axis_;
 		int num_pools_;
@@ -343,6 +343,29 @@ namespace caffe {
 		virtual void Backward_gpu(const vector<Blob<Dtype>*>&  top, const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom){}
 
 	};
+
+
+	/**
+	* @brief Added by qing li, Like reshape_layer, unroll video to frames, and generate continuing indicators used by RCS layers
+	*/
+	template <typename Dtype>
+	class VideoLabelExpandLayer : public Layer<Dtype> {
+	public:
+		explicit VideoLabelExpandLayer(const LayerParameter& param)
+			: Layer<Dtype>(param){}
+		virtual void Reshape(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+
+		virtual inline const char* type() const { return "VideoUnroll"; }
+		virtual inline int ExactNumBottomBlobs() const { return 2; }
+		virtual inline int ExactNumTopBlobs() const { return 1; }
+
+	protected:
+		virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+		virtual void Backward_cpu(const vector<Blob<Dtype>*>& top, const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom){}
+
+	};
+
+
 }  // namespace caffe
 
 #endif  // CAFFE_VIDEO_LAYERS_HPP_

@@ -41,6 +41,10 @@ namespace caffe {
 
 		int* mask = NULL;
 
+		/*for (int i = 0; i < 15; i++)
+		{
+			LOG(INFO) << bottom_data[i];
+		}*/
 		switch (this->layer_param_.axis_pooling_param().pool())
 		{
 		case AxisPoolingParameter_PoolMethod_MAX:

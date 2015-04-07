@@ -156,7 +156,39 @@ class XavierFiller : public Filler<Dtype> {
   }
 };
 
+	/// @brief filler used in RCSLayer.
+	template <typename Dtype>
+	class RCSFiller : public Filler<Dtype> {
+	public:
+		explicit RCSFiller(const FillerParameter& param)
+			: Filler<Dtype>(param) {}
+		virtual void Fill(Blob<Dtype>* blob) {
+			Dtype* data = blob->mutable_cpu_data();
+			int count = blob->count();
+			CHECK(count);
+			data[0] = this->filler_param_.value();
+			caffe_rng_gaussian<Dtype>(count-1, Dtype(this->filler_param_.mean()),
+				Dtype(this->filler_param_.std()), &(data[1]));
+		}
+	};
 
+	/// @brief filler used in SSDLayer, not implemented.
+	template <typename Dtype>
+	class SSDFiller : public Filler<Dtype> {
+	public:
+		explicit SSDFiller(const FillerParameter& param)
+			: Filler<Dtype>(param) {}
+		virtual void Fill(Blob<Dtype>* blob) {
+			Dtype* data = blob->mutable_cpu_data();
+			int count = blob->count();
+			CHECK(count);
+			data[0] = this->filler_param_.value();
+			caffe_rng_gaussian<Dtype>(count-1, Dtype(this->filler_param_.mean()),
+				Dtype(this->filler_param_.std()), &(data[1]));
+		}
+	};
+
+	
 /**
  * @brief Get a specific filler from the specification given in FillerParameter.
  *
@@ -176,7 +208,11 @@ Filler<Dtype>* GetFiller(const FillerParameter& param) {
     return new UniformFiller<Dtype>(param);
   } else if (type == "xavier") {
     return new XavierFiller<Dtype>(param);
-  } else {
+	} else if (type == "rcs") {
+		return new RCSFiller<Dtype>(param);
+	} else if (type == "ssd") {
+		return new SSDFiller<Dtype>(param);
+	} else {
     CHECK(false) << "Unknown filler name: " << param.type();
   }
   return (Filler<Dtype>*)(NULL);

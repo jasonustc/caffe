@@ -83,6 +83,25 @@ void ConstrainIPLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void ConstrainIPLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
+
+	// hard constraints
+	Dtype* weight_data = this->blobs_[0]->mutable_cpu_data();
+	for (int n = 0; n < N_; n++)
+	{
+		Dtype sum = 0;
+		for (int k = K_-1; k >=0; k--)
+		{
+			int index = n*K_ + k;
+			Dtype low_limit = (k==K_-1?0:weight_data[index+1]);
+			if (weight_data[index] < low_limit)
+				weight_data[index] = low_limit;
+			sum += weight_data[index];
+		}
+		caffe_scal(K_, Dtype(1) / sum, &(weight_data[n*K_]));
+	}
+
+
+
   const Dtype* bottom_data = bottom[0]->cpu_data();
   Dtype* top_data = top[0]->mutable_cpu_data();
   const Dtype* weight = this->blobs_[0]->cpu_data();
@@ -93,6 +112,20 @@ void ConstrainIPLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         bias_multiplier_.cpu_data(),
         this->blobs_[1]->cpu_data(), (Dtype)1., top_data);
   }
+
+
+	/*for (int i = 0; i < K_; i++)
+	{
+		LOG(INFO) << bottom_data[i];
+	}*/
+	/*Dtype sum = 0;
+	for (int i = 0; i < K_; i++)
+	{
+		LOG(INFO) << weight[i];
+		sum += weight[i];
+	}
+	LOG(INFO) << sum;*/
+
 }
 
 template <typename Dtype>

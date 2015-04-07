@@ -12,6 +12,22 @@ namespace caffe {
 template <typename Dtype>
 void ConstrainIPLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
+	// hard constraints
+	Dtype* weight_data = this->blobs_[0]->mutable_gpu_data();
+	for (int n = 0; n < N_; n++)
+	{
+		Dtype sum = 0;
+		for (int k = K_-1; k >=0; k--)
+		{
+			int index = n*K_ + k;
+			Dtype low_limit = (k==K_-1?0:weight_data[index+1]);
+			if (weight_data[index] < low_limit)
+				weight_data[index] = low_limit;
+			sum += weight_data[index];
+		}
+		caffe_gpu_scal(K_, Dtype(1) / sum, &(weight_data[n*K_]));
+	}
+	
   const Dtype* bottom_data = bottom[0]->gpu_data();
   Dtype* top_data = top[0]->mutable_gpu_data();
   const Dtype* weight = this->blobs_[0]->gpu_data();
@@ -22,6 +38,7 @@ void ConstrainIPLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
         bias_multiplier_.gpu_data(),
         this->blobs_[1]->gpu_data(), (Dtype)1., top_data);
   }
+
 }
 
 template <typename Dtype>

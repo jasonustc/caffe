@@ -90,6 +90,11 @@ void InnerProductLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         bias_multiplier_.cpu_data(),
         this->blobs_[1]->cpu_data(), (Dtype)1., top_data);
   }
+
+	/*for (int i = 0; i < K_; i++)
+	{
+		LOG(INFO) << weight[i];
+	}*/
 }
 
 template <typename Dtype>
