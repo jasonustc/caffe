@@ -93,6 +93,11 @@ void InnerProductLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 
 	/*for (int i = 0; i < K_; i++)
 	{
+		LOG(INFO) << bottom_data[i];
+	}*/
+
+	/*for (int i = 0; i < 1; i++)
+	{
 		LOG(INFO) << weight[i];
 	}*/
 }

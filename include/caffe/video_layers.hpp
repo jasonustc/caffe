@@ -345,27 +345,47 @@ namespace caffe {
 	};
 
 
+	///**
+	//* @brief Added by qing li, Like reshape_layer, unroll video to frames, and generate continuing indicators used by RCS layers
+	//*/
+	//template <typename Dtype>
+	//class VideoLabelExpandLayer : public Layer<Dtype> {
+	//public:
+	//	explicit VideoLabelExpandLayer(const LayerParameter& param)
+	//		: Layer<Dtype>(param){}
+	//	virtual void Reshape(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+
+	//	virtual inline const char* type() const { return "VideoUnroll"; }
+	//	virtual inline int ExactNumBottomBlobs() const { return 2; }
+	//	virtual inline int ExactNumTopBlobs() const { return 1; }
+
+	//protected:
+	//	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+	//	virtual void Backward_cpu(const vector<Blob<Dtype>*>& top, const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom){}
+
+	//};
+
 	/**
-	* @brief Added by qing li, Like reshape_layer, unroll video to frames, and generate continuing indicators used by RCS layers
+	* @brief Added by qing li
 	*/
 	template <typename Dtype>
-	class VideoLabelExpandLayer : public Layer<Dtype> {
+	class VideoSigmoidLabelLayer : public Layer<Dtype> {
 	public:
-		explicit VideoLabelExpandLayer(const LayerParameter& param)
+		explicit VideoSigmoidLabelLayer(const LayerParameter& param)
 			: Layer<Dtype>(param){}
 		virtual void Reshape(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
 
-		virtual inline const char* type() const { return "VideoUnroll"; }
-		virtual inline int ExactNumBottomBlobs() const { return 2; }
+		virtual inline const char* type() const { return "VideoSigmoidLabel"; }
+		virtual inline int ExactNumBottomBlobs() const { return 1; }
 		virtual inline int ExactNumTopBlobs() const { return 1; }
 
 	protected:
 		virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
 		virtual void Backward_cpu(const vector<Blob<Dtype>*>& top, const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom){}
 
+		int n_cate_;
+
 	};
-
-
 }  // namespace caffe
 
 #endif  // CAFFE_VIDEO_LAYERS_HPP_

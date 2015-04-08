@@ -108,13 +108,13 @@ void RCSLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const
 	// Add generic LayerParameter's (without bottoms/tops) of layer types we'll
 	// use to save redundant code.
 	// 1. split layer
-	LayerParameter split_param;
+	/*LayerParameter split_param;
 	split_param.set_type("Split");
 
 	LayerParameter* cate_split_param = net_param->add_layer();
 	cate_split_param->CopyFrom(split_param);
 	cate_split_param->set_name("cate_split");
-	cate_split_param->add_bottom("x");
+	cate_split_param->add_bottom("x");*/
 
 	// 2. part_sort layer
 	LayerParameter part_sort_param;
@@ -144,14 +144,15 @@ void RCSLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const
 		string cs = this->int_to_str(c);
 
 		//1. split
-		cate_split_param->add_top("x_c" + cs);
+		//cate_split_param->add_top("x_c" + cs);
 
 		//2. part_sort
 		LayerParameter* x_part_sort_layer_param = net_param->add_layer();
 		x_part_sort_layer_param->CopyFrom(part_sort_param);
 		x_part_sort_layer_param->mutable_part_sort_param()->set_first_element(c);
 		x_part_sort_layer_param->set_name("x_c" + cs + "_part_sort");
-		x_part_sort_layer_param->add_bottom("x_c" + cs);
+		x_part_sort_layer_param->add_bottom("x");
+		//x_part_sort_layer_param->add_bottom("x_c" + cs);
 		x_part_sort_layer_param->add_top("x_c" + cs + "_part_sort");
 
 		//3. constrain ip
