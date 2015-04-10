@@ -24,8 +24,7 @@ template <typename Dtype>
 void RCSLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 	const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom)
 {
-	CHECK(!propagate_down[1]) << "Cannot backpropagate to sequence indicators.";
-	if (!propagate_down[0] && !propagate_down[2]) { return; }
+	//if (!propagate_down[0]) { return; }
 
 	unrolled_net_->Backward();
 }

@@ -52,10 +52,21 @@ namespace caffe {
 			back_lookup_[i][0] = first_element_;
 			for (int j = 1; j < dim; j++)
 			{
-				top_data[i*dim + j] = bottom_data_vector[j].first;
-				back_lookup_[i][j] = bottom_data_vector[j].second;
+				top_data[i*dim + j] = bottom_data_vector[j-1].first;
+				back_lookup_[i][j] = bottom_data_vector[j-1].second;
 			}
 		}
+
+		/*LOG(INFO) << "PART SORT BOTTOM:";
+		for (int i = 0; i < 5; i++)
+		{
+			LOG(INFO) << bottom_data[i];
+		}*/
+		/*LOG(INFO) << "TOP";
+		for (int i = 0; i < dim; i++)
+		{
+			LOG(INFO) << top_data[i];
+		}*/
 	}
 
 	template <typename Dtype>

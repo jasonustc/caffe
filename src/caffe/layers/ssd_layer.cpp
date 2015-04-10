@@ -192,7 +192,7 @@ void SSDLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void SSDLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
-  if (!propagate_down[0]) { return; }
+	//if (!propagate_down[0]) { LOG(INFO) << "NOT BP"; return; }
   unrolled_net_->Backward();
 }
 

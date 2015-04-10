@@ -270,10 +270,13 @@
     <ClCompile Include="..\src\caffe\layers\pairwise_ranking_hinge_loss_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\caffe.cpp" />
     <ClCompile Include="..\src\caffe\layers\video_sigmoid_label.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\binary_label_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tools\caffe.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
@@ -402,10 +405,10 @@
     <CudaCompile Include="..\src\caffe\layers\constrain_ip_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\ssd_layer.cu">
+    <CudaCompile Include="..\src\caffe\layers\rcs_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\rcs_layer.cu">
+    <CudaCompile Include="..\src\caffe\layers\ssd_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
   </ItemGroup>

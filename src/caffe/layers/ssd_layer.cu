@@ -24,12 +24,12 @@ template <typename Dtype>
 void SSDLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 	const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom)
 {
-	CHECK(!propagate_down[1]) << "Cannot backpropagate to sequence indicators.";
-	if (!propagate_down[0] && !propagate_down[2]) { return; }
+	//if (!propagate_down[0]) { LOG(INFO) << "NOT BP"; return; }
 
 	unrolled_net_->Backward();
 }
 
 INSTANTIATE_LAYER_GPU_FUNCS(SSDLayer);
+//INSTANTIATE_LAYER_GPU_FORWARD(SSDLayer);
 
 }  // namespace caffe

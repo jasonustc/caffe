@@ -93,10 +93,10 @@ void RCSLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   x_input_blob_->ShareDiff(*bottom[0]);
 
   top[0]->ReshapeLike(*x_output_blob_);
-  //x_output_blob_->ShareData(*top[0]);
-  //x_output_blob_->ShareDiff(*top[0]);
-  top[0]->ShareData(*x_output_blob_);
-  top[0]->ShareDiff(*x_output_blob_);
+  x_output_blob_->ShareData(*top[0]);
+  x_output_blob_->ShareDiff(*top[0]);
+  //top[0]->ShareData(*x_output_blob_);
+  //top[0]->ShareDiff(*x_output_blob_);
 }
 
 template<typename Dtype>
@@ -139,7 +139,7 @@ void RCSLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const
 
 
 	//network scaffolding
-	for (int c = 0; c < this->C_; c++)
+	for (int c = 0; c < C_; c++)
 	{
 		string cs = this->int_to_str(c);
 
@@ -160,8 +160,14 @@ void RCSLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const
 		x_ip_layer_param->CopyFrom(ip_param);
 		x_ip_layer_param->set_name("x_c" + cs + "_ip");
 
+
 		x_ip_layer_param->add_param()->set_name("W_c" + cs);
 		x_ip_layer_param->add_param()->set_name("b_c" + cs);
+		/*x_ip_layer_param->mutable_param(0)->set_lr_mult(500);
+		x_ip_layer_param->mutable_param(0)->set_decay_mult(1);
+		x_ip_layer_param->mutable_param(1)->set_lr_mult(500*2);
+		x_ip_layer_param->mutable_param(1)->set_decay_mult(0);*/
+
 
 		x_ip_layer_param->add_bottom("x_c" + cs + "_part_sort");
 		x_ip_layer_param->add_top("x_c" + cs + "_ip");
@@ -182,13 +188,18 @@ void RCSLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     unrolled_net_->ShareWeightData();
   }
 
+
+
   unrolled_net_->ForwardPrefilled();
+
+
 }
 
 template <typename Dtype>
 void RCSLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
-  if (!propagate_down[0]) { return; }
+	//if (!propagate_down[0]) { LOG(INFO) << "NOT BP"; return; }
+
   unrolled_net_->Backward();
 }
 

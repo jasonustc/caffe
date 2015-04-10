@@ -67,11 +67,14 @@ void ConcatLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     }
     offset_concat_axis += bottom_concat_axis;
   }
+
 }
 
 template <typename Dtype>
 void ConcatLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
+
+
   const Dtype* top_diff = top[0]->cpu_diff();
   int offset_concat_axis = 0;
   const int top_concat_axis = top[0]->shape(concat_axis_);
@@ -86,6 +89,7 @@ void ConcatLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     }
     offset_concat_axis += bottom_concat_axis;
   }
+
 }
 
 #ifdef CPU_ONLY

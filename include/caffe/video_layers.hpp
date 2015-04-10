@@ -284,6 +284,10 @@ namespace caffe {
 		virtual inline int ExactNumBottomBlobs() const { return 1; }
 		virtual inline int ExactNumTopBlobs() const { return 1; }
 
+		virtual inline bool AllowForceBackward(const int bottom_index) const {
+			return true;
+		}
+
 	protected:
 		/**
 		* @brief Fills net_param with the RCS network arcthiecture.
@@ -384,6 +388,27 @@ namespace caffe {
 		virtual void Backward_cpu(const vector<Blob<Dtype>*>& top, const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom){}
 
 		int n_cate_;
+
+	};
+
+
+	/**
+	* @brief Added by qing li
+	*/
+	template <typename Dtype>
+	class BinaryLabelLayer : public Layer<Dtype> {
+	public:
+		explicit BinaryLabelLayer(const LayerParameter& param)
+			: Layer<Dtype>(param){}
+		virtual void Reshape(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+
+		virtual inline const char* type() const { return "BinaryLabel"; }
+		virtual inline int ExactNumBottomBlobs() const { return 1; }
+		virtual inline int ExactNumTopBlobs() const { return 1; }
+
+	protected:
+		virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+		virtual void Backward_cpu(const vector<Blob<Dtype>*>& top, const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom){}
 
 	};
 }  // namespace caffe
