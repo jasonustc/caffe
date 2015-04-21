@@ -32,7 +32,7 @@ bool ReadImageListToDatum(const vector<string>& list_file, const string& img_dir
 
 	merge_img.create(rows, cols, CV_8UC(merge_channels));
 	cv::Mat one_img;
-	for (int img_id = 1; img_id < list_file.size(); img_id++)
+	for (int img_id = 0; img_id < list_file.size(); img_id++)
 	{
 		one_img=ReadImageToCVMat(img_dir + '\\' + list_file[img_id] + ".jpg", height, width, is_color);
 		
