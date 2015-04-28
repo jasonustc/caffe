@@ -369,7 +369,7 @@ message TransformationParameter {
   //added by qing li, used by mirror on timeline
   optional bool mirror_by_time = 9 [default = false];
   //denote how many form a unit when crop and mirror on timeline
-  optional uint32 time_unit = 10 [default = 3];
+  optional uint32 time_unit = 10 [default = 1];
 
 
   // mean_file and mean_value cannot be specified at the same time

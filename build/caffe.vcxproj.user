@@ -4,11 +4,11 @@
     <ShowAllFiles>false</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>train -solver "D:\Users\v-liqing\caffe\example\action_recognition_ucf101\prob+ssd_frame\ssd_solver.prototxt"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>train -solver "D:\Users\v-liqing\caffe\example\action_recognition_ucf101\prob+rcs_frame\rcs_solver.prototxt"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>train -solver "D:\Users\v-liqing\caffe\example\action_recognition_ucf101\prob+ssd_frame\ssd_solver.prototxt"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>train -solver "D:\Users\v-liqing\caffe\example\action_recognition_ucf101\prob+rcs_frame\rcs_solver.prototxt"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

@@ -135,8 +135,8 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
   }
 
   //added by qing li, crop on timeline
-  /*CHECK((datum_channels%time_unit) == 0)
-	  << "datum_channels is not divisible by time_unit";*/
+  CHECK((datum_channels%time_unit) == 0)
+	  << "datum_channels is not divisible by time_unit";
   int time_length = datum_channels/time_unit;
   int t_off = 0;
   if (crop_by_time_length) {

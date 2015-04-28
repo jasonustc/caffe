@@ -143,15 +143,11 @@ int feature_extraction_pipeline(int argc, char** argv) {
     for (int i = 0; i < num_features; ++i) {
       const boost::shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net
           ->blob_by_name(blob_names[i]);
-			const boost::shared_ptr<Blob<Dtype>> label_blob = feature_extraction_net
-				->blob_by_name("label");
       int batch_size = feature_blob->num();
-			CHECK_EQ(batch_size, label_blob->num());
       int dim_features = feature_blob->count() / batch_size;
       const Dtype* feature_blob_data;
-			const Dtype* label_blob_data = label_blob->cpu_data();
       for (int n = 0; n < batch_size; ++n) {
-				int label = (int)label_blob_data[n];
+				int label =0;
 				datum.set_label(label);
         datum.set_height(feature_blob->height());
         datum.set_width(feature_blob->width());

@@ -411,6 +411,28 @@ namespace caffe {
 		virtual void Backward_cpu(const vector<Blob<Dtype>*>& top, const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom){}
 
 	};
+
+	///**
+	//* @brief normalize the sample to [0,1]
+	//*/
+	//template <typename Dtype>
+	//class Norm01Layer : public NeuronLayer<Dtype> {
+	//public:
+	//	explicit Norm01Layer(const LayerParameter& param)
+	//		: NeuronLayer<Dtype>(param) {}
+	//	virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+	//		const vector<Blob<Dtype>*>& top);
+
+	//	virtual inline const char* type() const { return "Norm01"; }
+
+	//protected:
+	//	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+	//		const vector<Blob<Dtype>*>& top);
+	//	
+	//	virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+	//		const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+	//
+	//};
 }  // namespace caffe
 
 #endif  // CAFFE_VIDEO_LAYERS_HPP_

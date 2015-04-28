@@ -3157,7 +3157,7 @@ class TransformationParameter : public ::google::protobuf::Message {
   inline bool mirror_by_time() const;
   inline void set_mirror_by_time(bool value);
 
-  // optional uint32 time_unit = 10 [default = 3];
+  // optional uint32 time_unit = 10 [default = 1];
   inline bool has_time_unit() const;
   inline void clear_time_unit();
   static const int kTimeUnitFieldNumber = 10;
@@ -14750,7 +14750,7 @@ inline void TransformationParameter::set_mirror_by_time(bool value) {
   // @@protoc_insertion_point(field_set:caffe.TransformationParameter.mirror_by_time)
 }
 
-// optional uint32 time_unit = 10 [default = 3];
+// optional uint32 time_unit = 10 [default = 1];
 inline bool TransformationParameter::has_time_unit() const {
   return (_has_bits_[0] & 0x00000080u) != 0;
 }
@@ -14761,7 +14761,7 @@ inline void TransformationParameter::clear_has_time_unit() {
   _has_bits_[0] &= ~0x00000080u;
 }
 inline void TransformationParameter::clear_time_unit() {
-  time_unit_ = 3u;
+  time_unit_ = 1u;
   clear_has_time_unit();
 }
 inline ::google::protobuf::uint32 TransformationParameter::time_unit() const {

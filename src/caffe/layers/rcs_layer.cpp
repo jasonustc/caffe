@@ -161,8 +161,8 @@ void RCSLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const
 		x_ip_layer_param->set_name("x_c" + cs + "_ip");
 
 
-		x_ip_layer_param->add_param()->set_name("W_c" + cs);
-		x_ip_layer_param->add_param()->set_name("b_c" + cs);
+		//x_ip_layer_param->add_param()->set_name("W_c" + cs);
+		//x_ip_layer_param->add_param()->set_name("b_c" + cs);
 		/*x_ip_layer_param->mutable_param(0)->set_lr_mult(500);
 		x_ip_layer_param->mutable_param(0)->set_decay_mult(1);
 		x_ip_layer_param->mutable_param(1)->set_lr_mult(500*2);
@@ -201,6 +201,11 @@ void RCSLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 	//if (!propagate_down[0]) { LOG(INFO) << "NOT BP"; return; }
 
   unrolled_net_->Backward();
+
+	/*for (int i = 0; i < 5; i++)
+	{
+		LOG(INFO) << bottom[0]->cpu_diff()[i];
+	}*/
 }
 
 #ifdef CPU_ONLY

@@ -1832,7 +1832,7 @@ void protobuf_AddDesc_caffe_2eproto() {
     "tion\030\006 \001(\r\022\036\n\023crop_by_time_length\030\007 \001(\r:"
     "\0010\022\035\n\025crop_by_time_position\030\010 \001(\005\022\035\n\016mir"
     "ror_by_time\030\t \001(\010:\005false\022\024\n\ttime_unit\030\n "
-    "\001(\r:\0013\022\021\n\tmean_file\030\004 \001(\t\022\022\n\nmean_value\030"
+    "\001(\r:\0011\022\021\n\tmean_file\030\004 \001(\t\022\022\n\nmean_value\030"
     "\005 \003(\002\">\n\rLossParameter\022\024\n\014ignore_label\030\001"
     " \001(\005\022\027\n\tnormalize\030\002 \001(\010:\004true\"d\n\021Accurac"
     "yParameter\022\020\n\005top_k\030\001 \001(\r:\0011\022\017\n\004axis\030\002 \001"
@@ -10701,7 +10701,7 @@ void TransformationParameter::SharedCtor() {
   crop_by_time_length_ = 0u;
   crop_by_time_position_ = 0;
   mirror_by_time_ = false;
-  time_unit_ = 3u;
+  time_unit_ = 1u;
   mean_file_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
@@ -10754,7 +10754,7 @@ void TransformationParameter::Clear() {
   if (_has_bits_[0 / 32] & 255) {
     ZR_(crop_size_, crop_by_time_position_);
     scale_ = 1;
-    time_unit_ = 3u;
+    time_unit_ = 1u;
   }
   if (has_mean_file()) {
     if (mean_file_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
@@ -10920,7 +10920,7 @@ bool TransformationParameter::MergePartialFromCodedStream(
         break;
       }
 
-      // optional uint32 time_unit = 10 [default = 3];
+      // optional uint32 time_unit = 10 [default = 1];
       case 10: {
         if (tag == 80) {
          parse_time_unit:
@@ -11011,7 +11011,7 @@ void TransformationParameter::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteBool(9, this->mirror_by_time(), output);
   }
 
-  // optional uint32 time_unit = 10 [default = 3];
+  // optional uint32 time_unit = 10 [default = 1];
   if (has_time_unit()) {
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(10, this->time_unit(), output);
   }
@@ -11078,7 +11078,7 @@ void TransformationParameter::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(9, this->mirror_by_time(), target);
   }
 
-  // optional uint32 time_unit = 10 [default = 3];
+  // optional uint32 time_unit = 10 [default = 1];
   if (has_time_unit()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(10, this->time_unit(), target);
   }
@@ -11138,7 +11138,7 @@ int TransformationParameter::ByteSize() const {
       total_size += 1 + 1;
     }
 
-    // optional uint32 time_unit = 10 [default = 3];
+    // optional uint32 time_unit = 10 [default = 1];
     if (has_time_unit()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::UInt32Size(
