@@ -1,0 +1,8 @@
+Debug/
+Release/
+src/
+x64/
+*.suo
+*.pdb
+*.sdf
+
