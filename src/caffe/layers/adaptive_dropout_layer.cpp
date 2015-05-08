@@ -45,6 +45,8 @@ void AdaptiveDropoutLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 	const int num_output = this->layer_param_.adaptive_dropout_param().num_output();
 	bias_term_ = this->layer_param_.adaptive_dropout_param().bias_term();
 	N_ = num_output;
+	hidden_act_type_ = this->layer_param_.adaptive_dropout_param().neuron_act_type();
+	prob_act_type_ = this->layer_param_.adaptive_dropout_param().prob_act_type();
 	const int axis = bottom[0]->CanonicalAxisIndex(
 		this->layer_param_.adaptive_dropout_param().axis());
 	// Dimensions starting from "axis" are "flattened" into a single

@@ -5,4 +5,5 @@ x64/
 *.suo
 *.pdb
 *.sdf
+*.opensdf
 
