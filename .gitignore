@@ -1,5 +1,4 @@
 ## General
-bin/*
 build/*.sdf
 # Examples
 examples/
