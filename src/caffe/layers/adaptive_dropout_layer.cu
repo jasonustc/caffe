@@ -47,6 +47,15 @@ __global__ void caffe_mult_and_add_scalar(const int n, const Dtype* in, Dtype* o
 }
 
 template <typename Dtype>
+void PrintToFile(string fileName, const int n, const Dtype* data){
+	std::ofstream outFile(fileName.c_str(), std::ofstream::out);
+	for (int i = 0; i < n; i++){
+		outFile << data[i] << "\t";
+	}
+	outFile.close();
+}
+
+template <typename Dtype>
 void AdaptiveDropoutLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
   const Dtype* bottom_data = bottom[0]->gpu_data();
@@ -63,26 +72,104 @@ void AdaptiveDropoutLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom
 	  (count_weight, weight_data, prob_weight_data, alpha_, beta_);
   CUDA_POST_KERNEL_CHECK;
   //prob_data = alpha * op(bottom_data) * (prob_weight_data) + beta * prob_data
+//  PrintToFile<Dtype>("prob_no_mul_act_data", count_prob, this->prob_vec_.cpu_data());
   caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasTrans, M_, N_, K_, (Dtype)1.,
       bottom_data, prob_weight_data, (Dtype)0., prob_data);
-  activate(count_prob, prob_data, prob_data, this->prob_act_type_);
-  //compute hidden units
-  caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasTrans, M_, N_, K_, (Dtype)1.,
-      bottom_data, weight_data, (Dtype)0., top_data);
-  activate(top[0]->count(), top_data, top_data, this->hidden_act_type_);
-  CUDA_POST_KERNEL_CHECK;
-  if (this->phase_ == TRAIN){
-	  caffe_gpu_rng_bernoulli<Dtype>(count_prob, prob_data, rand_vec_data);
-	  caffe_gpu_mul_b<Dtype>(count_prob, top_data, rand_vec_data, top_data);
+  if (bias_term_) {
+    caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, N_, 1, (Dtype)1.,
+        bias_multiplier_.gpu_data(),
+        this->blobs_[1]->gpu_data(), (Dtype)1., this->prob_vec_.mutable_gpu_data());
   }
-  else{
-	  caffe_gpu_mul<Dtype>(count_prob, top_data, prob_data, top_data);
+//  PrintToFile<Dtype>("prob_noact_data", count_prob, this->prob_vec_.cpu_data());
+  activate(count_prob, prob_data, prob_data, this->prob_act_type_);
+//  PrintToFile<Dtype>("prob_act_data", count_prob, this->prob_vec_.cpu_data());
+  //compute hidden units
+//  PrintToFile<Dtype>("weight_data", this->blobs_[0]->count(), this->blobs_[0]->cpu_data());
+//  PrintToFile<Dtype>("prob_weight_data", count_weight, this->prob_weight_.cpu_data());
+  caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasTrans, M_, N_, K_, (Dtype)1.,
+      bottom_data, weight_data, (Dtype)0., unact_hidden_.mutable_gpu_data());
+//  PrintToFile<Dtype>("top_data_before_act", top[0]->count(), top[0]->cpu_data());
+  if (top[0]->mutable_cpu_data()){
+	  ;
+  }
+  if (top[0]->mutable_gpu_data()){
+	  ;
   }
   if (bias_term_) {
     caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, N_, 1, (Dtype)1.,
         bias_multiplier_.gpu_data(),
-        this->blobs_[1]->gpu_data(), (Dtype)1., top_data);
+        this->blobs_[1]->gpu_data(), (Dtype)1., unact_hidden_.mutable_gpu_data());
   }
+  activate(top[0]->count(), unact_hidden_.gpu_data(), top_data, this->hidden_act_type_);
+//  PrintToFile<Dtype>("top_data_after_act", top[0]->count(), top[0]->cpu_data());
+  CUDA_POST_KERNEL_CHECK;
+  //set all probability to be 0.5 for test
+//  caffe_set<Dtype>(count_prob, 0.0001, prob_vec_.mutable_cpu_data());
+  if (prob_vec_.mutable_gpu_data()){
+	  ;
+  }
+  if (this->phase_ == TRAIN){
+	  caffe_gpu_rng_bernoulli<Dtype>(count_prob, prob_data, rand_vec_data);
+//	  PrintToFile<Dtype>("prob_data", this->prob_vec_.count(), this->prob_vec_.cpu_data());
+//	  PrintToFile<unsigned int>("prob_data_sampled", this->prob_vec_.count(), this->rand_vec_.cpu_data());
+	  caffe_gpu_mul_b<Dtype>(count_prob, top_data, rand_vec_data, top_data);
+  }
+  else{
+//	PrintToFile<Dtype>("prob_act_data", count_prob, this->prob_vec_.cpu_data());
+//	PrintToFile<Dtype>("top_data_before_drop", top[0]->count(), top[0]->cpu_data());
+	if (top[0]->mutable_cpu_data()){
+		;
+	}
+	if (top[0]->mutable_gpu_data()){
+		;
+	}
+	caffe_gpu_mul<Dtype>(count_prob, top_data, prob_data, top_data);
+//	PrintToFile<Dtype>("top_data_after_drop", top[0]->count(), top[0]->cpu_data());
+  }
+}
+
+template<typename Dtype>
+__global__ void SigmoidBackward(const int n, const Dtype* in_diff,
+	const Dtype* unact_data, Dtype* out_diff){
+	CUDA_KERNEL_LOOP(index, n){
+		const Dtype sigmoid_x = 1. / (1. + exp(-unact_data[index]));
+		out_diff[index] = in_diff[index] * sigmoid_x * (1 - sigmoid_x);
+	}
+}
+
+template <typename Dtype>
+__global__ void ReLUBackward(const int n, const Dtype* in_diff,
+	const Dtype* in_data, Dtype* out_diff){
+	CUDA_KERNEL_LOOP(index, n){
+		out_diff[index] = in_diff[index] * (in_data[index] > 0);
+	}
+}
+
+template <typename Dtype>
+inline void ActBackward(const int n, const Dtype* in_diff,
+	const Dtype* in_data, Dtype* out_diff, AdaptiveDropoutParameter_ActType act_type){
+	switch (act_type)
+	{
+	case caffe::AdaptiveDropoutParameter_ActType_RELU:
+		ReLUBackward<Dtype ><<<CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS>>>(
+			n, in_diff, in_data, out_diff);
+		break;
+	case caffe::AdaptiveDropoutParameter_ActType_SIGMOID:
+		SigmoidBackward<Dtype><<<CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS>>>(
+			n, in_diff, in_data, out_diff);
+		break;
+	default:
+		LOG(FATAL) << "unknown act function type.";
+		break;
+	}
+} 
+
+template <typename Dtype>
+__global__ void DropoutBackward(const int n, const Dtype* in_diff,
+	const unsigned int* mask, const float scale, Dtype* out_diff){
+	CUDA_KERNEL_LOOP(index, n){
+		out_diff[index] = in_diff[index] * scale * mask[index];
+	}
 }
 
 template <typename Dtype>
@@ -91,33 +178,48 @@ void AdaptiveDropoutLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<Blob<Dtype>*>& bottom) {
 	const int count_top = top[0]->count();
 	Dtype* top_diff = top[0]->mutable_gpu_diff();
+	Dtype* unact_hidden_diff = this->unact_hidden_.mutable_gpu_diff();
+	//backward through dropout
 	if (this->phase_ == TRAIN){
 		const unsigned int* rand_vec_data = this->rand_vec_.mutable_gpu_data();
+//		PrintToFile<unsigned int>("rand_vec_used", rand_vec_.count(), rand_vec_.cpu_data());
 		//top_diff = top_diff * rand_vec_data
-		caffe_gpu_mul_b<Dtype>(count_top, top_diff, rand_vec_data, top_diff);
+//		caffe_gpu_mul_b<Dtype>(count_top, top_diff, rand_vec_data, top_diff);
+		DropoutBackward<Dtype><<< CAFFE_GET_BLOCKS(count_top), CAFFE_CUDA_NUM_THREADS>>>(
+			count_top, top_diff, rand_vec_data, 2., top_diff);
 	}
 	else{
 		const Dtype* prob_vec_data = this->prob_vec_.mutable_gpu_data();
 		caffe_gpu_mul<Dtype>(count_top, top_diff, prob_vec_data, top_diff);
 	}
+	//backward through non-linear activation
+	const Dtype* in_data = unact_hidden_.gpu_data();
+//	PrintToFile<Dtype>("unact_hidden", unact_hidden_.count(), unact_hidden_.cpu_data());
+//	PrintToFile<Dtype>("top_diff_before", top[0]->count(), top[0]->cpu_diff());
+	ActBackward(count_top, top_diff, in_data, unact_hidden_diff, hidden_act_type_);
+//	PrintToFile<Dtype>("top_diff_after", top[0]->count(), unact_hidden_.cpu_diff());
+
 	if (this->param_propagate_down_[0]) {
 		const Dtype* bottom_data = bottom[0]->gpu_data();
 		// Gradient with respect to weight
 		caffe_gpu_gemm<Dtype>(CblasTrans, CblasNoTrans, N_, K_, M_, (Dtype)1.,
-			top_diff, bottom_data, (Dtype)0., this->blobs_[0]->mutable_gpu_diff());
+			unact_hidden_diff, bottom_data, (Dtype)0., this->blobs_[0]->mutable_gpu_diff());
+//		PrintToFile<Dtype>("adaptive_weight",this->blobs_[0]->count(), this->blobs_[0]->cpu_data());
+//		PrintToFile<Dtype>("adaptive_weight_diff",this->blobs_[0]->count(), this->blobs_[0]->cpu_diff());
 	}
 	if (bias_term_ && this->param_propagate_down_[1]) {
 		// Gradient with respect to bias
-		caffe_gpu_gemv<Dtype>(CblasTrans, M_, N_, (Dtype)1., top_diff,
+		caffe_gpu_gemv<Dtype>(CblasTrans, M_, N_, (Dtype)1., unact_hidden_diff,
 			bias_multiplier_.gpu_data(), (Dtype)0.,
 			this->blobs_[1]->mutable_gpu_diff());
 	}
 	if (propagate_down[0]) {
 		// Gradient with respect to bottom data
 		caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, K_, N_, (Dtype)1.,
-			top_diff, this->blobs_[0]->gpu_data(), (Dtype)0.,
+			unact_hidden_diff, this->blobs_[0]->gpu_data(), (Dtype)0.,
 			bottom[0]->mutable_gpu_diff());
 	}
+//	PrintToFile<Dtype>("bottom_data",bottom[0]->count(), bottom[0]->cpu_data());
 }
 
 INSTANTIATE_LAYER_GPU_FUNCS(AdaptiveDropoutLayer);

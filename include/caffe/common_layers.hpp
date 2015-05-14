@@ -327,7 +327,7 @@ class AdaptiveDropoutLayer: public Layer<Dtype> {
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
 
-  virtual inline const char* type() const { return "DropConnect"; }
+  virtual inline const char* type() const { return "AdaptiveDropout"; }
   virtual inline int ExactNumBottomBlobs() const { return 1; }
   virtual inline int ExactNumTopBlobs() const { return 1; }
 
@@ -352,6 +352,8 @@ class AdaptiveDropoutLayer: public Layer<Dtype> {
   Blob<Dtype> prob_weight_;
   //adaptive dropout probability
   Blob<Dtype> prob_vec_;
+  //the raw hidden layer value before activate
+  Blob<Dtype> unact_hidden_;
   //random generated number
   Blob<unsigned int> rand_vec_;
   //affine parameters of the relationship between action 

@@ -13,6 +13,7 @@ namespace caffe {
 template <typename Dtype>
 void DropoutLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
+	//reshape the top layer to shape like bottom layer
   NeuronLayer<Dtype>::LayerSetUp(bottom, top);
   threshold_ = this->layer_param_.dropout_param().dropout_ratio();
   drop_type_ = this->layer_param_.dropout_param().drop_type();

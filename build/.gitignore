@@ -1,9 +1,7 @@
-Debug/
-Release/
-src/
-x64/
-*.suo
-*.pdb
-*.sdf
-*.opensdf
-
+## ignore all files
+*
+## except vs project files
+!*.sln
+!*.vcxproj
+!*.vcxproj.filters
+!*.vcxproj.user

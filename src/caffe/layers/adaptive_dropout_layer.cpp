@@ -99,6 +99,8 @@ void AdaptiveDropoutLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   // The first "axis" dimensions are independent inner products; the total
   // number of these is M_, the product over these dimensions.
   M_ = bottom[0]->count(0, axis);
+  DLOG(INFO) << "M_ " << M_;
+  DLOG(INFO) << "axis " << axis;
   // The top shape will be the bottom shape with the flattened axes dropped,
   // and replaced by a single axis with dimension num_output (N_).
   vector<int> top_shape = bottom[0]->shape();
@@ -109,6 +111,8 @@ void AdaptiveDropoutLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   this->prob_vec_.Reshape(top_shape);
   //set up cache for the random vector
   this->rand_vec_.Reshape(top_shape);
+  //set up cache for the unact_hidden layer
+  this->unact_hidden_.Reshape(top_shape);
   vector<int> weight_shape(2);
   weight_shape[0] = N_;
   weight_shape[1] = K_;
