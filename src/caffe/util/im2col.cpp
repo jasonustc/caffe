@@ -7,6 +7,7 @@
 
 namespace caffe {
 
+//what are this image for?
 template <typename Dtype>
 void im2col_cpu(const Dtype* data_im, const int channels,
     const int height, const int width, const int kernel_h, const int kernel_w,
