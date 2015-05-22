@@ -156,6 +156,28 @@ class XavierFiller : public Filler<Dtype> {
   }
 };
 
+template <typename Dtype>
+class TestLocalFiller :public Filler<Dtype>{
+public:
+	explicit TestLocalFiller(const FillerParameter& param)
+		:Filler<Dtype>(param){}
+	virtual void Fill(Blob<Dtype>* blob){
+		LOG(INFO) << "Doing mutable cpu.";
+		LOG(INFO) << "blobs" << blob;
+		Dtype* data = blob->mutable_cpu_data();
+		LOG(INFO) << "Done doing mutable cpu.";
+		CHECK_EQ(blob->channels(), 1);
+		for (int n = 0; n < blob->num(); n++){
+			for (int h = 0; h < blob->height(); h++){
+				for (int w = 0; w < blob->width(); w++){
+					*(data + blob->offset(n, 0, h, w)) = w;
+				}
+			}
+		}
+	}
+
+};
+
 
 /**
  * @brief Get a specific filler from the specification given in FillerParameter.
@@ -176,7 +198,11 @@ Filler<Dtype>* GetFiller(const FillerParameter& param) {
     return new UniformFiller<Dtype>(param);
   } else if (type == "xavier") {
     return new XavierFiller<Dtype>(param);
-  } else {
+  }
+  else if (type == "test_local"){
+	  return new TestLocalFiller<Dtype>(param);
+  }
+  else {
     CHECK(false) << "Unknown filler name: " << param.type();
   }
   return (Filler<Dtype>*)(NULL);

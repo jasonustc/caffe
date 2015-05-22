@@ -418,6 +418,7 @@ class PoolingLayer : public Layer<Dtype> {
   Blob<int> max_idx_;
 };
 
+
 #ifdef USE_CUDNN
 /*
  * @brief cuDNN implementation of PoolingLayer.

@@ -333,6 +333,7 @@ message LayerParameter {
   optional WindowDataParameter window_data_param = 129;
   optional DropConnectParameter drop_connect_param = 131;
   optional AdaptiveDropoutParameter adaptive_dropout_param = 132;
+  optional LocalParameter local_param = 133;
 }
 
 // Message that stores parameters used to apply transformation
@@ -422,6 +423,17 @@ message ConvolutionParameter {
     CUDNN = 2;
   }
   optional Engine engine = 15 [default = DEFAULT];
+}
+
+//Message that stores parameters used by locally-connected layer
+message LocalParameter{
+    optional uint32 num_output = 1;//The number of outputs for the layer
+    optional bool bias_term = 2[default = true]; //whether to have bias terms
+    optional uint32 pad = 3 [default = 0]; //The padding size
+    optional uint32 kernel_size = 4; //The kernel size
+    optional uint32 stride = 6[default = 1]; //The stride
+    optional FillerParameter weight_filler = 7; //The filler for the weight
+    optional FillerParameter bias_filler = 8; //The filler for the bias
 }
 
 // Message that stores parameters used by DataLayer
