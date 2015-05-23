@@ -55,6 +55,8 @@
     <ClCompile Include="..\src\caffe\layers\image_data_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\infogain_loss_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\inner_product_layer.cpp" />
+    <ClCompile Include="..\src\caffe\layers\local_adaptive_dropout_layer.cpp" />
+    <ClCompile Include="..\src\caffe\layers\local_dropconnect_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\local_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\loss_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\lrn_layer.cpp" />
@@ -113,6 +115,8 @@
     <CudaCompile Include="..\src\caffe\layers\hdf5_output_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\im2col_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\inner_product_layer.cu" />
+    <CudaCompile Include="..\src\caffe\layers\local_adaptive_dropout_layer.cu" />
+    <CudaCompile Include="..\src\caffe\layers\local_dropconnect_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\local_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\lrn_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\mvn_layer.cu" />

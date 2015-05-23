@@ -334,6 +334,8 @@ message LayerParameter {
   optional DropConnectParameter drop_connect_param = 131;
   optional AdaptiveDropoutParameter adaptive_dropout_param = 132;
   optional LocalParameter local_param = 133;
+  optional LocalAdaptiveDropoutParameter local_adaptive_dropout_param = 134;
+  optional LocalDropConnectParameter local_dropconnect_param = 135;
 }
 
 // Message that stores parameters used to apply transformation
@@ -434,6 +436,41 @@ message LocalParameter{
     optional uint32 stride = 6[default = 1]; //The stride
     optional FillerParameter weight_filler = 7; //The filler for the weight
     optional FillerParameter bias_filler = 8; //The filler for the bias
+}
+
+//Message that stores parameters used by locally-connected layer
+message LocalAdaptiveDropoutParameter{
+    optional uint32 num_output = 1;//The number of outputs for the layer
+    optional bool bias_term = 2[default = true]; //whether to have bias terms
+    optional uint32 pad = 3 [default = 0]; //The padding size
+    optional uint32 kernel_size = 4; //The kernel size
+    optional uint32 stride = 6[default = 1]; //The stride
+    optional FillerParameter weight_filler = 7; //The filler for the weight
+    optional FillerParameter bias_filler = 8; //The filler for the bias
+    optional float alpha = 9[default = 1]; //scale
+    optional float beta = 10[default = 0]; //shift
+    optional bool need_act = 11[default = true];//if need activation
+    enum ActType{
+        SIGMOID = 1;
+        RELU = 2;
+    }
+
+    optional ActType neuron_act_type = 12[default = RELU];//activation type
+    //of hidden neuron
+    optional ActType prob_act_type = 13[default = SIGMOID];//activation type
+    //of dropout probability
+}
+
+//Message that stores parameters used by locally-connected layer
+message LocalDropConnectParameter{
+    optional uint32 num_output = 1;//The number of outputs for the layer
+    optional bool bias_term = 2[default = true]; //whether to have bias terms
+    optional uint32 pad = 3 [default = 0]; //The padding size
+    optional uint32 kernel_size = 4; //The kernel size
+    optional uint32 stride = 6[default = 1]; //The stride
+    optional FillerParameter weight_filler = 7; //The filler for the weight
+    optional FillerParameter bias_filler = 8; //The filler for the bias
+    optional float dropout_ratio = 9[default = 0.5];//The dropout ratio
 }
 
 // Message that stores parameters used by DataLayer
@@ -638,7 +675,6 @@ message AdaptiveDropoutParameter{
   // May be negative to index from the end (e.g., -1 for the last axis).
   optional int32 axis = 6 [default = 1];
 }
-
 // Message that stores parameters used by LRNLayer
 message LRNParameter {
   optional uint32 local_size = 1 [default = 5];

@@ -75,16 +75,9 @@ void DropConnectLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
   if (propagate_down[0]) {
     const Dtype* top_diff = top[0]->gpu_diff();
     // Gradient with respect to bottom data
-	if (this->phase_ == TRAIN){
-		caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, K_, N_, (Dtype)1.,
-			top_diff, this->dropped_weight_.gpu_data(), (Dtype)0.,
-			bottom[0]->mutable_gpu_diff());
-	}
-	else{
-		caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, K_, N_, (Dtype)1.,
-			top_diff, this->blobs_[0]->gpu_data(), (Dtype)0.,
-			bottom[0]->mutable_gpu_diff());
-	}
+	caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, K_, N_, (Dtype)1.,
+		top_diff, this->dropped_weight_.gpu_data(), (Dtype)0.,
+		bottom[0]->mutable_gpu_diff());
   }
 }
 

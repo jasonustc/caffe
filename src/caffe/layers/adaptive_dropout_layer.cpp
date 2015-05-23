@@ -20,16 +20,16 @@ inline Dtype relu(Dtype x){
 }
 
 template <typename Dtype>
-inline void activate(const int n, Dtype* d, AdaptiveDropoutParameter_ActType act_type){
+inline void activate(const int n, const Dtype* in, Dtype* out, AdaptiveDropoutParameter_ActType act_type){
 	switch (act_type){
 	case caffe::AdaptiveDropoutParameter_ActType_SIGMOID:
 		for (int i = 0; i < n; i++){
-			d[i] = sigmoid<Dtype>(d[i]);
+			out[i] = sigmoid<Dtype>(in[i]);
 		}
 		break;
 	case caffe::AdaptiveDropoutParameter_ActType_RELU:
 		for (int i = 0; i < n; i++){
-			d[i] = relu<Dtype>(d[i]);
+			out[i] = relu<Dtype>(in[i]);
 		}
 		break;
 	default:
@@ -153,10 +153,13 @@ void AdaptiveDropoutLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
 	caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasTrans, M_, N_, K_, (Dtype)1.,
 		bottom_data, prob_weight_data, (Dtype)0., prob_vec_data);
 	//activation for probability
-	activate(prob_vec_.count(), prob_vec_data, prob_act_type_);
+	activate(prob_vec_.count(), prob_vec_data, prob_vec_data, prob_act_type_);
+
 	//output = W^T * Input
+	//weight: K_xN_
 	caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasTrans, M_, N_, K_, (Dtype)1.,
-		bottom_data, weight_data, (Dtype)0., top_data);
+		bottom_data, weight_data, (Dtype)0., unact_hidden_.mutable_cpu_data());
+
 	const int count_top = top[0]->count();
 	if (bias_term_) {
 		//top_data = 1* top_data + bias_multiplier * blobs_[1]
@@ -164,9 +167,10 @@ void AdaptiveDropoutLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
 			bias_multiplier_.cpu_data(),
 			this->blobs_[1]->cpu_data(), (Dtype)1., top_data);
 	}
-	//activate top data
-	activate(count_top, top_data, hidden_act_type_);
-	//weight: K_xN_
+	//activation for hidden units
+	const Dtype* unact_data = unact_hidden_.cpu_data();
+	activate<Dtype>(unact_hidden_.count(), unact_data, top[0]->mutable_cpu_data(), hidden_act_type_);
+	//dropout
 	if (this->phase_ == TRAIN){
 		DCHECK(prob_vec_.count() == rand_vec_.count());
 		unsigned int* rand_vec_data = this->rand_vec_.mutable_cpu_data();
@@ -178,41 +182,76 @@ void AdaptiveDropoutLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
 	}
 }
 
+template<typename Dtype>
+inline void SigmoidBackward(const int n, const Dtype* in_diff,
+	const Dtype* unact_data, Dtype* out_diff){
+	for(int i= 0; i < n ; i++){
+		const Dtype sigmoid_x = 1. / (1. + exp(- unact_data[i]));
+		out_diff[i] = in_diff[i] * sigmoid_x * (1 - sigmoid_x);
+	}
+}
+
+template <typename Dtype>
+inline void ReLUBackward(const int n, const Dtype* in_diff,
+	const Dtype* in_data, Dtype* out_diff){
+	for (int i = 0; i<n;i++){
+		out_diff[i] = in_diff[i] * (in_data[i] > 0);
+	}
+}
+
+template <typename Dtype>
+inline void ActBackward(const int n, const Dtype* in_diff,
+	const Dtype* in_data, Dtype* out_diff, AdaptiveDropoutParameter_ActType act_type){
+	switch (act_type)
+	{
+	case caffe::AdaptiveDropoutParameter_ActType_RELU:
+		ReLUBackward<Dtype>(n, in_diff, in_data, out_diff);
+		break;
+	case caffe::AdaptiveDropoutParameter_ActType_SIGMOID:
+		SigmoidBackward<Dtype>(n, in_diff, in_data, out_diff);
+		break;
+	default:
+		LOG(FATAL) << "unknown act function type.";
+		break;
+	}
+} 
+
 template <typename Dtype>
 void AdaptiveDropoutLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob<Dtype>*>& bottom) {
 	Dtype* top_diff = top[0]->mutable_cpu_diff();
 	const int count_top = top[0]->count();
-	if (this->phase_ == TRAIN){
-		const unsigned int* rand_vec_data = this->rand_vec_.mutable_cpu_data();
-		//top_diff = top_diff * rand_vec_data
-		common_mul<Dtype>(count_top, top_diff, rand_vec_data, top_diff);
+	//backward through dropout, put difference in prob_vec_.diff
+	const unsigned int* rand_vec_data = this->rand_vec_.mutable_cpu_data();
+	//top_diff = top_diff * rand_vec_data
+	common_mul<Dtype>(count_top, top_diff, rand_vec_data, prob_vec_.mutable_cpu_diff());
+	//backward through non-linear activation
+	const Dtype* in_data = unact_hidden_.cpu_data();
+	ActBackward<Dtype>(top[0]->count(), prob_vec_.cpu_diff(), in_data, unact_hidden_.mutable_cpu_diff(), hidden_act_type_);
+
+	//backward through inner product part
+	const Dtype* unact_diff = unact_hidden_.cpu_diff();
+	if (this->param_propagate_down_[0]) {
+		const Dtype* bottom_data = bottom[0]->cpu_data();
+		// Gradient with respect to weight
+		caffe_cpu_gemm<Dtype>(CblasTrans, CblasNoTrans, N_, K_, M_, (Dtype)1.,
+			unact_diff, bottom_data, (Dtype)0., this->blobs_[0]->mutable_cpu_diff());
 	}
-	else{
-		const Dtype* prob_vec_data = this->prob_vec_.mutable_cpu_data();
-		caffe_mul<Dtype>(count_top, top_diff, prob_vec_data, top_diff);
+	if (bias_term_ && this->param_propagate_down_[1]) {
+		const Dtype* top_diff = top[0]->cpu_diff();
+		// Gradient with respect to bias
+		caffe_cpu_gemv<Dtype>(CblasTrans, M_, N_, (Dtype)1., unact_diff,
+			bias_multiplier_.cpu_data(), (Dtype)0.,
+			this->blobs_[1]->mutable_cpu_diff());
 	}
-  if (this->param_propagate_down_[0]) {
-	  const Dtype* bottom_data = bottom[0]->cpu_data();
-	  // Gradient with respect to weight
-	  caffe_cpu_gemm<Dtype>(CblasTrans, CblasNoTrans, N_, K_, M_, (Dtype)1.,
-		  top_diff, bottom_data, (Dtype)0., this->blobs_[0]->mutable_cpu_diff());
-  }
-  if (bias_term_ && this->param_propagate_down_[1]) {
-    const Dtype* top_diff = top[0]->cpu_diff();
-    // Gradient with respect to bias
-    caffe_cpu_gemv<Dtype>(CblasTrans, M_, N_, (Dtype)1., top_diff,
-        bias_multiplier_.cpu_data(), (Dtype)0.,
-        this->blobs_[1]->mutable_cpu_diff());
-  }
-  if (propagate_down[0]) {
-    const Dtype* top_diff = top[0]->cpu_diff();
-    // Gradient with respect to bottom data
-	caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, K_, N_, (Dtype)1.,
-		top_diff, this->blobs_[0]->cpu_data(), (Dtype)0.,
-		bottom[0]->mutable_cpu_diff());
-  }
+	if (propagate_down[0]) {
+		const Dtype* top_diff = top[0]->cpu_diff();
+		// Gradient with respect to bottom data
+		caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, K_, N_, (Dtype)1.,
+			unact_diff, this->blobs_[0]->cpu_data(), (Dtype)0.,
+			bottom[0]->mutable_cpu_diff());
+	}
 }
 
 #ifdef CPU_ONLY

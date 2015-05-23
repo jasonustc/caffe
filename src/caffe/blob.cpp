@@ -19,6 +19,7 @@ void Blob<Dtype>::Reshape(const int num, const int channels, const int height,
   Reshape(shape);
 }
 
+//reshape will allocate memory for both data and diff
 template <typename Dtype>
 void Blob<Dtype>::Reshape(const vector<int>& shape) {
   CHECK_LE(shape.size(), kMaxBlobAxes);
@@ -484,6 +485,42 @@ void Blob<Dtype>::ToProto(BlobProto* proto, bool write_diff) const {
       proto->add_diff(diff_vec[i]);
     }
   }
+}
+
+template <typename Dtype>
+void Blob<Dtype>::PrintDataToFile(string blob_name)const{
+	string file_name = blob_name + "_data";
+	std::ofstream out_data(file_name, std::ofstream::out);
+	const Dtype* blob_data = this->cpu_data();
+	out_data << "num: " << this->num() << "\t";
+	out_data << "channel: " << this->channels() << "\t";
+	out_data << "height: " << this->height() << "\t";
+	out_data << "width: " << this->width() << "\t";
+	out_data << "L1 norm: " << this->asum_data() << "\t";
+	out_data << "L2 norm: " << this->sumsq_data() << "\n";
+	out_data << "data:\n";
+	for (int i = 0; i < this->count(); i++){
+		out_data << blob_data[i] << "\t";
+	}
+	out_data.close();
+}
+
+template <typename Dtype>
+void Blob<Dtype>::PrintDiffToFile(string blob_name)const{
+	string file_name = blob_name + "_diff";
+	std::ofstream out_data(file_name, std::ofstream::out);
+	const Dtype* blob_diff = this->cpu_diff();
+	out_data << "num: " << this->num() << "\t";
+	out_data << "channel: " << this->channels() << "\t";
+	out_data << "height: " << this->height() << "\t";
+	out_data << "width: " << this->width() << "\t";
+	out_data << "L1 norm: " << this->asum_diff() << "\t";
+	out_data << "L2 norm: " << this->sumsq_diff() << "\n";
+	out_data << "diff:\n";
+	for (int i = 0; i < this->count(); i++){
+		out_data << blob_diff[i] << "\t";
+	}
+	out_data.close();
 }
 
 INSTANTIATE_CLASS(Blob);

@@ -147,12 +147,11 @@ void DropConnectLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 	Dtype* weight_diff = this->blobs_[0]->mutable_cpu_diff();
 	const unsigned int* weight_multiplier = weight_multiplier_.cpu_data();
 	const int count_weight = this->blobs_[0]->count();
+	
 	caffe_cpu_gemm<Dtype>(CblasTrans, CblasNoTrans, N_, K_, M_, (Dtype)1.,
 		top_diff, bottom_data, (Dtype)0., this->blobs_[0]->mutable_cpu_diff());
-	if (this->phase_ == TRAIN){
-		for (int i = 0; i < count_weight; i++){
-			weight_diff[i] *=  weight_multiplier[i];
-		}
+	for (int i = 0; i < count_weight; i++){
+		weight_diff[i] *= weight_multiplier[i];
 	}
   }
   if (bias_term_ && this->param_propagate_down_[1]) {
@@ -165,16 +164,9 @@ void DropConnectLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   if (propagate_down[0]) {
     const Dtype* top_diff = top[0]->cpu_diff();
     // Gradient with respect to bottom data
-	if (this->phase_ == TRAIN){
-		caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, K_, N_, (Dtype)1.,
-			top_diff, this->dropped_weight_.cpu_data(), (Dtype)0.,
-			bottom[0]->mutable_cpu_diff());
-	}
-	else{
-		caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, K_, N_, (Dtype)1.,
-			top_diff, this->blobs_[0]->cpu_data(), (Dtype)0.,
-			bottom[0]->mutable_cpu_diff());
-	}
+	caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, K_, N_, (Dtype)1.,
+		top_diff, this->dropped_weight_.cpu_data(), (Dtype)0.,
+		bottom[0]->mutable_cpu_diff());
   }
 }
 
