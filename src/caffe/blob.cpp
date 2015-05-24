@@ -5,6 +5,7 @@
 #include "caffe/common.hpp"
 #include "caffe/syncedmem.hpp"
 #include "caffe/util/math_functions.hpp"
+#include <boost/algorithm/string.hpp>
 
 namespace caffe {
 
@@ -493,7 +494,7 @@ void Blob<Dtype>::PrintDataToFile(string blob_name)const{
 	std::ofstream out_data(file_name, std::ofstream::out);
 	const Dtype* blob_data = this->cpu_data();
 	out_data << "num: " << this->num() << "\t";
-	out_data << "channel: " << this->channels() << "\t";
+	out_data << "channels: " << this->channels() << "\t";
 	out_data << "height: " << this->height() << "\t";
 	out_data << "width: " << this->width() << "\t";
 	out_data << "L1 norm: " << this->asum_data() << "\t";
@@ -511,7 +512,7 @@ void Blob<Dtype>::PrintDiffToFile(string blob_name)const{
 	std::ofstream out_data(file_name, std::ofstream::out);
 	const Dtype* blob_diff = this->cpu_diff();
 	out_data << "num: " << this->num() << "\t";
-	out_data << "channel: " << this->channels() << "\t";
+	out_data << "channels: " << this->channels() << "\t";
 	out_data << "height: " << this->height() << "\t";
 	out_data << "width: " << this->width() << "\t";
 	out_data << "L1 norm: " << this->asum_diff() << "\t";
@@ -521,6 +522,110 @@ void Blob<Dtype>::PrintDiffToFile(string blob_name)const{
 		out_data << blob_diff[i] << "\t";
 	}
 	out_data.close();
+}
+
+template <typename Dtype>
+void Blob<Dtype>::ReadDataFromFile(string blob_name) {
+	string file_name = blob_name + "_data";
+	std::ifstream in_data(file_name, std::ifstream::in);
+	if (!in_data.is_open()){
+		LOG(ERROR) << "open data file " << file_name.c_str() << " failed.";
+		return;
+	}
+	string line;
+	std::getline(in_data, line);
+	vector<string> strs;
+	boost::split(strs, line, boost::is_any_of("\t"));
+	string item;
+	stringstream strstm;
+	int value, num = 1, channels = 1, height = 1, width = 1;
+	for (int i = 0; i < strs.size(); i++){
+		vector<string> infos;
+		line = strs[i];
+		boost::split(infos, line, boost::is_any_of(": "));
+		strstm.str(infos[1]);
+		if (!(strstm >> value)){
+			value = 1;
+		}
+		if (strcmp(infos[0].c_str(), "num")){
+			num = value;
+		}
+		else if (strcmp(infos[0].c_str(), "channels")){
+			channels = value;
+		}
+		else if (strcmp(infos[0].c_str(), "height")){
+			height = value;
+		}
+		else if (strcmp(infos[0].c_str(), "width")){
+			width = value;
+		}
+	}
+	this->Reshape(num, channels, height, width);
+	std::getline(in_data, line);
+	std::getline(in_data, line);
+	vector<string> feats;
+	boost::split(feats, line, boost::is_any_of("\t"));
+	CHECK_EQ(feats.size(), num*channels*height*width) 
+		<< "num of feats is not compatible with the dim info.";
+	Dtype* blob_data = this->mutable_cpu_data();
+	for (int i = 0; i < feats.size(); i++){
+		strstm.str(feats[i]);
+		if (!(strstm >> blob_data[i])){
+			blob_data[i] = (Dtype)0.;
+		}
+	}
+}
+
+template <typename Dtype>
+void Blob<Dtype>::ReadDiffFromFile(string blob_name) {
+	string file_name = blob_name + "_diff";
+	std::ifstream in_data(file_name, std::ifstream::in);
+	if (!in_data.is_open()){
+		LOG(ERROR) << "open diff file " << file_name.c_str() << " failed.";
+		return;
+	}
+	string line;
+	std::getline(in_data, line);
+	vector<string> strs;
+	boost::split(strs, line, boost::is_any_of("\t"));
+	string item;
+	stringstream strstm;
+	int value, num = 1, channels = 1, height = 1, width = 1;
+	for (int i = 0; i < strs.size(); i++){
+		vector<string> infos;
+		line = strs[i];
+		boost::split(infos, line, boost::is_any_of(": "));
+		strstm.str(infos[1]);
+		if (!(strstm >> value)){
+			value = 1;
+		}
+		if (strcmp(infos[0].c_str(), "num")){
+			num = value;
+		}
+		else if (strcmp(infos[0].c_str(), "channels")){
+			channels = value;
+		}
+		else if (strcmp(infos[0].c_str(), "height")){
+			height = value;
+		}
+		else if (strcmp(infos[0].c_str(), "width")){
+			width = value;
+		}
+	}
+	this->Reshape(num, channels, height, width);
+	std::getline(in_data, line);
+	std::getline(in_data, line);
+	vector<string> feats;
+	boost::split(feats, line, boost::is_any_of("\t"));
+	CHECK_EQ(feats.size(), num*channels*height*width) 
+		<< "num of feats is not compatible with the dim info.";
+	Dtype* blob_data = this->mutable_cpu_diff();
+	for (int i = 0; i < feats.size(); i++){
+		strstm.str(feats[i]);
+		if (!(strstm >> blob_data[i])){
+			blob_data[i] = (Dtype)0.;
+		}
+	}
 }
 
 INSTANTIATE_CLASS(Blob);

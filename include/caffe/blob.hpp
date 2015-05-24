@@ -233,6 +233,8 @@ class Blob {
   /// @brief print the blob data to file, for debug usage.
   void PrintDataToFile(string blob_name) const;
   void PrintDiffToFile(string blob_name) const;
+  void ReadDataFromFile(string blob_name);
+  void ReadDiffFromFile(string blob_name);
 
   /// @brief Compute the sum of absolute values (L1 norm) of the data.
   Dtype asum_data() const;
