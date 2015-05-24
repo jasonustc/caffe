@@ -13,6 +13,16 @@ void LocalLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 	const vector<Blob<Dtype>*>& top){
 	CHECK_EQ(bottom.size(), 1) << "Locally Conv Layer takes a single blob as input.";
 	CHECK_EQ(top.size(), 1) << "Locally Conv Layer takes a single blob as output.";
+	bottom[0]->ReadDataFromFile("bottom_dropout");
+
+	LocalParameter* convolution_param = this->layer_param_.mutable_local_param();
+	convolution_param->set_kernel_size(3);
+	convolution_param->set_stride(1);
+	convolution_param->set_num_output(1);
+	convolution_param->mutable_weight_filler()->set_type("constant");
+	convolution_param->mutable_weight_filler()->set_value(1.);
+	convolution_param->mutable_bias_filler()->set_type("constant");
+	convolution_param->mutable_bias_filler()->set_value(0.1);
 
 	kernel_size_ = this->layer_param_.local_param().kernel_size();
 	stride_ = this->layer_param_.local_param().stride();
@@ -22,6 +32,8 @@ void LocalLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 	height_ = bottom[0]->height();
 	width_ = bottom[0]->width();
 	num_output_ = this->layer_param_.local_param().num_output();
+
+
 
 	//height of output map
 	height_out_ = (height_ + 2 * pad_ - kernel_size_) / stride_ + 1;
@@ -97,6 +109,9 @@ void LocalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 	const Dtype* weight = this->blobs_[0]->cpu_data();
 	const Dtype* bottom_data = bottom[0]->cpu_data();
 	Dtype* top_data = top[0]->mutable_cpu_data();
+	bottom[0]->PrintDataToFile("test_local_bottom");
+	this->blobs_[0]->PrintDataToFile("test_local_weight");
+	this->blobs_[1]->PrintDataToFile("test_local_bias");
 
 	Blob<Dtype> E;
 	E.Reshape(1, 1, 1, K_);
@@ -126,6 +141,7 @@ void LocalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 				top_data + top[0]->offset(n));
 		}
 	}
+	top[0]->PrintDataToFile("test_of_top_local");
 }
 
 template <typename Dtype>

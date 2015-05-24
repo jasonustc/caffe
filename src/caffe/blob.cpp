@@ -537,26 +537,27 @@ void Blob<Dtype>::ReadDataFromFile(string blob_name) {
 	vector<string> strs;
 	boost::split(strs, line, boost::is_any_of("\t"));
 	string item;
-	stringstream strstm;
+	istringstream strstm;
 	int value, num = 1, channels = 1, height = 1, width = 1;
 	for (int i = 0; i < strs.size(); i++){
 		vector<string> infos;
 		line = strs[i];
-		boost::split(infos, line, boost::is_any_of(": "));
+		boost::split(infos, line, boost::is_any_of(":"));
+		strstm.clear();
 		strstm.str(infos[1]);
 		if (!(strstm >> value)){
 			value = 1;
 		}
-		if (strcmp(infos[0].c_str(), "num")){
+		if (!strcmp(infos[0].c_str(), "num")){
 			num = value;
 		}
-		else if (strcmp(infos[0].c_str(), "channels")){
+		else if (!strcmp(infos[0].c_str(), "channels")){
 			channels = value;
 		}
-		else if (strcmp(infos[0].c_str(), "height")){
+		else if (!strcmp(infos[0].c_str(), "height")){
 			height = value;
 		}
-		else if (strcmp(infos[0].c_str(), "width")){
+		else if (!strcmp(infos[0].c_str(), "width")){
 			width = value;
 		}
 	}
@@ -569,10 +570,12 @@ void Blob<Dtype>::ReadDataFromFile(string blob_name) {
 		<< "num of feats is not compatible with the dim info.";
 	Dtype* blob_data = this->mutable_cpu_data();
 	for (int i = 0; i < feats.size(); i++){
+		strstm.clear();
 		strstm.str(feats[i]);
 		if (!(strstm >> blob_data[i])){
 			blob_data[i] = (Dtype)0.;
 		}
+		std::cout << blob_data[i] << "\t";
 	}
 }
 
