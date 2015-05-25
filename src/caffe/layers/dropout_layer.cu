@@ -11,15 +11,6 @@
 namespace caffe {
 
 template <typename Dtype>
-void PrintToFile(string fileName, const int n, const Dtype* data){
-	std::ofstream outFile(fileName.c_str(), std::ofstream::out);
-	for (int i = 0; i < n; i++){
-		outFile << data[i] << "\t";
-	}
-	outFile.close();
-}
-
-template <typename Dtype>
 __global__ void DropoutClip(const int n, const Dtype* in,
     Dtype* mask, const Dtype lower_bound,  const Dtype higher_bound,
 	const float scale, Dtype* out) {
@@ -93,42 +84,36 @@ template <typename Dtype>
 void DropoutLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob<Dtype>*>& bottom) {
-  if (propagate_down[0]) {
-    const Dtype* top_diff = top[0]->gpu_diff();
-    Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
-	DLOG(INFO) << "mask data:";
-	for (int i = 0; i < 10; i++){
-		DLOG(INFO) << rand_vec_.cpu_data()[i];
+	if (propagate_down[0]) {
+		const Dtype* top_diff = top[0]->gpu_diff();
+		Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
+		if (this->phase_ == TRAIN) {
+			const Dtype* mask =
+				static_cast<const Dtype*>(rand_vec_.gpu_data());
+			const int count = bottom[0]->count();
+			//mask is set or clipped during forward pass
+			if (this->drop_type_ == DropoutParameter_DROPTYPE_GAUSSIAN){
+				DropoutBackward<Dtype> << <CAFFE_GET_BLOCKS(count),
+					CAFFE_CUDA_NUM_THREADS >> >(
+					count, top_diff, mask, scale_, bottom_diff);
+			}
+			else if (this->drop_type_ == DropoutParameter_DROPTYPE_UNIFORM){
+				DropoutBackward<Dtype> << <CAFFE_GET_BLOCKS(count),
+					CAFFE_CUDA_NUM_THREADS >> >(
+					count, top_diff, mask, scale_, bottom_diff);
+			}
+			else{
+				// NOLINT_NEXT_LINE(whitespace/operators)
+				DropoutBackward<Dtype> << <CAFFE_GET_BLOCKS(count),
+					CAFFE_CUDA_NUM_THREADS >> >(
+					count, top_diff, mask, scale_, bottom_diff);
+			}
+			CUDA_POST_KERNEL_CHECK;
+		}
+		else {
+			caffe_copy(top[0]->count(), top_diff, bottom_diff);
+		}
 	}
-    if (this->phase_ == TRAIN) {
-      const Dtype* mask =
-          static_cast<const Dtype*>(rand_vec_.gpu_data());
-      const int count = bottom[0]->count();
-	  //mask is set or clipped during forward pass
-	  if (this->drop_type_ == DropoutParameter_DROPTYPE_GAUSSIAN){
-		  DropoutBackward<Dtype><<<CAFFE_GET_BLOCKS(count),
-			CAFFE_CUDA_NUM_THREADS>>>(
-			  count, top_diff, mask, scale_, bottom_diff);
-	  }
-	  else if (this->drop_type_ == DropoutParameter_DROPTYPE_UNIFORM){
-		  DropoutBackward<Dtype><<<CAFFE_GET_BLOCKS(count),
-			CAFFE_CUDA_NUM_THREADS>>>(
-			  count, top_diff, mask, scale_, bottom_diff);
-	  }
-	  else{
-		  // NOLINT_NEXT_LINE(whitespace/operators)
-		  DropoutBackward<Dtype><<<CAFFE_GET_BLOCKS(count),
-			CAFFE_CUDA_NUM_THREADS>>>(
-			  count, top_diff, mask, scale_, bottom_diff);
-	  }
-      CUDA_POST_KERNEL_CHECK;
-	  PrintToFile<Dtype>("bottom_data_dropout", bottom[0]->count(), bottom[0]->cpu_data());
-	  PrintToFile<Dtype>("top_data_dropout", top[0]->count(), top[0]->cpu_data());
-	  PrintToFile<Dtype>("top_diff_dropout", top[0]->count(), top[0]->cpu_diff());
-    } else {
-      caffe_copy(top[0]->count(), top_diff, bottom_diff);
-    }
-  }
 }
 
 INSTANTIATE_LAYER_GPU_FUNCS(DropoutLayer);

@@ -62,7 +62,6 @@ void DropoutLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 	  for (int i = 0; i < count; ++i) {
 		  top_data[i] = bottom_data[i] * mask[i] * scale_;
 	  }
-	  rand_vec_.PrintDataToFile("mask_of_dropout");
   } else {
     caffe_copy(bottom[0]->count(), bottom_data, top_data);
   }
@@ -81,8 +80,6 @@ void DropoutLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 			for (int i = 0; i < count; ++i) {
 				bottom_diff[i] = top_diff[i] * mask[i] * scale_;
 			}
-			top[0]->PrintDiffToFile("top_dropout");
-			bottom[0]->PrintDiffToFile("bottom_dropout");
 		}
 		else {
 			caffe_copy(top[0]->count(), top_diff, bottom_diff);

@@ -21,7 +21,8 @@ class Filler {
  public:
   explicit Filler(const FillerParameter& param) : filler_param_(param) {}
   virtual ~Filler() {}
-  virtual void Fill(Blob<Dtype>* blob) = 0;
+  /// @brief when fill_diff is true, fill diff not data
+  virtual void Fill(Blob<Dtype>* blob, bool fill_diff = false) = 0;
  protected:
   FillerParameter filler_param_;
 };  // class Filler
@@ -33,16 +34,23 @@ class ConstantFiller : public Filler<Dtype> {
  public:
   explicit ConstantFiller(const FillerParameter& param)
       : Filler<Dtype>(param) {}
-  virtual void Fill(Blob<Dtype>* blob) {
-    Dtype* data = blob->mutable_cpu_data();
-    const int count = blob->count();
-    const Dtype value = this->filler_param_.value();
-    CHECK(count);
-    for (int i = 0; i < count; ++i) {
-      data[i] = value;
-    }
-    CHECK_EQ(this->filler_param_.sparse(), -1)
-         << "Sparsity not supported by this Filler.";
+  //here changed by xu shen to allow for diff filling
+  virtual void Fill(Blob<Dtype>* blob, bool fill_diff = false) {
+	  Dtype* data;
+	  if (fill_diff){
+		  data = blob->mutable_cpu_diff();
+	  }
+	  else{
+		  data = blob->mutable_cpu_data();
+	  }
+	  const int count = blob->count();
+	  const Dtype value = this->filler_param_.value();
+	  CHECK(count);
+	  for (int i = 0; i < count; ++i) {
+		  data[i] = value;
+	  }
+	  CHECK_EQ(this->filler_param_.sparse(), -1)
+		  << "Sparsity not supported by this Filler.";
   }
 };
 
@@ -52,7 +60,7 @@ class UniformFiller : public Filler<Dtype> {
  public:
   explicit UniformFiller(const FillerParameter& param)
       : Filler<Dtype>(param) {}
-  virtual void Fill(Blob<Dtype>* blob) {
+  virtual void Fill(Blob<Dtype>* blob, bool fill_diff = false) {
     CHECK(blob->count());
     caffe_rng_uniform<Dtype>(blob->count(), Dtype(this->filler_param_.min()),
         Dtype(this->filler_param_.max()), blob->mutable_cpu_data());
@@ -67,7 +75,7 @@ class GaussianFiller : public Filler<Dtype> {
  public:
   explicit GaussianFiller(const FillerParameter& param)
       : Filler<Dtype>(param) {}
-  virtual void Fill(Blob<Dtype>* blob) {
+  virtual void Fill(Blob<Dtype>* blob, bool fill_diff = false) {
     Dtype* data = blob->mutable_cpu_data();
     CHECK(blob->count());
     caffe_rng_gaussian<Dtype>(blob->count(), Dtype(this->filler_param_.mean()),
@@ -103,7 +111,7 @@ class PositiveUnitballFiller : public Filler<Dtype> {
  public:
   explicit PositiveUnitballFiller(const FillerParameter& param)
       : Filler<Dtype>(param) {}
-  virtual void Fill(Blob<Dtype>* blob) {
+  virtual void Fill(Blob<Dtype>* blob, bool fill_diff = false) {
     Dtype* data = blob->mutable_cpu_data();
     DCHECK(blob->count());
     caffe_rng_uniform<Dtype>(blob->count(), 0, 1, blob->mutable_cpu_data());
@@ -145,7 +153,7 @@ class XavierFiller : public Filler<Dtype> {
  public:
   explicit XavierFiller(const FillerParameter& param)
       : Filler<Dtype>(param) {}
-  virtual void Fill(Blob<Dtype>* blob) {
+  virtual void Fill(Blob<Dtype>* blob, bool fill_diff = false) {
     CHECK(blob->count());
     int fan_in = blob->count() / blob->num();
     Dtype scale = sqrt(Dtype(3) / fan_in);
@@ -161,7 +169,7 @@ class TestLocalFiller :public Filler<Dtype>{
 public:
 	explicit TestLocalFiller(const FillerParameter& param)
 		:Filler<Dtype>(param){}
-	virtual void Fill(Blob<Dtype>* blob){
+	virtual void Fill(Blob<Dtype>* blob, bool fill_diff = false){
 		LOG(INFO) << "Doing mutable cpu.";
 		LOG(INFO) << "blobs" << blob;
 		Dtype* data = blob->mutable_cpu_data();
