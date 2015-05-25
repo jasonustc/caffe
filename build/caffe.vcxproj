@@ -90,7 +90,7 @@
     <ClCompile Include="..\src\caffe\util\math_functions.cpp" />
     <ClCompile Include="..\src\caffe\util\upgrade_proto.cpp" />
     <ClCompile Include="..\src\gtest\gtest-all.cpp" />
-    <ClCompile Include="..\tools\test\test_local_layer.cpp" />
+    <ClCompile Include="..\tools\caffe.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu" />
@@ -226,7 +226,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>../bin/</OutDir>
-    <TargetName>caffe_test</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -234,7 +233,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>../bin/</OutDir>
-    <TargetName>caffe_test</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

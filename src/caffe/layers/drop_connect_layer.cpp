@@ -56,13 +56,6 @@ void DropConnectLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 			  this->layer_param_.drop_connect_param().bias_filler()));
 		  bias_filler->Fill(this->blobs_[1].get());
 	  }
-	  // Initialize the weight multiplier
-	  this->weight_multiplier_.Reshape(bottom[0]->num(), bottom[0]->channels(),
-		  weight_shape[0], weight_shape[1]);
-	  //Initialize the weight after dropout
-	  //one sample one channel corresponding to one time drop connect
-	  this->dropped_weight_.Reshape(bottom[0]->num(), bottom[0]->channels(),
-		  weight_shape[0], weight_shape[1]);
   }  // parameter initialization
   this->param_propagate_down_.resize(this->blobs_.size(), true);
 }
@@ -71,36 +64,34 @@ template <typename Dtype>
 void DropConnectLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   // Figure out the dimensions
-  const int axis = bottom[0]->CanonicalAxisIndex(
-      this->layer_param_.drop_connect_param().axis());
-  const int new_K = bottom[0]->count(axis);
-  CHECK_EQ(K_, new_K)
-      << "Input size incompatible with inner product parameters.";
-  // The first "axis" dimensions are independent inner products; the total
-  // number of these is M_, the product over these dimensions.
-  M_ = bottom[0]->count(0, axis);
-  // The top shape will be the bottom shape with the flattened axes dropped,
-  // and replaced by a single axis with dimension num_output (N_).
-  vector<int> top_shape = bottom[0]->shape();
-  top_shape.resize(axis + 1);
-  top_shape[axis] = N_;
-    vector<int> weight_shape(2);
-    weight_shape[0] = N_;
-    weight_shape[1] = K_;
-  top[0]->Reshape(top_shape);
+	const int axis = bottom[0]->CanonicalAxisIndex(
+		this->layer_param_.drop_connect_param().axis());
+	const int new_K = bottom[0]->count(axis);
+	CHECK_EQ(K_, new_K)
+		<< "Input size incompatible with inner product parameters.";
+	// The first "axis" dimensions are independent inner products; the total
+	// number of these is M_, the product over these dimensions.
+	M_ = bottom[0]->count(0, axis);
+	// The top shape will be the bottom shape with the flattened axes dropped,
+	// and replaced by a single axis with dimension num_output (N_).
+	vector<int> top_shape = bottom[0]->shape();
+	top_shape.resize(axis + 1);
+	top_shape[axis] = N_;
+	vector<int> weight_shape(2);
+	weight_shape[0] = N_;
+	weight_shape[1] = K_;
+	top[0]->Reshape(top_shape);
 	// Set up the cache for random weight multiplier generation
-	this->weight_multiplier_.Reshape(bottom[0]->num(), bottom[0]->channels(), 
-		weight_shape[0], weight_shape[1]);
+	this->weight_multiplier_.Reshape(this->blobs_[0]->shape());
 	//Initialize the weight after dropout
 	//one sample one channel corresponding to one time drop connect
-	this->dropped_weight_.Reshape(bottom[0]->num(), bottom[0]->channels(), 
-		weight_shape[0], weight_shape[1]);
-  // Set up the bias multiplier
-  if (bias_term_) {
-    vector<int> bias_shape(1, M_);
-    bias_multiplier_.Reshape(bias_shape);
-    caffe_set(M_, Dtype(1), bias_multiplier_.mutable_cpu_data());
-  }
+	this->dropped_weight_.Reshape(this->blobs_[0]->shape());
+	// Set up the bias multiplier
+	if (bias_term_) {
+		vector<int> bias_shape(1, M_);
+		bias_multiplier_.Reshape(bias_shape);
+		caffe_set(M_, Dtype(1), bias_multiplier_.mutable_cpu_data());
+	}
 }
 
 template <typename Dtype>
@@ -113,7 +104,7 @@ void DropConnectLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 	//mutable_cpu_data(): Dtype*, can be set by other values
   unsigned int* weight_multiplier = this->weight_multiplier_.mutable_cpu_data();
   Dtype* dropped_weight = this->dropped_weight_.mutable_cpu_data();
-  const int count = this->weight_multiplier_.count();
+  const int count = this->blobs_[0]->count();
   //weight: K_xN_
   if (this->phase_ == TRAIN){
 	  //create random numbers
@@ -140,34 +131,36 @@ template <typename Dtype>
 void DropConnectLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob<Dtype>*>& bottom) {
-  if (this->param_propagate_down_[0]) {
-    const Dtype* top_diff = top[0]->cpu_diff();
-    const Dtype* bottom_data = bottom[0]->cpu_data();
-    // Gradient with respect to weight
-	Dtype* weight_diff = this->blobs_[0]->mutable_cpu_diff();
-	const unsigned int* weight_multiplier = weight_multiplier_.cpu_data();
-	const int count_weight = this->blobs_[0]->count();
-	
-	caffe_cpu_gemm<Dtype>(CblasTrans, CblasNoTrans, N_, K_, M_, (Dtype)1.,
-		top_diff, bottom_data, (Dtype)0., this->blobs_[0]->mutable_cpu_diff());
-	for (int i = 0; i < count_weight; i++){
-		weight_diff[i] *= weight_multiplier[i];
+	if (this->param_propagate_down_[0]) {
+		const Dtype* top_diff = top[0]->cpu_diff();
+		const Dtype* bottom_data = bottom[0]->cpu_data();
+		// Gradient with respect to weight
+		Dtype* weight_diff = this->blobs_[0]->mutable_cpu_diff();
+		const unsigned int* weight_multiplier = weight_multiplier_.cpu_data();
+		const int count_weight = this->blobs_[0]->count();
+
+		caffe_cpu_gemm<Dtype>(CblasTrans, CblasNoTrans, N_, K_, M_, (Dtype)1.,
+			top_diff, bottom_data, (Dtype)0., this->blobs_[0]->mutable_cpu_diff());
+		if (this->phase_ == TRAIN){
+			for (int i = 0; i < count_weight; i++){
+				weight_diff[i] = weight_diff[i] * weight_multiplier[i] * scale_;
+			}
+		}
 	}
-  }
-  if (bias_term_ && this->param_propagate_down_[1]) {
-    const Dtype* top_diff = top[0]->cpu_diff();
-    // Gradient with respect to bias
-    caffe_cpu_gemv<Dtype>(CblasTrans, M_, N_, (Dtype)1., top_diff,
-        bias_multiplier_.cpu_data(), (Dtype)0.,
-        this->blobs_[1]->mutable_cpu_diff());
-  }
-  if (propagate_down[0]) {
-    const Dtype* top_diff = top[0]->cpu_diff();
-    // Gradient with respect to bottom data
-	caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, K_, N_, (Dtype)1.,
-		top_diff, this->dropped_weight_.cpu_data(), (Dtype)0.,
-		bottom[0]->mutable_cpu_diff());
-  }
+	if (bias_term_ && this->param_propagate_down_[1]) {
+		const Dtype* top_diff = top[0]->cpu_diff();
+		// Gradient with respect to bias
+		caffe_cpu_gemv<Dtype>(CblasTrans, M_, N_, (Dtype)1., top_diff,
+			bias_multiplier_.cpu_data(), (Dtype)0.,
+			this->blobs_[1]->mutable_cpu_diff());
+	}
+	if (propagate_down[0]) {
+		const Dtype* top_diff = top[0]->cpu_diff();
+		// Gradient with respect to bottom data
+		caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, K_, N_, (Dtype)1.,
+			top_diff, this->dropped_weight_.cpu_data(), (Dtype)0.,
+			bottom[0]->mutable_cpu_diff());
+	}
 }
 
 #ifdef CPU_ONLY
