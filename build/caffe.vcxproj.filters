@@ -244,8 +244,6 @@
     <ClCompile Include="..\src\gtest\gtest-all.cpp">
       <Filter>src\test</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\caffe\test\test_convolution_layer.cpp" />
-    <ClCompile Include="..\src\caffe\test\test_local_layer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">

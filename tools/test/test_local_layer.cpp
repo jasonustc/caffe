@@ -107,7 +107,7 @@ namespace caffe{
 			convolution_param->set_kernel_size(3);
 			convolution_param->set_stride(2);
 			convolution_param->set_num_output(4);
-			convolution_param->mutable_weight_filler()->set_type("constant");
+			convolution_param->mutable_weight_filler()->set_type("test_local");
 			convolution_param->mutable_weight_filler()->set_value(1.);
 			convolution_param->mutable_bias_filler()->set_type("constant");
 			convolution_param->mutable_bias_filler()->set_value(0.1);
