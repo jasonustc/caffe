@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>train -solver=D:\\caffe-windows\\bin\\cifar10\\proto/cifar10_full_solver_d.prototxt</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>train -solver=D:/Users/v-xushe/caffe/cifar10/proto/cifar10_full_solver_80cfg.prototxt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>train -solver=D:\\caffe-windows\\bin\\cifar10\\proto/cifar10_full_solver_d.prototxt</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>train -solver=D:/Users/v-xushe/caffe/cifar10/proto/cifar10_full_solver_80cfg.prototxt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

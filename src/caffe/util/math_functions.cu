@@ -128,6 +128,7 @@ void caffe_gpu_asum<double>(const int n, const double* x, double* y) {
   CUBLAS_CHECK(cublasDasum(Caffe::cublas_handle(), n, x, 1, y));
 }
 
+//y[i] = alpha * x[i]
 template <>
 void caffe_gpu_scale<float>(const int n, const float alpha, const float *x,
                             float* y) {
@@ -442,10 +443,11 @@ void caffe_gpu_rng_uniform<float>(const int n, const float a, const float b,
 template <typename Dtype>
 __global__ void thred_kernel(const int n, const Dtype* p, unsigned int* r){
 	CUDA_KERNEL_LOOP(index, n){
-		r[index] = r[index] > static_cast<unsigned int>(p[index] * UINT_MAX);
+		r[index] = r[index] < static_cast<unsigned int>(p[index] * UINT_MAX);
 	}
 }
 
+//p[i] = P(r[i]=1)
 template <>
 void caffe_gpu_rng_bernoulli<float>(const int n, const float* p, unsigned int* r){
 	//generate n unsigned int random numbers in [0, UINT_MAX] and put into r

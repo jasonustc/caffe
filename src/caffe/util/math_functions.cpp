@@ -113,6 +113,8 @@ template void caffe_copy<unsigned int>(const int N, const unsigned int* X,
 template void caffe_copy<float>(const int N, const float* X, float* Y);
 template void caffe_copy<double>(const int N, const double* X, double* Y);
 
+//multiple each element of a matrix/vector by a constant
+//cblas_sscal(const int N, const float alpha, void* X, const int incX);
 template <>
 void caffe_scal<float>(const int N, const float alpha, float *X) {
   cblas_sscal(N, alpha, X, 1);

@@ -10,26 +10,26 @@
 namespace caffe {
 template <typename Dtype>
 //inline: only self and friend class can call
-inline Dtype sigmoid(Dtype x){
+inline Dtype sigmoid_cpu(Dtype x){
 	return 1. / (1. + exp(-x));
 }
 
 template <typename Dtype>
-inline Dtype relu(Dtype x){
+inline Dtype relu_cpu(Dtype x){
 	return std::max(x, Dtype(0));
 }
 
 template <typename Dtype>
-inline void activate(const int n, const Dtype* in, Dtype* out, AdaptiveDropoutParameter_ActType act_type){
+inline void activate_cpu(const int n, const Dtype* in, Dtype* out, AdaptiveDropoutParameter_ActType act_type){
 	switch (act_type){
 	case caffe::AdaptiveDropoutParameter_ActType_SIGMOID:
 		for (int i = 0; i < n; i++){
-			out[i] = sigmoid<Dtype>(in[i]);
+			out[i] = sigmoid_cpu<Dtype>(in[i]);
 		}
 		break;
 	case caffe::AdaptiveDropoutParameter_ActType_RELU:
 		for (int i = 0; i < n; i++){
-			out[i] = relu<Dtype>(in[i]);
+			out[i] = relu_cpu<Dtype>(in[i]);
 		}
 		break;
 	default:
@@ -99,8 +99,6 @@ void AdaptiveDropoutLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   // The first "axis" dimensions are independent inner products; the total
   // number of these is M_, the product over these dimensions.
   M_ = bottom[0]->count(0, axis);
-  DLOG(INFO) << "M_ " << M_;
-  DLOG(INFO) << "axis " << axis;
   // The top shape will be the bottom shape with the flattened axes dropped,
   // and replaced by a single axis with dimension num_output (N_).
   vector<int> top_shape = bottom[0]->shape();
@@ -116,8 +114,6 @@ void AdaptiveDropoutLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   vector<int> weight_shape(2);
   weight_shape[0] = N_;
   weight_shape[1] = K_;
-  //set up cache for probability weight
-  this->prob_weight_.Reshape(weight_shape);
   // Set up the bias multiplier
   if (bias_term_) {
     vector<int> bias_shape(1, M_);
@@ -127,7 +123,7 @@ void AdaptiveDropoutLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 }
 
 template <typename Dtype>
-inline void common_mul(const int n, const Dtype* a, const unsigned int* b, Dtype* y){
+inline void common_mul_cpu(const int n, const Dtype* a, const unsigned int* b, Dtype* y){
 	for (int i = 0; i < n; i++){
 		y[i] = a[i] * Dtype(b[i]);
 	}
@@ -142,18 +138,17 @@ void AdaptiveDropoutLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
 	const Dtype* weight_data = this->blobs_[0]->cpu_data();
 	//cpu_data(): const Dtype*, can not be changed
 	//mutable_cpu_data(): Dtype*, can be set by other values
-	Dtype* prob_weight_data = this->prob_weight_.mutable_cpu_data();
 	Dtype* prob_vec_data = this->prob_vec_.mutable_cpu_data();
-	const int count_weight = this->prob_weight_.count();
-	//compute prob_weight_data from weight_data
-	for (int i = 0; i < count_weight; i++){
-		prob_weight_data[i] = alpha_ * weight_data[i] + beta_;
-	}
 	//get probabilities by prob_weight
 	caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasTrans, M_, N_, K_, (Dtype)1.,
-		bottom_data, prob_weight_data, (Dtype)0., prob_vec_data);
+		bottom_data, weight_data, (Dtype)0., prob_vec_data);
+	//compute prob_weight_data from weight_data
+	//prob_act = f(alpha*(pi * bottom + bias) + beta)
+	for (int i = 0; i < this->prob_vec_.count(); i++){
+		prob_vec_data[i] = alpha_ * prob_vec_data[i] + beta_;
+	}
 	//activation for probability
-	activate(prob_vec_.count(), prob_vec_data, prob_vec_data, prob_act_type_);
+	activate_cpu<Dtype>(prob_vec_.count(), this->prob_vec_.cpu_data(), prob_vec_data, prob_act_type_);
 
 	//output = W^T * Input
 	//weight: K_xN_
@@ -169,13 +164,14 @@ void AdaptiveDropoutLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
 	}
 	//activation for hidden units
 	const Dtype* unact_data = unact_hidden_.cpu_data();
-	activate<Dtype>(unact_hidden_.count(), unact_data, top[0]->mutable_cpu_data(), hidden_act_type_);
+	activate_cpu<Dtype>(unact_hidden_.count(), unact_data, top[0]->mutable_cpu_data(), hidden_act_type_);
 	//dropout
 	if (this->phase_ == TRAIN){
 		DCHECK(prob_vec_.count() == rand_vec_.count());
 		unsigned int* rand_vec_data = this->rand_vec_.mutable_cpu_data();
+		//p[i]=P(r[i]=1)
 		caffe_rng_bernoulli<Dtype>(prob_vec_.count(), prob_vec_data, rand_vec_data);
-		common_mul<Dtype>(count_top, top_data, rand_vec_data, top_data);
+		common_mul_cpu<Dtype>(count_top, top_data, rand_vec_data, top_data);
 	}
 	else{
 		caffe_mul<Dtype>(count_top, top_data, prob_vec_data, top_data);
@@ -183,7 +179,7 @@ void AdaptiveDropoutLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
 }
 
 template<typename Dtype>
-inline void SigmoidBackward(const int n, const Dtype* in_diff,
+inline void SigmoidBackward_cpu(const int n, const Dtype* in_diff,
 	const Dtype* unact_data, Dtype* out_diff){
 	for(int i= 0; i < n ; i++){
 		const Dtype sigmoid_x = 1. / (1. + exp(- unact_data[i]));
@@ -192,7 +188,7 @@ inline void SigmoidBackward(const int n, const Dtype* in_diff,
 }
 
 template <typename Dtype>
-inline void ReLUBackward(const int n, const Dtype* in_diff,
+inline void ReLUBackward_cpu(const int n, const Dtype* in_diff,
 	const Dtype* in_data, Dtype* out_diff){
 	for (int i = 0; i<n;i++){
 		out_diff[i] = in_diff[i] * (in_data[i] > 0);
@@ -200,15 +196,15 @@ inline void ReLUBackward(const int n, const Dtype* in_diff,
 }
 
 template <typename Dtype>
-inline void ActBackward(const int n, const Dtype* in_diff,
+inline void ActBackward_cpu(const int n, const Dtype* in_diff,
 	const Dtype* in_data, Dtype* out_diff, AdaptiveDropoutParameter_ActType act_type){
 	switch (act_type)
 	{
 	case caffe::AdaptiveDropoutParameter_ActType_RELU:
-		ReLUBackward<Dtype>(n, in_diff, in_data, out_diff);
+		ReLUBackward_cpu<Dtype>(n, in_diff, in_data, out_diff);
 		break;
 	case caffe::AdaptiveDropoutParameter_ActType_SIGMOID:
-		SigmoidBackward<Dtype>(n, in_diff, in_data, out_diff);
+		SigmoidBackward_cpu<Dtype>(n, in_diff, in_data, out_diff);
 		break;
 	default:
 		LOG(FATAL) << "unknown act function type.";
@@ -225,10 +221,11 @@ void AdaptiveDropoutLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 	//backward through dropout, put difference in prob_vec_.diff
 	const unsigned int* rand_vec_data = this->rand_vec_.mutable_cpu_data();
 	//top_diff = top_diff * rand_vec_data
-	common_mul<Dtype>(count_top, top_diff, rand_vec_data, prob_vec_.mutable_cpu_diff());
+	common_mul_cpu<Dtype>(count_top, top_diff, rand_vec_data, prob_vec_.mutable_cpu_diff());
 	//backward through non-linear activation
 	const Dtype* in_data = unact_hidden_.cpu_data();
-	ActBackward<Dtype>(top[0]->count(), prob_vec_.cpu_diff(), in_data, unact_hidden_.mutable_cpu_diff(), hidden_act_type_);
+	ActBackward_cpu<Dtype>(top[0]->count(), prob_vec_.cpu_diff(), in_data, 
+		unact_hidden_.mutable_cpu_diff(), hidden_act_type_);
 
 	//backward through inner product part
 	const Dtype* unact_diff = unact_hidden_.cpu_diff();

@@ -489,16 +489,20 @@ void Blob<Dtype>::ToProto(BlobProto* proto, bool write_diff) const {
 }
 
 template <typename Dtype>
-void Blob<Dtype>::PrintDataToFile(string blob_name)const{
+void Blob<Dtype>::PrintDataToFile(string blob_name, bool print_norm){
 	string file_name = blob_name + "_data";
 	std::ofstream out_data(file_name, std::ofstream::out);
+	this->mutable_cpu_data();
+	this->mutable_gpu_data();
 	const Dtype* blob_data = this->cpu_data();
 	out_data << "num:" << this->num() << "\t";
 	out_data << "channels:" << this->channels() << "\t";
 	out_data << "height:" << this->height() << "\t";
 	out_data << "width:" << this->width() << "\t";
-//	out_data << "L1 norm:" << this->asum_data() << "\t";
-//	out_data << "L2 norm:" << this->sumsq_data() << "\n";
+	if (print_norm){
+		out_data << "L1 norm:" << this->asum_data() << "\t";
+		out_data << "L2 norm:" << this->sumsq_data() << "\n";
+	}
 	out_data << "data:\n";
 	for (int i = 0; i < this->count(); i++){
 		out_data << blob_data[i] << "\t";
@@ -507,9 +511,11 @@ void Blob<Dtype>::PrintDataToFile(string blob_name)const{
 }
 
 template <typename Dtype>
-void Blob<Dtype>::PrintDiffToFile(string blob_name)const{
+void Blob<Dtype>::PrintDiffToFile(string blob_name){
 	string file_name = blob_name + "_diff";
 	std::ofstream out_data(file_name, std::ofstream::out);
+	this->mutable_cpu_diff();
+	this->mutable_gpu_diff();
 	const Dtype* blob_diff = this->cpu_diff();
 	out_data << "num:" << this->num() << "\t";
 	out_data << "channels:" << this->channels() << "\t";

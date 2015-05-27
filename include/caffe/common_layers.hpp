@@ -317,6 +317,7 @@ class DropConnectLayer: public Layer<Dtype> {
  *
  * TODO(dox): thorough documentation for Forward, Backward, and proto params.
  */
+ //TODO: use independent weight for adaptive dropout probability
 template <typename Dtype>
 class AdaptiveDropoutLayer: public Layer<Dtype> {
  public:
@@ -348,8 +349,6 @@ class AdaptiveDropoutLayer: public Layer<Dtype> {
   int N_;
   bool bias_term_;
   Blob<Dtype> bias_multiplier_;
-  //TODO: use independent weight for adaptive dropout probability
-  Blob<Dtype> prob_weight_;
   //adaptive dropout probability
   Blob<Dtype> prob_vec_;
   //the raw hidden layer value before activate

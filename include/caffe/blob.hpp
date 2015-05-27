@@ -231,8 +231,8 @@ class Blob {
   void ToProto(BlobProto* proto, bool write_diff = false) const;
 
   /// @brief print the blob data to file, for debug usage.
-  void PrintDataToFile(string blob_name) const;
-  void PrintDiffToFile(string blob_name) const;
+  void PrintDataToFile(string blob_name, bool print_norm = true);
+  void PrintDiffToFile(string blob_name);
   void ReadDataFromFile(string blob_name);
   void ReadDiffFromFile(string blob_name);
 

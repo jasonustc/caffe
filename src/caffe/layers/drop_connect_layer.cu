@@ -61,10 +61,8 @@ void DropConnectLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 	if (this->phase_ == TRAIN){
 		unsigned int* weight_multiplier = static_cast<unsigned int*>(
 			weight_multiplier_.mutable_gpu_data());
-		this->blobs_[0]->PrintDataToFile("weight_gpu_before_drop");
 		DropWeight<Dtype> << <CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS >> >(
-			count, weight_diff, weight_multiplier, uint_thres_, (Dtype)1., weight_diff);
-		this->blobs_[0]->PrintDataToFile("weight_gpu_after_drop");
+			count, weight_diff, weight_multiplier, uint_thres_, scale_, weight_diff);
 	}
   }
   if (bias_term_ && this->param_propagate_down_[1]) {
