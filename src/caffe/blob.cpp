@@ -21,6 +21,8 @@ void Blob<Dtype>::Reshape(const int num, const int channels, const int height,
 }
 
 //reshape will allocate memory for both data and diff
+//if count < capacity, will not allocate new memory, just use the allocated memory
+//I think this operation can save much time.
 template <typename Dtype>
 void Blob<Dtype>::Reshape(const vector<int>& shape) {
   CHECK_LE(shape.size(), kMaxBlobAxes);
