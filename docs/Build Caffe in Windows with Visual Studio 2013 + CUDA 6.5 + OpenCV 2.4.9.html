@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<!-- saved from url=(0114)https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/ -->
+<html lang="en"><!--
+	generated in 0.511 seconds
+	102985 bytes batcached for 300 seconds
+--><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<title>Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9 | Neil Z. SHAO's Blog</title>
+<link rel="profile" href="http://gmpg.org/xfn/11">
+<link rel="pingback" href="https://initialneil.wordpress.com/xmlrpc.php">
+
+<link rel="alternate" type="application/rss+xml" title="Neil Z. SHAO&#39;s Blog » Feed" href="https://initialneil.wordpress.com/feed/">
+<link rel="alternate" type="application/rss+xml" title="Neil Z. SHAO&#39;s Blog » Comments Feed" href="https://initialneil.wordpress.com/comments/feed/">
+<link rel="alternate" type="application/rss+xml" title="Neil Z. SHAO&#39;s Blog » Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9 Comments Feed" href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/feed/">
+<script type="text/javascript">
+/* <![CDATA[ */
+function addLoadEvent(func){var oldonload=window.onload;if(typeof window.onload!='function'){window.onload=func;}else{window.onload=function(){oldonload();func();}}}
+/* ]]> */
+</script>
+<link rel="stylesheet" id="all-css-0" href="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/saved_resource" type="text/css" media="all">
+<link rel="stylesheet" id="zoren-bitter-css" href="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/css" type="text/css" media="all">
+<link rel="stylesheet" id="zoren-open-sans-css" href="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/css(1)" type="text/css" media="all">
+<link rel="stylesheet" id="all-css-4" href="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/saved_resource(1)" type="text/css" media="all">
+<link rel="stylesheet" id="print-css-4" href="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/global-print.css" type="text/css" media="print">
+<script type="text/javascript">
+/* <![CDATA[ */
+var LoggedOutFollow = {"invalid_email":"Your subscription did not succeed, please try again with a valid email address."};
+/* ]]> */
+</script>
+<script type="text/javascript" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/saved_resource(2)"></script>
+<link rel="stylesheet" id="all-css-0" href="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/style.css" type="text/css" media="all">
+<!--[if lt IE 8]>
+<link rel='stylesheet' id='highlander-comments-ie7-css'  href='https://s2.wp.com/wp-content/mu-plugins/highlander-comments/style-ie7.css?m=1351637563g&#038;ver=20110606' type='text/css' media='all' />
+<![endif]-->
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://initialneil.wordpress.com/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://s1.wp.com/wp-includes/wlwmanifest.xml"> 
+<link rel="prev" title="OpenCV 2.4.9 + CUDA 6.5 + Visual Studio 2013" href="https://initialneil.wordpress.com/2014/09/25/opencv-2-4-9-cuda-6-5-visual-studio-2013/">
+<meta name="generator" content="WordPress.com">
+<link rel="canonical" href="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9.html">
+<link rel="shortlink" href="http://wp.me/p1R33M-18">
+<link rel="alternate" type="application/json+oembed" href="https://public-api.wordpress.com/oembed/1.0/?format=json&url=https%3A%2F%2Finitialneil.wordpress.com%2F2015%2F01%2F11%2Fbuild-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9%2F&for=wpcom-auto-discovery"><link rel="alternate" type="application/xml+oembed" href="https://public-api.wordpress.com/oembed/1.0/?format=xml&url=https%3A%2F%2Finitialneil.wordpress.com%2F2015%2F01%2F11%2Fbuild-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9%2F&for=wpcom-auto-discovery">
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article">
+<meta property="og:title" content="Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9">
+<meta property="og:url" content="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/">
+<meta property="og:description" content="Caffe is a deep learning framework popular in Linux with Python or Matlab interface. I just managed to compile Caffe in Windows, and I think it&#39;s worth sharing. niuzhiheng&#39;s GitHub was of great hel...">
+<meta property="article:published_time" content="2015-01-11T07:59:13+00:00">
+<meta property="article:modified_time" content="2015-01-26T03:31:44+00:00">
+<meta property="article:author" content="https://initialneil.wordpress.com/author/initialneil/">
+<meta property="og:site_name" content="Neil Z. SHAO&#39;s Blog">
+<meta property="og:image" content="https://initialneil.files.wordpress.com/2015/01/vs2013-setup-6.png">
+<meta property="og:image" content="https://initialneil.files.wordpress.com/2015/01/vs2013-setup-5.png">
+<meta property="og:image" content="https://initialneil.files.wordpress.com/2015/01/vs2013-setup-4.png">
+<meta property="og:image" content="https://initialneil.files.wordpress.com/2015/01/vs2013-setup-3.png">
+<meta property="og:image" content="https://initialneil.files.wordpress.com/2015/01/environment-1.png">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:site" content="@wordpressdotcom">
+<meta name="twitter:image" content="https://initialneil.files.wordpress.com/2015/01/configuration-manager-1.png?w=240">
+<meta name="twitter:card" content="summary">
+<meta property="fb:app_id" content="249643311490">
+<meta property="article:publisher" content="https://www.facebook.com/WordPresscom">
+<link rel="shortcut icon" type="image/x-icon" href="https://s2.wp.com/i/favicon.ico" sizes="16x16 24x24 32x32 48x48">
+<link rel="icon" type="image/x-icon" href="https://s2.wp.com/i/favicon.ico" sizes="16x16 24x24 32x32 48x48">
+<link rel="apple-touch-icon-precomposed" href="https://s0.wp.com/i/webclip.png">
+<link rel="openid.server" href="https://initialneil.wordpress.com/?openidserver=1">
+<link rel="openid.delegate" href="https://initialneil.wordpress.com/">
+<link rel="search" type="application/opensearchdescription+xml" href="https://initialneil.wordpress.com/osd.xml" title="Neil Z. SHAO&#39;s Blog">
+<link rel="search" type="application/opensearchdescription+xml" href="http://wordpress.com/opensearch.xml" title="WordPress.com">
+		<style type="text/css">
+			.recentcomments a {
+				display: inline !important;
+				padding: 0 !important;
+				margin: 0 !important;
+			}
+
+			table.recentcommentsavatartop img.avatar, table.recentcommentsavatarend img.avatar {
+				border: 0px;
+				margin: 0;
+			}
+
+			table.recentcommentsavatartop a, table.recentcommentsavatarend a {
+				border: 0px !important;
+				background-color: transparent !important;
+			}
+
+			td.recentcommentsavatarend, td.recentcommentsavatartop {
+				padding: 0px 0px 1px 0px;
+				margin: 0px;
+			}
+
+			td.recentcommentstextend {
+				border: none !important;
+				padding: 0px 0px 2px 10px;
+			}
+
+			.rtl td.recentcommentstextend {
+				padding: 0px 10px 2px 0px;
+			}
+
+			td.recentcommentstexttop {
+				border: none;
+				padding: 0px 0px 0px 10px;
+			}
+
+			.rtl td.recentcommentstexttop {
+				padding: 0px 10px 0px 0px;
+			}
+		</style>
+		<meta name="application-name" content="Neil Z. SHAO&#39;s Blog"><meta name="msapplication-window" content="width=device-width;height=device-height"><meta name="msapplication-tooltip" content="The Same is Lame."><meta name="msapplication-task" content="name=Subscribe;action-uri=https://initialneil.wordpress.com/feed/;icon-uri=https://s2.wp.com/i/favicon.ico"><meta name="msapplication-task" content="name=Sign up for a free blog;action-uri=http://wordpress.com/signup/;icon-uri=https://s2.wp.com/i/favicon.ico"><meta name="msapplication-task" content="name=WordPress.com Support;action-uri=http://support.wordpress.com/;icon-uri=https://s2.wp.com/i/favicon.ico"><meta name="msapplication-task" content="name=WordPress.com Forums;action-uri=http://forums.wordpress.com/;icon-uri=https://s2.wp.com/i/favicon.ico"><meta name="title" content="Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9 | Neil Z. SHAO&#39;s Blog on WordPress.com">
+<meta name="description" content="Caffe is a deep learning framework popular in Linux with Python or Matlab interface. I just managed to compile Caffe in Windows, and I think it&#39;s worth sharing. niuzhiheng&#39;s GitHub was of great help. This repository is organized in a way that future update merging from Caffe&#39;s GitHub would be very straight forward. For quick setup and…">
+<style type="text/css" id="custom-background-css">
+body.custom-background { background-image: url('https://s0.wp.com/wp-content/themes/pub/zoren/images/body.png'); background-repeat: repeat; background-position: top left; background-attachment: scroll; }
+</style>
+
+<script type="text/javascript" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/google_service.js">
+</script>
+<script type="text/javascript">
+if ( typeof GS_googleAddAdSenseService == 'function' ) { GS_googleAddAdSenseService("ca-pub-3443918307802676"); }
+if ( typeof GS_googleEnableAllServices == 'function' ) { GS_googleEnableAllServices() };
+</script><script src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/google_ads.js"></script>
+<script type="text/javascript" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/amzn_ads.js"></script>
+<script type="text/javascript">
+try { amznads.getAds("3033","300x250"); } catch(e) { /* ignore */ }
+</script><script type="text/javascript" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/bid"></script>
+<script type="text/javascript">
+var amznKeys = amznads.getKeys();
+if (typeof amznKeys != "undefined" && amznKeys != "") { for (var i =0; i < amznKeys.length; i++) { var key = amznKeys[i]; GA_googleAddAttr("amzn", key);} }
+document.close();
+</script>
+<script type="text/javascript">
+if ( typeof GA_googleAddSlot == 'function' ) { GA_googleAddSlot("ca-pub-3443918307802676", "wpcom_below_post"); }
+</script>
+<script type="text/javascript">
+if ( typeof GA_googleFetchAds == 'function' ) { GA_googleFetchAds(); }
+</script>
+
+<script type="text/javascript">
+var wpcom_ads = { bid: 27419486, pt: 'permalink', wa: 0, as: 0, domain: 'initialneil.wordpress.com', url: 'https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/', gid: '', };
+</script>
+<style type="text/css" id="syntaxhighlighteranchor"></style>
+<script type="text/javascript">
+	window.google_analytics_uacct = "UA-52447-2";
+</script>
+
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-52447-2']);
+	_gaq.push(['_setDomainName', 'wordpress.com']);
+	_gaq.push(['_initData']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+	})();
+</script><script type="text/javascript" async="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/ga.js"></script>
+<script type="text/javascript" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/osd.js"></script><link rel="stylesheet" type="text/css" id="gravatar-card-css" href="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/hovercard.css"><link rel="stylesheet" type="text/css" id="gravatar-card-services-css" href="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/services.css"><script type="text/javascript" async="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/saved_resource(3)"></script></head>
+
+<body class="single single-post postid-70 single-format-standard custom-background mp6 customizer-styles-applied highlander-enabled highlander-light">
+<div id="page" class="hfeed site">
+		<header id="masthead" class="site-header" role="banner">
+		<div class="site-branding">
+			<h1 class="site-title"><a href="https://initialneil.wordpress.com/" title="Neil Z. SHAO&#39;s Blog" rel="home" sl-processed="1">Neil Z. SHAO's Blog</a></h1>
+			<h2 class="site-description">The Same is Lame.</h2>
+		</div>
+
+		<nav id="site-navigation" class="main-navigation" role="navigation">
+			<h1 class="menu-toggle">Menu</h1>
+			<div class="screen-reader-text skip-link"><a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#content" title="Skip to content" sl-processed="1">Skip to content</a></div>
+
+			<div class="menu"><ul class=" nav-menu"><li><a href="https://initialneil.wordpress.com/" sl-processed="1">Home</a></li><li class="page_item page-item-2"><a href="https://initialneil.wordpress.com/about/" sl-processed="1">About Me</a></li></ul></div>
+		</nav><!-- #site-navigation -->
+	</header><!-- #masthead -->
+
+	
+	<div id="main" class="site-main">
+	<div id="primary" class="content-area">
+		<div id="content" class="site-content" role="main">
+
+		
+			
+<article id="post-70" class="post-70 post type-post status-publish format-standard hentry category-uncategorized">
+
+		<div class="entry-meta clear">
+
+					<span class="entry-format-badge genericon genericon-standard"><span class="screen-reader-text">Standard</span></span>
+		
+		<div class="author-meta ">
+			<p>Posted by</p>
+			<span><a href="https://initialneil.wordpress.com/author/initialneil/" title="Posts by Neil Shao" rel="author" sl-processed="1">Neil Shao</a></span>
+		</div>
+		<div class="clock-meta">
+			<p>Posted on</p>
+			<span><a href="https://initialneil.wordpress.com/2015/01/11/" rel="bookmark" title="7:59 am" sl-processed="1">January 11, 2015</a></span>
+		</div>
+		<div class="category-meta">
+			<p>Posted under</p>
+			<span> <a href="https://initialneil.wordpress.com/category/uncategorized/" rel="category tag" sl-processed="1">Uncategorized</a></span>
+		</div>
+
+				<div class="discussion-meta">
+			<p>Comments</p>
+			<span><a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comments" title="Comment on Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9" sl-processed="1">21 Comments</a></span>
+		</div>
+			</div><!-- .entry-meta -->
+	
+	<h1 class="entry-title">Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV&nbsp;2.4.9</h1>
+	<div class="entry-content clear">
+		<p>Caffe is a deep learning framework popular in Linux with Python or Matlab interface. I just managed to compile Caffe in Windows, and I think it’s worth sharing. <a href="https://github.com/niuzhiheng/caffe" target="_blank" sl-processed="1">niuzhiheng’s GitHub</a>&nbsp;was of great help. This repository is organized in a way that future update&nbsp;merging from <a href="https://github.com/BVLC/caffe" target="_blank" sl-processed="1">Caffe’s GitHub</a> would be very straight forward.</p>
+<p>For quick setup and usage go to my <a href="https://github.com/initialneil/caffe/tree/windows" target="_blank" sl-processed="1">GitHub</a>.</p>
+<hr>
+<p>Below is my step by step record to compile Caffe from source in Windows 8.1 + vs2013 + OpenCV 2.4.9 + CUDA 6.5.</p>
+<ol>
+<li>Download source from <a href="https://github.com/BVLC/caffe" target="_blank" sl-processed="1">Caffe’s GitHub</a> and unzip.</li>
+<li>Create a new project in Visual Studio 2013.</li>
+</ol>
+<ul>
+<li><em>File -&gt; New -&gt; Project</em></li>
+<li>Choose <em>Win32 Console Application</em></li>
+<li>Set location to the root of Caffe</li>
+<li>Change Name to <em>caffe </em>(the generated exe file later is named after the project name, so please use this low case word)</li>
+<li>Click <em>OK</em></li>
+<li>Check <em>Empty project</em>, and then <em>Finish</em></li>
+</ul>
+<ol start="3">
+<li>Change the platform from <em>Win32</em> to</li>
+</ol>
+<ul>
+<li><em>Build -&gt; Configuration Manager -&gt; Active solution platform -&gt; new -&gt; x64 -&gt; OK</em></li>
+</ul>
+<p><a href="https://initialneil.files.wordpress.com/2015/01/configuration-manager-1.png" sl-processed="1"><img class="  wp-image-83 alignnone" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/configuration-manager-1.png" alt="Configuration Manager - 1" width="555" height="350"></a></p>
+<ol start="4">
+<li>An empty project called <em>caffe</em> is generated into the root of Caffe now. To compile big project like Caffe, good practice is to compile a few *<em>.cpp</em> files first and figure out dependencies one by one.</li>
+</ol>
+<ul>
+<li>Drag files in <em>caffe/src/caffe</em> to <em>Source Files </em>in VS.</li>
+</ul>
+<p><a href="https://initialneil.files.wordpress.com/2015/01/vs2013-setup-1.png" sl-processed="1"><img class="alignnone  wp-image-85" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/vs2013-setup-1.png" alt="vs2013 setup - 1" width="320" height="430"></a></p>
+<ol start="5">
+<li>Let’s set some directories of the project.</li>
+</ol>
+<ul>
+<li>In <em>Property Manager</em>, both <em>Debug|x64 </em>and <em>Release|x64</em> need to be set:</li>
+</ul>
+<p><a href="https://initialneil.files.wordpress.com/2015/01/vs2013-setup-2.png" sl-processed="1"><img class="alignnone  wp-image-89" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/vs2013-setup-2.png" alt="vs2013 setup - 2" width="1048" height="346"></a></p>
+<ul>
+<li>In <em>Configuration Properties</em> <em>-&gt; General</em>, set <em>Output Directory </em>to ‘<em>../bin’. </em>The generated exe files will be easy to use later. Change for both Debug and Release mode.</li>
+<li>In <em>Configuration Properties -&gt; C/C++ -&gt; General</em>, edit <em>Additional Include Directories&nbsp;(Both Debug and Release)</em> to include:</li>
+</ul>
+<blockquote><p>../include;<br>
+../src;</p></blockquote>
+<ul>
+<li>Make sure to check <em>Inherit from parent or project defaults.</em></li>
+</ul>
+<ol start="6">
+<li>Now let’s fix dependencies one by one: (My pre-built <em>3rdparty</em> folder can be downloaded: <a href="https://drive.google.com/file/d/0B_G5BUend20PRnFhMUlMelFEZW8/view?usp=sharing" target="_blank" sl-processed="1">3rdparty.zip</a>, if you are using Windows 64bit + vs2013)</li>
+</ol>
+<ul>
+<li>CUDA 6.5
+<ul>
+<li>Download and install (You have to have a GPU on your PC lol)</li>
+</ul>
+</li>
+<li>OpenCV 2.4.9 + CUDA 6.5
+<ul>
+<li><a href="http://sourceforge.net/projects/opencvlibrary/files/opencv-win/" sl-processed="1">Pre-built</a> OpenCV libraries should work.&nbsp;If you want to build OpenCV with CUDA to enable OpenCV’s GPU support such as <em>GpuMat</em>, a tutorial can be found <a href="https://initialneil.wordpress.com/2014/09/25/opencv-2-4-9-cuda-6-5-visual-studio-2013/" sl-processed="1">here</a>. Seems it’s not required by Caffe though.</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>Boost
+<ul>
+<li><a href="http://sourceforge.net/projects/boost/files/boost-binaries/" sl-processed="1">Pre-built</a> ones works fine. I used “<a href="http://sourceforge.net/projects/boost/files/boost-binaries/1.56.0/boost_1_56_0-msvc-12.0-64.exe/download" sl-processed="1"><em>boost_1_56_0-msvc-12.0-64.exe</em></a>”.</li>
+</ul>
+</li>
+<li>OpenBLAS
+<ul>
+<li><a href="http://sourceforge.net/projects/openblas/files/" sl-processed="1">Pre-built</a> ones works fine. I used “<a href="http://sourceforge.net/projects/openblas/files/v0.2.12/OpenBLAS-v0.2.12-Win64-int64.zip/download" sl-processed="1"><em>OpenBLAS-v0.2.12-Win64-int64.zip</em></a>”.</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>Add OpenCV + CUDA + Boost into the project:
+<ul>
+<li>I used to put these 3 libraries outside Caffe folder because they are so useful.</li>
+<li>Add include path to <em>Additional Include Directories</em>: (Both Debug and Release)</li>
+</ul>
+</li>
+</ul>
+<blockquote><p>$(CUDA_PATH_V6_5)\include<br>
+$(OPENCV_X64_VS2013_2_4_9)\include<br>
+$(OPENCV_X64_VS2013_2_4_9)\include\opencv<br>
+$(BOOST_1_56_0)</p></blockquote>
+<ul>
+<li>CUDA_PATH_V6_5 is added by CUDA initialization. <em>OPENCV_X64_VS2013_2_4_9</em> and <em>BOOST_1_56_0</em> need to be added to the <em>Environment Variables</em> Also, the <em>bin </em>(e.g. /to/opencv-2.4.9/x64-vs2013/bin) folder of OpenCV need to be added to <em>Path</em>. You may need to log off to enable them.</li>
+</ul>
+<p><a href="https://initialneil.files.wordpress.com/2015/01/environment-1.png" sl-processed="1"><img class="alignnone  wp-image-92" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/environment-1.png" alt="Environment - 1" width="540" height="600"></a></p>
+<ul>
+<li>Add lib path to <em>Additional Library Directories </em>in <em>Configuration Properties -&gt; Linker -&gt; General</em>: (Both Debug and Release)</li>
+</ul>
+<blockquote><p>$(CUDA_PATH_V6_5)\lib\$(PlatformName)<br>
+$(OPENCV_X64_VS2013_2_4_9)\lib<br>
+$(BOOST_1_56_0)\lib64-msvc-12.0</p></blockquote>
+<ul>
+<li>Add libraries to <em>Additional Dependencies</em> in <em>Configuration Properties -&gt; Linker -&gt; Input</em></li>
+<li>Debug:</li>
+</ul>
+<blockquote><p>opencv_core249d.lib;opencv_calib3d249d.lib;opencv_contrib249d.lib;opencv_flann249d.lib;opencv_highgui249d.lib;opencv_imgproc249d.lib;opencv_legacy249d.lib;opencv_ml249d.lib;opencv_gpu249d.lib;opencv_objdetect249d.lib;opencv_photo249d.lib;opencv_features2d249d.lib;opencv_nonfree249d.lib;opencv_stitching249d.lib;opencv_video249d.lib;opencv_videostab249d.lib;<span class="skimlinks-unlinked">cudart.lib;cuda.lib;nppi.lib;cufft.lib;cublas.lib;curand.lib;%(AdditionalDependencies</span>)</p></blockquote>
+<ul>
+<li>Release:</li>
+</ul>
+<blockquote><p>opencv_core249.lib;opencv_flann249.lib;opencv_imgproc249.lib;opencv_highgui249.lib;opencv_legacy249.lib;opencv_video249.lib;opencv_ml249.lib;opencv_calib3d249.lib;opencv_objdetect249.lib;opencv_stitching249.lib;opencv_gpu249.lib;opencv_nonfree249.lib;opencv_features2d249.lib;<span class="skimlinks-unlinked">cudart.lib;cuda.lib;nppi.lib;cufft.lib;cublas.lib;curand.lib;%(AdditionalDependencies</span>)</p></blockquote>
+<ul>
+<li>GFlags + GLog + ProtoBuf + LevelDB
+<ul>
+<li>Download source code from the internet.</li>
+<li>Use CMake to generate .sln for vs2013. Remember to set “CMAKE_INSTALL_PREFIX”, which is where the output files will be generated by build “INSTALL”.</li>
+<li>Build in vs2013. Usually build “BUILD_ALL” first, then “INSTALL”. Both Debug and Release mode.</li>
+<li>Copy compiled files to <em>caffe/3rdparty. </em>Debug versions should be renamed “+d” before copy, e.g. “<em>lib” -&gt; “<span class="skimlinks-unlinked">gflagsd.lib</span>”.</em></li>
+<li>Google’s code are very good maintained. Nothing much to say.</li>
+</ul>
+</li>
+<li>HDF5
+<ul>
+<li>Download source code form the internet.</li>
+<li>In CMake, enable <em>HDF5_BUILD_HL_LIB</em>.</li>
+<li>Copy compiled files to <em>caffe/3rdparty.</em></li>
+</ul>
+</li>
+<li>LMDB
+<ul>
+<li>Download <a href="https://gitorious.org/mdb/mdb/source/462dc097451834477b597447af69c5acc93182b7:libraries/liblmdb" sl-processed="1">source code</a> from the internet.</li>
+<li>In Visual Studio 2013, <em>File -&gt; New -&gt; Project From Existing Code…</em></li>
+<li>In <em>c</em>, a header file called <em>unistd.h</em> is needed. A walk around is found <a href="http://stackoverflow.com/questions/341817/is-there-a-replacement-for-unistd-h-for-windows-visual-c" sl-processed="1">here</a>. Or one can download here: <a href="https://drive.google.com/file/d/0B_G5BUend20PVmFQQkJyT1V2b2M/view?usp=sharing" sl-processed="1">unistd.h</a>, <a href="https://drive.google.com/file/d/0B_G5BUend20PekJ0aHBQMGRJRFU/view?usp=sharing" sl-processed="1">getopt.h</a> and <a href="https://drive.google.com/file/d/0B_G5BUend20PWHpva1pEU1JuelU/view?usp=sharing" sl-processed="1">getopt.c</a>.</li>
+<li>The compiled <em>LMDB</em> has some problem which I’ll mention later.</li>
+</ul>
+</li>
+<li>Copy some <em>.dll </em>files so that <em>caffe</em> can run
+<ul>
+<li>Copy <em><span class="skimlinks-unlinked">libglog.dll</span></em><em>&nbsp;</em>from GLog to <em>caffe/bin.</em></li>
+<li>Copy <em><span class="skimlinks-unlinked">libopenblas.dll</span></em> &nbsp;from OpenBLAS to <em>caffe/bin.</em></li>
+<li>Copy <em>msvcp120.dll</em> and <em>msvcr120.dll</em> &nbsp;from HDF5 to <em>caffe/bin.</em></li>
+</ul>
+</li>
+<li>More paths added to <em>Additional Include Directories</em> (Both Debug and Release):</li>
+</ul>
+<blockquote><p>../3rdparty/include;<br>
+../3rdparty/include/openblas;<br>
+../3rdparty/include/hdf5;<br>
+../3rdparty/include/lmdb;</p></blockquote>
+<ul>
+<li>More paths added to <em>Additional Library Directories </em>(Both Debug and Release)<em>:</em></li>
+</ul>
+<blockquote><p>../3rdparty/lib</p></blockquote>
+<ul>
+<li>More files added to Additional Dependencies:</li>
+<li>Debug:</li>
+</ul>
+<blockquote><p><span class="skimlinks-unlinked">gflagsd.lib;libglog.lib;libopenblas.dll.a;libprotobufd.lib;libprotoc.lib;leveldbd.lib;lmdbd.lib;libhdf5_D.lib;libhdf5_hl_D.lib;Shlwapi.lib</span>;</p></blockquote>
+<ul>
+<li>Release:</li>
+</ul>
+<blockquote><p><span class="skimlinks-unlinked">gflags.lib;libglog.lib;libopenblas.dll.a;libprotobuf.lib;libprotoc.lib;leveldb.lib;lmdb.lib;libhdf5.lib;libhdf5_hl.lib;Shlwapi.lib</span>;</p></blockquote>
+<ul>
+<li>My pre-built 3rdparty folder can be downloaded: <a href="https://drive.google.com/file/d/0B_G5BUend20PRnFhMUlMelFEZW8/view?usp=sharing" target="_blank" sl-processed="1">3rdparty.zip</a>, if you are using Windows 64bit + vs2013.</li>
+</ul>
+<ol start="7">
+<li>Now compile “<em><span class="skimlinks-unlinked">common.cpp</span></em>” to fix errors.</li>
+</ol>
+<p><a href="https://initialneil.files.wordpress.com/2015/01/vs2013-setup-3.png" sl-processed="1"><img class="alignnone  wp-image-93" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/vs2013-setup-3.png" alt="vs2013 setup - 3" width="909" height="676"></a></p>
+<ul>
+<li>Add “#include &lt;process.h&gt;” to <em><span class="skimlinks-unlinked">common.cpp</span></em>&nbsp;fix “getpid” error.</li>
+<li>Add “_CRT_SECURE_NO_WARNINGS” to <em>Configuration Properties -&gt; C/C++ -&gt; Preprocessor -&gt; Preprocessor Definitions</em> to fix “fopen_s” error.</li>
+<li>Change the line used “getpid” in <em><span class="skimlinks-unlinked">common.cpp</span></em><em>&nbsp;</em>to fix POSIX error.</li>
+</ul>
+<blockquote><p>// port for Win32<br>
+#ifndef _MSC_VER<br>
+pid = getpid();<br>
+#else<br>
+pid = _getpid();<br>
+#endif</p></blockquote>
+<ul>
+<li><em><span class="skimlinks-unlinked">common.cpp</span>&nbsp;</em>should be compiled without error&nbsp;now.</li>
+</ul>
+<ol start="8">
+<li>Now compile “<em><span class="skimlinks-unlinked">blob.cpp</span></em>”</li>
+</ol>
+<ul>
+<li>To enable #include “caffe/proto/<span class="skimlinks-unlinked">caffe.pb.h</span>”. We need to generate it from <span class="skimlinks-unlinked">caffe.proto</span>.</li>
+<li>Put <a href="https://drive.google.com/file/d/0B_G5BUend20PWVBGR2xBOXFhWWM/view?usp=sharing" target="_blank" sl-processed="1">proto.exe</a>&nbsp;in <em>caffe/3rdparty/bin </em>folder.</li>
+<li>Put <a href="https://drive.google.com/file/d/0B_G5BUend20PRDc3bXI0YkRLaUU/view?usp=sharing" sl-processed="1">GeneratePB.bat</a>&nbsp;in <em>caffe/scripts </em>folder.</li>
+<li>Add the line below (with the quote mark) to<em> Configuration Properties -&gt; Build Events -&gt; Pre-Build Event -&gt; Command Line</em>:</li>
+</ul>
+<blockquote><p>“../scripts/<span class="skimlinks-unlinked">GeneratePB.bat</span>”</p></blockquote>
+<ul>
+<li>Right click <em>caffe </em>to build to project, you will see “<span class="skimlinks-unlinked">caffe.pb.h</span> is being generated” and “<span class="skimlinks-unlinked">caffe_pretty_print.pb.h</span> is being generated”</li>
+<li>Now <em><span class="skimlinks-unlinked">blop.cpp</span>&nbsp;</em>can be compiled without errors.</li>
+</ul>
+<ol start="9">
+<li>Now compile “<em><span class="skimlinks-unlinked">net.cpp</span></em>”</li>
+</ol>
+<ul>
+<li>“unistd.h” missing error can be fixed like above. (also included in 3rdparty.zip already)</li>
+<li>“mkstemp” missing error can be fixed according to <a href="http://stackoverflow.com/questions/6036227/mkstemp-implementation-for-win32" sl-processed="1">this</a> (download here: <a href="https://drive.google.com/file/d/0B_G5BUend20PZzZmd2NpMUktYms/view?usp=sharing" sl-processed="1">mkstep.h</a>&nbsp;and <a href="https://drive.google.com/file/d/0B_G5BUend20PbUJ2RnJ4OUxNQ00/view?usp=sharing" sl-processed="1">mkstep.cpp</a> or find in 3rdparty.zip)</li>
+<li>Add “#include “mkstemp.h”” to <em><span class="skimlinks-unlinked">io.hpp</span></em>.</li>
+<li>Change the line used “close” the below in <em><span class="skimlinks-unlinked">io.hpp</span>&nbsp;</em>to fix <em>close</em> error. (Don’t do “#define close _close” in <em><span class="skimlinks-unlinked">io.hpp</span></em>. Such <em>define</em> are dangerous in any <em>.hpp</em> files, but acceptable in <em>.cpp </em>files)</li>
+</ul>
+<blockquote><p>#ifndef _MSC_VER<br>
+close(fd);<br>
+#else<br>
+_close(fd);<br>
+#endif</p></blockquote>
+<ul>
+<li>Change the line used “mkdtemp” function to below in <em><span class="skimlinks-unlinked">io.hpp</span>&nbsp;</em>(to use <em>_mktemp_s</em> as a walk-around for <em>mkdtemp</em>):</li>
+</ul>
+<blockquote><p>#ifndef _MSC_VER<br>
+char* mkdtemp_result = mkdtemp(temp_dirname_cstr);<br>
+#else<br>
+errno_t mkdtemp_result = _mktemp_s(temp_dirname_cstr, sizeof(temp_dirname_cstr));<br>
+#endif</p></blockquote>
+<ol start="10">
+<li>Now compile “<em><span class="skimlinks-unlinked">solver.cpp</span></em>”</li>
+</ol>
+<ul>
+<li>Add these line to <em><span class="skimlinks-unlinked">solver.cpp</span></em><em>&nbsp;</em>to fix “snprintf” error to below:</li>
+</ul>
+<blockquote><p>// port for Win32<br>
+#ifdef _MSC_VER<br>
+#define snprintf sprintf_s<br>
+#endif</p></blockquote>
+<ol start="11">
+<li>Now compile files in <em>caffe/src/layers</em></li>
+</ol>
+<ul>
+<li>Create a folder in <em>Source Files </em>and drag ONE <em>.cu</em> files in <em>layer</em> folder into it.</li>
+<li>Enable <em>CUDA 6.5(.targets, .props) </em>in <em>PROJECT -&gt; Build Customization</em>.</li>
+</ul>
+<p><a href="https://initialneil.files.wordpress.com/2015/01/vs2013-setup-4.png" sl-processed="1"><img class="alignnone  wp-image-96" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/vs2013-setup-4.png" alt="vs2013 setup - 4" width="750" height="435"></a></p>
+<p>&nbsp;</p>
+<p><a href="https://initialneil.files.wordpress.com/2015/01/vs2013-setup-5.png" sl-processed="1"><img class="alignnone  wp-image-97" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/vs2013-setup-5.png" alt="vs2013 setup - 5" width="749" height="447"></a></p>
+<p>&nbsp;</p>
+<ul>
+<li>In the property of any <em>.cu </em>file, change <em>Item Type </em>to <em>CUDA C/C++</em></li>
+</ul>
+<p><a href="https://initialneil.files.wordpress.com/2015/01/vs2013-setup-6.png" sl-processed="1"><img class="alignnone  wp-image-98" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/vs2013-setup-6.png" alt="vs2013 setup - 6" width="1024" height="215"></a></p>
+<ul>
+<li>Drag the rest files in <em>layer </em>folder to the project. All new added <em>.cu</em> file will have its <em>Item Type</em> Otherwise you have to change them one by one.</li>
+<li>In <em><span class="skimlinks-unlinked">bnll_layer.cu</span></em>, change “const float kBNLL_THRESHOLD = 50.;” to “#define kBNLL_THRESHOLD 50.0” to avoid error.</li>
+<li>Now every files in <em>layer</em> folder compiles fine.</li>
+</ul>
+<ol start="12">
+<li>Now compile files in <em>caffe/src/util </em>folder</li>
+</ol>
+<ul>
+<li>Goto&nbsp;<em>ReadProtoFromBinaryFile</em> function. Change “O_RDONLY” to “O_RDONLY | O_BINARY”. When loading a binary file in Windows, you have to specify that it’s binary. Otherwise you might have error loading a <em>*_mean.binaryproto&nbsp;</em>file later.</li>
+<li>Add these lines to <em><span class="skimlinks-unlinked">io.cpp</span></em><em>&nbsp;</em>file to avoid POSIX error:</li>
+</ul>
+<blockquote><p>// port for Win32<br>
+#ifdef _MSC_VER<br>
+#define open _open<br>
+#define close _close<br>
+#endif</p></blockquote>
+<ul>
+<li>Add these lines to&nbsp;<em><span class="skimlinks-unlinked">math_functions.cpp</span> </em>to fix <em>__builtin_popcount </em>and <em>__builtin_popcountl</em> error:</li>
+</ul>
+<blockquote><p>#define __builtin_popcount __popcnt<br>
+#define __builtin_popcountl __popcnt</p></blockquote>
+<ol start="13">
+<li>Now compile files in <em>caffe/src/proto</em></li>
+</ol>
+<ul>
+<li>Previously 2&nbsp;<em>.cc </em>files were generated by <em><span class="skimlinks-unlinked">GeneratePB.bat</span></em>.</li>
+<li>Create a folder in <em>Source Files</em> and drag 2 <em>.cc </em>files (“<span class="skimlinks-unlinked">caffe.pb.cc</span>” and “<span class="skimlinks-unlinked">caffe_pretty_print.pb.cc</span>”) into it.</li>
+<li>Add “-D_SCL_SECURE_NO_WARNINGS” to <em>Configuration Properties -&gt; C/C++ -&gt; Command Line </em>(Both Debug and Release mode) to fix <em>‘std::_Copy_impl’</em> unsafe error.</li>
+<li>Now we have every file compliable in Visual Studio.</li>
+</ul>
+<ol start="14">
+<li>Finally compile <em><span class="skimlinks-unlinked">caffe.cpp</span></em><em>&nbsp;</em>in <em>caffe/tools folder</em></li>
+</ol>
+<ul>
+<li>Drag <em>caffe/tools/<span class="skimlinks-unlinked">caffe.cpp</span> </em>file into Visual Studio’s <em>Source Files </em></li>
+<li>Right click project name <em>caffe</em>, and BUILD!</li>
+<li>Now everything should work! If you got some linking error, check the missing function’s name to decide what library is missing.</li>
+<li>Change to Release mode and BUILD again to get a <em>caffe/bin/<span class="skimlinks-unlinked">caffe.exe</span>&nbsp;</em>of Release mode.</li>
+<li>Copy <em><span class="skimlinks-unlinked">caffe.exe</span>&nbsp;</em>to get a backup, e.g. <em><span class="skimlinks-unlinked">caffe-backup.exe</span></em>. For if you build the project again, <em><span class="skimlinks-unlinked">caffe.exe</span> </em>will be overwritten.</li>
+</ul>
+<ol start="15">
+<li>Let’s do a QUICK TEST on MNIST!</li>
+</ol>
+<ul>
+<li>Get MNIST Dataset
+<ul>
+<li>Put <a href="https://drive.google.com/file/d/0B_G5BUend20PYTFpQU9panZlLW8/view?usp=sharing" sl-processed="1">7za.exe and wget.exe</a>&nbsp;into <em>caffe/3rdparty/bin</em>.</li>
+<li>Put <a href="https://drive.google.com/file/d/0B_G5BUend20PUjg4MjlnVEhBSGs/view?usp=sharing" sl-processed="1">get_mnist.bat</a>&nbsp;in <em>caffe/data/mnist </em>and run.</li>
+<li>You will get 4 files ending with “<em>-ubyte</em>”.</li>
+</ul>
+</li>
+<li>Generate&nbsp;<em><span class="skimlinks-unlinked">convert_mnist_data.exe</span></em>
+<ul>
+<li>Check the project in Visual Studio is in Release|x64.</li>
+<li>Exclude “<em><span class="skimlinks-unlinked">caffe.cpp</span></em>” from the project.</li>
+<li>Drag “<em>caffe/examples/mnist/<span class="skimlinks-unlinked">convert_mnist_data.cpp</span></em>” to the project.</li>
+<li>Add these lines in <em><span class="skimlinks-unlinked">convert_mnist_data.cpp</span></em><em>:</em></li>
+</ul>
+<blockquote><p>// port for Win32<br>
+#ifdef _MSC_VER<br>
+#include &lt;direct.h&gt;<br>
+#define snprintf sprintf_s<br>
+#endif</p></blockquote>
+<ul>
+<li>Change “mkdir” to “_mkdir” in <em><span class="skimlinks-unlinked">convert_mnist_data.cpp</span></em>:</li>
+</ul>
+<blockquote><p>// port for Win32<br>
+#ifndef&nbsp;_MSC_VER<br>
+CHECK_EQ(mkdir(db_path, 0744), 0) &lt;&lt; “mkdir ” &lt;&lt; db_path &lt;&lt; “failed”;<br>
+#else<br>
+CHECK_EQ(_mkdir(db_path), 0) &lt;&lt; “mkdir ” &lt;&lt; db_path &lt;&lt; “failed”;<br>
+#endif</p></blockquote>
+<ul>
+<li>The “potentially uninitialized local pointer variable” error can be fixed by initialize <em>db, mdb_env and mdb_txn </em>with NULL in <em><span class="skimlinks-unlinked">convert_mnist_data.cpp</span></em>. Change “<em>MDB_env *mdb_env;</em>” to “<em>MDB_env *mdb_env = NULL;</em>”, and similar for “<em>mdb_txn” </em>and <em>“db”</em>.</li>
+<li>BUILD the project to get <em><span class="skimlinks-unlinked">caffe.exe</span> </em>in <em>caffe/bin</em>. Rename it to <em><span class="skimlinks-unlinked">convert_mnist_data.exe</span></em>.</li>
+</ul>
+</li>
+<li>Create <em>LevelDB</em> data for training
+<ul>
+<li>Put <a href="https://drive.google.com/file/d/0B_G5BUend20PUWRxX3RnRkdUbWs/view?usp=sharing" sl-processed="1">create_mnist.bat</a>&nbsp;in <em>caffe/examples/mnist </em>and run. Here we generate <em>mnist_train_leveldb</em> and <em>mnist_test_leveldb</em>. If <em>lmdb </em>was used as backend, error occurs. Fortunately, <em>leveldb</em> works fine. It would be great if someone can fix the&nbsp;error of <em>lmdb</em>.</li>
+<li>Let’s get <em><span class="skimlinks-unlinked">caffe.exe</span> </em>back from the copied <em><span class="skimlinks-unlinked">caffe-backup.exe</span></em> if you copied it before.</li>
+<li>Now modify <em>caffe/examples/mnist/lenet_train_test.prototxt</em>, substitute “<em>lmdb</em>” with “<em>leveldb</em>”, because we generate “<em>leveldb</em>” data instead of “<em>lmdb</em>”.</li>
+</ul>
+</li>
+<li>Do training
+<ul>
+<li>Put <a href="https://drive.google.com/file/d/0B_G5BUend20PQkNZVC04YnE5aTQ/view?usp=sharing" sl-processed="1">train_lenet.bat</a>&nbsp;in <em>caffe/examples/mnist</em> and run. Cool! The training is on! The accuracy is around 0.98 after hundreds of iterations.</li>
+</ul>
+</li>
+</ul>
+<p>&nbsp;</p>
+<p><strong>Update – 2015.1.26</strong></p>
+<ul>
+<li>The above steps didn’t include cuDNN acceleration.</li>
+<li>One can add “USE_CUDNN” to <em>Preprocessor</em>&nbsp;of the project to enable cuDNN. (Currently Caffe works with <a href="https://developer.nvidia.com//rdp/cudnn-65-download?sid=707599" target="_blank" sl-processed="1">cuDNN v1</a>. The set-up is pretty straight forward. Noted that the “Code Generation” for CUDA should be at least “compute_30, sm_30″.)</li>
+<li>My practice showed&nbsp;that for LeNet layout, testing 800 images with the&nbsp;size of 32*32 (excluding the time for reading input images):
+<ul>
+<li>CPU takes around 400~500 ms</li>
+<li>GPU takes around 50 ms</li>
+<li>cuDNN takes around 15 ms</li>
+</ul>
+</li>
+</ul>
+
+<div class="wpcnt">
+<div class="wpa">
+<a class="wpa-about" href="http://wordpress.com/about-these-ads/" rel="nofollow" sl-processed="1">About these ads</a>
+<script type="text/javascript">
+		var wpcom_adclk_hovering = false;
+		var wpcom_adclk_recorded = false;
+		var wpcom_adclk_theme = "Zoren";
+		var wpcom_adclk_slot = "wpcom_below_post";
+		var wpcom_adclk_network = ( typeof wpcom_adclk_network === "undefined" ) ? "" : wpcom_adclk_network ;
+
+		jQuery(document).ready( function() {
+			function wpcom_adclk_hover_yes() { wpcom_adclk_hovering = true; }
+			function wpcom_adclk_hover_no() { wpcom_adclk_hovering = false; }
+			jQuery(".wpa").click(wpcom_adclk_click);
+			jQuery(".wpa iframe").hover( wpcom_adclk_hover_yes, wpcom_adclk_hover_no );
+			jQuery(".wpa object").hover( wpcom_adclk_hover_yes, wpcom_adclk_hover_no );
+
+			jQuery(window).blur( function() {
+				if ( wpcom_adclk_hovering ) { wpcom_adclk_click(); }
+			});
+		});
+
+		function wpcom_adclk_impression() {
+			var stat_gif = document.location.protocol + "//pixel.wp.com/g.gif?v=wpcom-no-pv";
+			stat_gif += "&x_ads_imp_theme=" + wpcom_adclk_theme;
+			stat_gif += "&x_ads_imp_placement="+wpcom_adclk_slot;
+			stat_gif += "&x_ads_imp_network=" + wpcom_adclk_network;
+			stat_gif += "&x_ads_imp_theme_network="+wpcom_adclk_theme+"_"+wpcom_adclk_network;
+			new Image().src = stat_gif + "&baba=" + Math.random();
+			return true;
+		}
+
+		function wpcom_adclk_click() {
+			if (wpcom_adclk_recorded) { return true; } // no double counting
+			var stat_gif = document.location.protocol + "//pixel.wp.com/g.gif?v=wpcom-no-pv";
+			stat_gif += "&x_ads_click_theme=" + wpcom_adclk_theme;
+			stat_gif += "&x_ads_click_placement="+wpcom_adclk_slot;
+			stat_gif += "&x_ads_click_network=" + wpcom_adclk_network;
+			stat_gif += "&x_ads_click_theme_network="+wpcom_adclk_theme+"_"+wpcom_adclk_network;
+
+			new Image().src = stat_gif + "&baba=" + Math.random();
+			wpcom_adclk_recorded = true;
+			var now=new Date(); var end=now.getTime()+250;
+			while(true){now=new Date();if(now.getTime()>end){break;}}
+			return true;
+		}
+	
+if ( typeof GA_googleAddAttr == 'function' ) {
+GA_googleAddAttr("AdOpt", "1");
+GA_googleAddAttr("Origin", "other");
+GA_googleAddAttr("LangId", "1");
+GA_googleAddAttr("Domain", "initialneil.wordpress.com");
+GA_googleAddAttr("BlogId", "27419486");
+GA_googleAddAttr("PageURL", "https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/");
+GA_googleAddAttr("Autotag", "technology");
+GA_googleAddAttr("theme_bg", "eeeeee");
+GA_googleAddAttr("theme_border", "d0d0d0");
+GA_googleAddAttr("theme_text", "666666");
+GA_googleAddAttr("theme_link", "759B22");
+GA_googleAddAttr("theme_url", "666666");
+GA_googleAddAdSensePageAttr("google_page_url", "https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/");
+GA_googleFillSlot("wpcom_below_post");
+}
+</script><script src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/ads"></script><div id="google_ads_div_wpcom_below_post_ad_wrapper">
+<div id="google_ads_div_wpcom_below_post_ad_container" style="display:inline-block;"><div style="position: relative; left: 0px; top: 0px; width: 0px; height: 0px;"><object type="application/x-shockwave-flash" data="https://www.gstatic.com/osd/hbe.swf?id=0~0" width="1" height="1" style="visibility: hidden; opacity: 0; z-index: -999999; position: absolute; left: 150px; top: 135px;"><param name="movie" value="//www.gstatic.com/osd/hbe.swf?id=0~0"><param name="allowscriptaccess" value="always"><param name="wmode" value="opaque"></object></div><script type="text/javascript">
+<!--//<![CDATA[
+   document.MAX_ct0 ='';
+   var m3_u = (location.protocol=='https:'?'https://cas.criteo.com/delivery/ajs.php?':'http://cas.criteo.com/delivery/ajs.php?');
+   var m3_r = Math.floor(Math.random()*99999999999);
+   document.write ("<scr"+"ipt type='text/javascript' src='"+m3_u);
+   document.write ("zoneid=155623");document.write("&amp;nodis=1");
+   document.write ('&amp;cb=' + m3_r);
+   if (document.MAX_used != ',') document.write ("&amp;exclude=" + document.MAX_used);
+   document.write (document.charset ? '&amp;charset='+document.charset : (document.characterSet ? '&amp;charset='+document.characterSet : ''));
+   document.write ("&amp;loc=" + escape(window.location));
+   if (document.referrer) document.write ("&amp;referer=" + escape(document.referrer));
+   if (document.context) document.write ("&context=" + escape(document.context));
+   if ((typeof(document.MAX_ct0) != 'undefined') && (document.MAX_ct0.substring(0,4) == 'http')) {
+       document.write ("&amp;ct0=" + escape(document.MAX_ct0));
+   }
+   if (document.mmm_fo) document.write ("&amp;mmm_fo=1");
+   document.write ("'></scr"+"ipt>");
+//]]>--></script><script type="text/javascript" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/ajs.php"></script><iframe src="about:blank" frameborder="0" scrolling="no" style="overflow: hidden; width: 300px; height: 250px;"></iframe>
+<div id="beacon_20eb0203bc" style="position: absolute; left: 0px; top: 0px; visibility: hidden;">
+<img width="0" height="0" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/lg.php">
+</div>
+
+
+</div>
+</div>
+
+</div>
+</div>
+
+<script type="text/javascript">
+jQuery( window ).load( function() {
+    if ( jQuery(".wpa script[src*='virool.com']").length > 0 || jQuery(".wpa script[src*='shareth.ru']").length > 0 || jQuery(".wpa iframe[src*='boomvideo.tv']").length > 0 || jQuery(".wpa iframe[src*='viewablemedia.net']").length > 0 || jQuery(".wpa .sharethrough-placement").length > 0 ) {
+        jQuery( '.wpa' ).css( 'width', '400px' );
+    }
+setTimeout(function(){if(typeof GS_googleAddAdSenseService !== 'function'){new Image().src=document.location.protocol+"//pixel.wp.com/g.gif?v=wpcom-no-pv&x_noads=adblock&baba="+Math.random()}},100);
+} );
+</script>
+
+<div id="jp-post-flair" class="sharedaddy sd-like-enabled sd-sharing-enabled"><div class="sharedaddy sd-sharing-enabled"><div class="robots-nocontent sd-block sd-social sd-social-icon-text sd-sharing"><h3 class="sd-title">Share this:</h3><div class="sd-content"><ul><li class="share-twitter"><a rel="nofollow" class="share-twitter sd-button share-icon" href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/?share=twitter&nb=1" title="Click to share on Twitter" id="sharing-twitter-70" sl-processed="1"><span>Twitter<span class="share-count">6</span></span></a></li><li class="share-facebook"><a rel="nofollow" class="share-facebook sd-button share-icon" href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/?share=facebook&nb=1" title="Share on Facebook" id="sharing-facebook-70" sl-processed="1"><span>Facebook</span></a></li><li class="share-end"></li></ul></div></div></div><div class="sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-loaded" id="like-post-wrapper-27419486-70-54fbf901aba05" data-src="//widgets.wp.com/likes/#blog_id=27419486&amp;post_id=70&amp;origin=initialneil.wordpress.com&amp;obj_id=27419486-70-54fbf901aba05" data-name="like-post-frame-27419486-70-54fbf901aba05"><h3 class="sd-title">Like this:</h3><div class="likes-widget-placeholder post-likes-widget-placeholder" style="height: 55px; display: none;"><span class="button"><span>Like</span></span> <span class="loading">Loading...</span></div><iframe class="post-likes-widget jetpack-likes-widget" name="like-post-frame-27419486-70-54fbf901aba05" height="55px" width="100%" frameborder="0" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/saved_resource(16).html"></iframe><span class="sd-text-color"></span><a class="sd-link-color"></a></div></div>							</div><!-- .entry-content -->
+
+</article><!-- #post-70 -->
+				<nav role="navigation" id="nav-below" class="navigation-post clear">
+		<h1 class="screen-reader-text">Post navigation</h1>
+
+	
+		<div class="previous"><a href="https://initialneil.wordpress.com/2014/09/25/opencv-2-4-9-cuda-6-5-visual-studio-2013/" rel="prev" sl-processed="1"><span class="meta-nav">←</span> OpenCV 2.4.9 + CUDA 6.5 + Visual Studio&nbsp;2013</a></div>		
+	
+	</nav><!-- #nav-below -->
+	
+			
+
+	<div id="comments" class="comments-area">
+
+	
+			<h2 class="comments-title">
+			21 thoughts on “<span>Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV&nbsp;2.4.9</span>”		</h2>
+
+		
+		<ol class="commentlist">
+				<li class="comment even thread-even depth-1 clear highlander-comment" id="li-comment-12">
+		<article id="comment-12" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/cbc5023c95d26c2d66440a73fcb93811" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-cbc5023c95d26c2d66440a73fcb93811-0">					<cite class="fn">xichao yang</cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-12" sl-processed="1"><time datetime="2015-01-19T06:17:11+00:00">
+					January 19, 2015 at 6:17 am					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>I have some problem when building your code on x64 debug mode. Can you help me solve the two problems?<br>
+Thanks!<br>
+1&gt;<span class="skimlinks-unlinked">common.obj</span> : error LNK2019: unresolved external symbol “__declspec(dllimport) void __cdecl google::InstallFailureSignalHandler(void)” (__imp_?InstallFailureSignalHandler@google@@YAXXZ) referenced in function “void __cdecl caffe::GlobalInit(int *,char * * *)” (?GlobalInit@caffe@@YAXPEAHPEAPEAPEAD@Z)<br>
+1&gt;<span class="skimlinks-unlinked">data_layer.obj</span> : error LNK2019: unresolved external symbol “class boost::shared_ptr&lt;class caffe::Dataset&lt;class std::basic_string&lt;char,struct std::char_traits,class std::allocator &gt;,class caffe::Datum,struct caffe::dataset_internal::DefaultCoder&lt;class std::basic_string&lt;char,struct std::char_traits,class std::allocator &gt; &gt;,struct caffe::dataset_internal::DefaultCoder &gt; &gt; __cdecl caffe::DatasetFactory&lt;class std::basic_string&lt;char,struct std::char_traits,class std::allocator &gt;,class caffe::Datum&gt;(enum caffe::DataParameter_DB const &amp;)”</p>
+</div>
+			<div class="reply"><a class="comment-reply-link" href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/?replytocom=12#respond" onclick="return addComment.moveForm( &quot;comment-12&quot;, &quot;12&quot;, &quot;respond&quot;, &quot;70&quot; )" aria-label="Reply to xichao yang" sl-processed="1">Reply</a></div>		</article><!-- #comment-## -->
+
+	<ul class="children">
+	<li class="comment byuser comment-author-initialneil bypostauthor odd alt depth-2 clear highlander-comment" id="li-comment-13">
+		<article id="comment-13" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/2d57c95a0c1b97633a17e7d4c3e39500" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-2d57c95a0c1b97633a17e7d4c3e39500-0">					<cite class="fn"><a href="https://initialneil.wordpress.com/" rel="external nofollow" class="url" sl-processed="1">Neil Shao</a></cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-13" sl-processed="1"><time datetime="2015-01-19T06:42:48+00:00">
+					January 19, 2015 at 6:42 am					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>1) `InstallFailureSignalHandler` can be commented out in `<span class="skimlinks-unlinked">common.cpp</span>`.<br>
+2) The linking problem is probably caused by not having boost library or not compiling all files in `caffe/src/caffe` folder.<br>
+It seems that you  are using 9c39b93, which is my attempt to merge from caffe::dev. Yet some static lining problem happened afterwords. Please try later commits, e.g. <a href="https://github.com/initialneil/caffe/tree/2a9acc2dc92bb33d2a25cdd1430d815d9a2c1f49" target="_blank" rel="nofollow" sl-processed="1">2a9acc2</a>.</p>
+</div>
+			<div class="reply"><a class="comment-reply-link" href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/?replytocom=13#respond" onclick="return addComment.moveForm( &quot;comment-13&quot;, &quot;13&quot;, &quot;respond&quot;, &quot;70&quot; )" aria-label="Reply to Neil Shao" sl-processed="1">Reply</a></div>		</article><!-- #comment-## -->
+
+	<ul class="children">
+	<li class="comment even depth-3 clear highlander-comment" id="li-comment-14">
+		<article id="comment-14" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/cbc5023c95d26c2d66440a73fcb93811" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-cbc5023c95d26c2d66440a73fcb93811-1">					<cite class="fn">xichao yang</cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-14" sl-processed="1"><time datetime="2015-01-19T12:37:32+00:00">
+					January 19, 2015 at 12:37 pm					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>The code has worked. Thanks!</p>
+</div>
+					</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 clear highlander-comment" id="li-comment-27">
+		<article id="comment-27" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/4ecdf74a5523b3fa31e39fe51726b9ba" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-4ecdf74a5523b3fa31e39fe51726b9ba-0">					<cite class="fn">apollo</cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-27" sl-processed="1"><time datetime="2015-02-02T03:36:02+00:00">
+					February 2, 2015 at 3:36 am					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>Can I build and test it on the windows 8, Core-i7 x64 without nVIDIA card?</p>
+</div>
+			<div class="reply"><a class="comment-reply-link" href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/?replytocom=27#respond" onclick="return addComment.moveForm( &quot;comment-27&quot;, &quot;27&quot;, &quot;respond&quot;, &quot;70&quot; )" aria-label="Reply to apollo" sl-processed="1">Reply</a></div>		</article><!-- #comment-## -->
+
+	<ul class="children">
+	<li class="comment byuser comment-author-initialneil bypostauthor even depth-2 clear highlander-comment" id="li-comment-28">
+		<article id="comment-28" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/2d57c95a0c1b97633a17e7d4c3e39500" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-2d57c95a0c1b97633a17e7d4c3e39500-1">					<cite class="fn"><a href="https://initialneil.wordpress.com/" rel="external nofollow" class="url" sl-processed="1">Neil Shao</a></cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-28" sl-processed="1"><time datetime="2015-02-02T03:55:58+00:00">
+					February 2, 2015 at 3:55 am					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>Yes, I think so. Just no need to add any .cu files and set Caffe mode to CPU before you create a Net in your code.</p>
+</div>
+			<div class="reply"><a class="comment-reply-link" href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/?replytocom=28#respond" onclick="return addComment.moveForm( &quot;comment-28&quot;, &quot;28&quot;, &quot;respond&quot;, &quot;70&quot; )" aria-label="Reply to Neil Shao" sl-processed="1">Reply</a></div>		</article><!-- #comment-## -->
+
+	<ul class="children">
+	<li class="comment odd alt depth-3 clear highlander-comment" id="li-comment-29">
+		<article id="comment-29" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/4ecdf74a5523b3fa31e39fe51726b9ba" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-4ecdf74a5523b3fa31e39fe51726b9ba-1">					<cite class="fn">apollo</cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-29" sl-processed="1"><time datetime="2015-02-02T07:20:30+00:00">
+					February 2, 2015 at 7:20 am					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>Thanks for you reply. How can I set the Caffe mode to CPU?</p>
+</div>
+					</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+	<li class="comment byuser comment-author-initialneil bypostauthor even depth-3 clear highlander-comment" id="li-comment-30">
+		<article id="comment-30" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/2d57c95a0c1b97633a17e7d4c3e39500" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-2d57c95a0c1b97633a17e7d4c3e39500-2">					<cite class="fn"><a href="https://initialneil.wordpress.com/" rel="external nofollow" class="url" sl-processed="1">Neil Shao</a></cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-30" sl-processed="1"><time datetime="2015-02-02T07:31:48+00:00">
+					February 2, 2015 at 7:31 am					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>An example is roughly like this:</p>
+<p>    // Set CPU<br>
+    Caffe::set_mode(Caffe::CPU);</p>
+<p>    // Set to TEST Phase<br>
+    Caffe::set_phase(Caffe::TEST);</p>
+<p>    // Load net<br>
+    Net net(“deploy.prototxt”);</p>
+<p>    // Load pre-trained net (binary proto)<br>
+    net.CopyTrainedLayersFrom(“trained_model.caffemodel”);</p>
+</div>
+					</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+	<li class="comment odd alt thread-even depth-1 clear highlander-comment" id="li-comment-35">
+		<article id="comment-35" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/0a7e1fe9ab2381fca9b5d8a630802680" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-0a7e1fe9ab2381fca9b5d8a630802680-0">					<cite class="fn">Ivan</cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-35" sl-processed="1"><time datetime="2015-02-14T19:13:41+00:00">
+					February 14, 2015 at 7:13 pm					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>Thank you very much for this! I was able to build and run caffe with VS2013 following your detailed instructions! Everything else that I tried previously has failed.</p>
+</div>
+			<div class="reply"><a class="comment-reply-link" href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/?replytocom=35#respond" onclick="return addComment.moveForm( &quot;comment-35&quot;, &quot;35&quot;, &quot;respond&quot;, &quot;70&quot; )" aria-label="Reply to Ivan" sl-processed="1">Reply</a></div>		</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+	<li class="comment even thread-odd thread-alt depth-1 clear highlander-comment" id="li-comment-41">
+		<article id="comment-41" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/44028e1faf313b929b2ed91065f8a903" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-44028e1faf313b929b2ed91065f8a903-0">					<cite class="fn">Nian Liu</cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-41" sl-processed="1"><time datetime="2015-02-27T10:13:55+00:00">
+					February 27, 2015 at 10:13 am					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>Hi Neil,<br>
+    I have almost successfully  installed caffe following your instruction, only failed  at step 14. When I was building caffe, I got “fatal error LNK1104: cannot open file ‘libboost_date_time-vc120-mt-gd-1_56.lib'”. But I used boost_1_57_0 in my project thoroughly and everything else worked well, it’s so strange that the project calls for a library in  boost_1_56_0,  could you help me?</p>
+</div>
+			<div class="reply"><a class="comment-reply-link" href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/?replytocom=41#respond" onclick="return addComment.moveForm( &quot;comment-41&quot;, &quot;41&quot;, &quot;respond&quot;, &quot;70&quot; )" aria-label="Reply to Nian Liu" sl-processed="1">Reply</a></div>		</article><!-- #comment-## -->
+
+	<ul class="children">
+	<li class="comment byuser comment-author-initialneil bypostauthor odd alt depth-2 clear highlander-comment" id="li-comment-42">
+		<article id="comment-42" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/2d57c95a0c1b97633a17e7d4c3e39500" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-2d57c95a0c1b97633a17e7d4c3e39500-3">					<cite class="fn"><a href="https://initialneil.wordpress.com/" rel="external nofollow" class="url" sl-processed="1">Neil Shao</a></cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-42" sl-processed="1"><time datetime="2015-02-27T10:27:02+00:00">
+					February 27, 2015 at 10:27 am					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>It’s not weird because the call for boost libs lies in the header files of the boost. In order to use boost 1.57, you have to replace the boost header files that you use in your project.</p>
+</div>
+			<div class="reply"><a class="comment-reply-link" href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/?replytocom=42#respond" onclick="return addComment.moveForm( &quot;comment-42&quot;, &quot;42&quot;, &quot;respond&quot;, &quot;70&quot; )" aria-label="Reply to Neil Shao" sl-processed="1">Reply</a></div>		</article><!-- #comment-## -->
+
+	<ul class="children">
+	<li class="comment even depth-3 clear highlander-comment" id="li-comment-43">
+		<article id="comment-43" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/44028e1faf313b929b2ed91065f8a903" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-44028e1faf313b929b2ed91065f8a903-1">					<cite class="fn">Nian Liu</cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-43" sl-processed="1"><time datetime="2015-02-27T10:53:16+00:00">
+					February 27, 2015 at 10:53 am					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>I have been using the header files of the boost 1.57 in my project, which means I am using the path of boost 1.57 in Additional Include Directories.</p>
+</div>
+					</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+	<li class="comment odd alt depth-3 clear highlander-comment" id="li-comment-44">
+		<article id="comment-44" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/44028e1faf313b929b2ed91065f8a903" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-44028e1faf313b929b2ed91065f8a903-2">					<cite class="fn">Nian Liu</cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-44" sl-processed="1"><time datetime="2015-02-27T13:30:16+00:00">
+					February 27, 2015 at 1:30 pm					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>Could you articulate this  in detail? It is the header files of boost 1.57 I have been using in my project.</p>
+</div>
+					</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+	<li class="comment byuser comment-author-initialneil bypostauthor even depth-3 clear highlander-comment" id="li-comment-53">
+		<article id="comment-53" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/2d57c95a0c1b97633a17e7d4c3e39500" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-2d57c95a0c1b97633a17e7d4c3e39500-4">					<cite class="fn"><a href="https://initialneil.wordpress.com/" rel="external nofollow" class="url" sl-processed="1">Neil Shao</a></cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-53" sl-processed="1"><time datetime="2015-03-03T14:35:37+00:00">
+					March 3, 2015 at 2:35 pm					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>“boost/<span class="skimlinks-unlinked">version.hpp</span>” specifies the version of boost. e.g. #define BOOST_LIB_VERSION “1_56″</p>
+</div>
+					</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+	<li class="comment odd alt depth-2 clear highlander-comment" id="li-comment-45">
+		<article id="comment-45" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/4ecdf74a5523b3fa31e39fe51726b9ba" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-4ecdf74a5523b3fa31e39fe51726b9ba-2">					<cite class="fn">apollo</cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-45" sl-processed="1"><time datetime="2015-03-02T09:04:27+00:00">
+					March 2, 2015 at 9:04 am					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>I had the same problem and solved by replacing boost 1.57 with 1.56 in my project.<br>
+I think the pre-built libraries use the boost 1.56.<br>
+You may install boost 1.56 to solve it.</p>
+</div>
+			<div class="reply"><a class="comment-reply-link" href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/?replytocom=45#respond" onclick="return addComment.moveForm( &quot;comment-45&quot;, &quot;45&quot;, &quot;respond&quot;, &quot;70&quot; )" aria-label="Reply to apollo" sl-processed="1">Reply</a></div>		</article><!-- #comment-## -->
+
+	<ul class="children">
+	<li class="comment even depth-3 clear highlander-comment" id="li-comment-47">
+		<article id="comment-47" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/44028e1faf313b929b2ed91065f8a903" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-44028e1faf313b929b2ed91065f8a903-3">					<cite class="fn">Nian Liu</cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-47" sl-processed="1"><time datetime="2015-03-02T09:12:58+00:00">
+					March 2, 2015 at 9:12 am					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>Thanks for your reply, I have solved the problem via the same way.</p>
+</div>
+					</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+	<li class="comment odd alt thread-even depth-1 clear highlander-comment" id="li-comment-46">
+		<article id="comment-46" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/4ecdf74a5523b3fa31e39fe51726b9ba" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-4ecdf74a5523b3fa31e39fe51726b9ba-3">					<cite class="fn">apollo</cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-46" sl-processed="1"><time datetime="2015-03-02T09:12:15+00:00">
+					March 2, 2015 at 9:12 am					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>I had build and test it on the windows 8, Core-i7 x64 without CUDA mode.<br>
+Thanks for your help.<br>
+I have the new problem.<br>
+I test the net in debug and release mode.<br>
+In the debug mode, I got the valid Test net output in first iteration.<br>
+But in the release mode, I got the invalid test net loss output.</p>
+<p>I0302 17:09:29.914144  9944 <span class="skimlinks-unlinked">solver.cpp:320</span>]     Test net output #0: accuracy = 0.0128<br>
+I0302 17:09:29.926195  9944 <span class="skimlinks-unlinked">solver.cpp:320</span>]     Test net output #1: loss = -1.#QNAN (* 1 = -1.#QNAN loss)</p>
+<p>What’s different with debug and release mode?</p>
+</div>
+			<div class="reply"><a class="comment-reply-link" href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/?replytocom=46#respond" onclick="return addComment.moveForm( &quot;comment-46&quot;, &quot;46&quot;, &quot;respond&quot;, &quot;70&quot; )" aria-label="Reply to apollo" sl-processed="1">Reply</a></div>		</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+	<li class="comment even thread-odd thread-alt depth-1 clear highlander-comment" id="li-comment-48">
+		<article id="comment-48" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/d1eaa70b29a5a803c6ca67ce3604e59e" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-d1eaa70b29a5a803c6ca67ce3604e59e-0">					<cite class="fn">kai li</cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-48" sl-processed="1"><time datetime="2015-03-02T10:55:19+00:00">
+					March 2, 2015 at 10:55 am					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>i bulid the lmdb as you said<br>
+but there is on error.<br>
+&gt;mdb.c(8767): error C2440: “函数”: 无法从“DWORD (__cdecl *)(void *)”转换为“LPTHREAD_START_ROUTINE”</p>
+</div>
+			<div class="reply"><a class="comment-reply-link" href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/?replytocom=48#respond" onclick="return addComment.moveForm( &quot;comment-48&quot;, &quot;48&quot;, &quot;respond&quot;, &quot;70&quot; )" aria-label="Reply to kai li" sl-processed="1">Reply</a></div>		</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+	<li class="comment odd alt thread-even depth-1 clear highlander-comment" id="li-comment-49">
+		<article id="comment-49" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/d1eaa70b29a5a803c6ca67ce3604e59e" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-d1eaa70b29a5a803c6ca67ce3604e59e-1">					<cite class="fn">kai li</cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-49" sl-processed="1"><time datetime="2015-03-02T14:47:35+00:00">
+					March 2, 2015 at 2:47 pm					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>I used your 3rdparty.<br>
+I test a simple leveldb c++ code</p>
+<p>#include “leveldb/db.h”<br>
+#include “leveldb/write_batch.h”<br>
+#include<br>
+int main()<br>
+{<br>
+	leveldb::DB* db;<br>
+	leveldb::Options options;<br>
+	return 0;<br>
+}<br>
+but i get error like this<br>
+error LNK2019: unresolved external symbol public: __thiscall leveldb::Options::Options(void)” (??0Options@leveldb@@QAE@XZ) referenced in function _main<br>
+what’ wrong?<br>
+i am using windows8.1  + vs2013 +64bit<br>
+Thank you very much!</p>
+</div>
+			<div class="reply"><a class="comment-reply-link" href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/?replytocom=49#respond" onclick="return addComment.moveForm( &quot;comment-49&quot;, &quot;49&quot;, &quot;respond&quot;, &quot;70&quot; )" aria-label="Reply to kai li" sl-processed="1">Reply</a></div>		</article><!-- #comment-## -->
+
+	<ul class="children">
+	<li class="comment byuser comment-author-initialneil bypostauthor even depth-2 clear highlander-comment" id="li-comment-50">
+		<article id="comment-50" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/2d57c95a0c1b97633a17e7d4c3e39500" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-2d57c95a0c1b97633a17e7d4c3e39500-5">					<cite class="fn"><a href="https://initialneil.wordpress.com/" rel="external nofollow" class="url" sl-processed="1">Neil Shao</a></cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-50" sl-processed="1"><time datetime="2015-03-02T15:03:10+00:00">
+					March 2, 2015 at 3:03 pm					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>Linking error is usually caused by missing implementation of declared functions. Did you add the leveldb’s lib into linking input?</p>
+</div>
+			<div class="reply"><a class="comment-reply-link" href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/?replytocom=50#respond" onclick="return addComment.moveForm( &quot;comment-50&quot;, &quot;50&quot;, &quot;respond&quot;, &quot;70&quot; )" aria-label="Reply to Neil Shao" sl-processed="1">Reply</a></div>		</article><!-- #comment-## -->
+
+	<ul class="children">
+	<li class="comment odd alt depth-3 clear highlander-comment" id="li-comment-51">
+		<article id="comment-51" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/d1eaa70b29a5a803c6ca67ce3604e59e" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-d1eaa70b29a5a803c6ca67ce3604e59e-2">					<cite class="fn">kai li</cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-51" sl-processed="1"><time datetime="2015-03-02T15:12:47+00:00">
+					March 2, 2015 at 3:12 pm					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>Yes, I have add leveldb’s lib into linking input.<br>
+I find the same problem in stackoverflow</p>
+<p><a href="http://stackoverflow.com/questions/9244670/leveldb-example-not-working-on-windows-error-lnk2029" rel="nofollow" sl-processed="1">http://stackoverflow.com/questions/9244670/leveldb-example-not-working-on-windows-error-lnk2029</a></p>
+<p>but the link in the answer is broken.<br>
+I have no idea what to do..</p>
+</div>
+					</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+	<li class="comment byuser comment-author-initialneil bypostauthor even depth-2 clear highlander-comment" id="li-comment-52">
+		<article id="comment-52" class="comment">
+			<footer>
+				<div class="comment-author vcard">
+					<img alt="" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/2d57c95a0c1b97633a17e7d4c3e39500" class="avatar avatar-40 grav-hashed grav-hijack" height="40" width="40" id="grav-2d57c95a0c1b97633a17e7d4c3e39500-6">					<cite class="fn"><a href="https://initialneil.wordpress.com/" rel="external nofollow" class="url" sl-processed="1">Neil Shao</a></cite> <span class="says">says:</span>				</div><!-- .comment-author .vcard -->
+				
+				<div class="comment-meta commentmetadata">
+					<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-52" sl-processed="1"><time datetime="2015-03-02T15:21:50+00:00">
+					March 2, 2015 at 3:21 pm					</time></a>
+									</div><!-- .comment-meta .commentmetadata -->
+			</footer>
+
+			<div class="comment-content"><p>I’m not sure, but looks like the missing part is “Options”. You may try to add you cpp file into the leveldb project and compile them together. </p>
+</div>
+			<div class="reply"><a class="comment-reply-link" href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/?replytocom=52#respond" onclick="return addComment.moveForm( &quot;comment-52&quot;, &quot;52&quot;, &quot;respond&quot;, &quot;70&quot; )" aria-label="Reply to Neil Shao" sl-processed="1">Reply</a></div>		</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+		</ol><!-- .comment-list -->
+
+		
+	
+	
+									<div id="respond" class="comment-respond js">
+				<h3 id="reply-title" class="comment-reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#respond" style="display:none;" sl-processed="1">Cancel reply</a></small></h3>
+									<form action="https://initialneil.wordpress.com/wp-comments-post.php" method="post" id="commentform" class="comment-form">
+																										
+
+
+												<input type="hidden" id="highlander_comment_nonce" name="highlander_comment_nonce" value="4d01aa1e25"><input type="hidden" name="_wp_http_referer" value="/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/">
+<input type="hidden" name="hc_post_as" id="hc_post_as" value="guest">
+
+<div class="comment-form-field comment-textarea">
+	
+	<div id="comment-form-comment"><textarea tabindex="-1" style="position: absolute; top: -999px; left: 0px; right: auto; bottom: auto; border: 0px; padding: 0px; box-sizing: content-box; word-wrap: break-word; overflow: hidden; -webkit-transition: none; transition: none; height: 0px !important; min-height: 0px !important; font-family: Bitter, sans-serif; font-size: 14px; font-weight: 400; font-style: normal; letter-spacing: 0px; text-transform: none; text-decoration: none; word-spacing: 0px; text-indent: 0px; line-height: 24.5px; width: 858px;" class="autosizejs "></textarea><textarea id="comment" name="comment" title="Enter your comment here..." placeholder="Enter your comment here..." style="height: 44px; overflow: hidden; word-wrap: break-word; resize: none;"></textarea></div>
+</div>
+
+<div id="comment-form-identity" style="display: none;">
+
+	<div id="comment-form-nascar">
+		<p>Fill in your details below or click an icon to log in:</p>
+		<ul>
+			<li class="selected" style="display:none;">
+				<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-form-guest" id="postas-guest" title="Guest" sl-processed="1">
+					<span></span>
+				</a>
+			</li>
+			<li>
+				<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-form-load-service:WordPress.com" id="postas-wordpress" title="WordPress.com" sl-processed="1">
+					<span></span>
+				</a>
+			</li>
+			<li>
+				<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-form-load-service:Twitter" id="postas-twitter" title="Twitter" sl-processed="1">
+					<span></span>
+				</a>
+			</li>
+			<li>
+				<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#comment-form-load-service:Facebook" id="postas-facebook" title="Facebook" sl-processed="1">
+					<span></span>
+				</a>
+			</li>
+			<li>
+			<iframe id="googleplus-sign-in" name="googleplus-sign-in" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/saved_resource.html" width="24" height="24" scrolling="no" allowtransparency="true" seamless="seamless" frameborder="0"></iframe>
+			</li>
+		</ul>
+	</div>
+
+	<div id="comment-form-guest" class="comment-form-service selected">
+		<div class="comment-form-padder">
+			<div class="comment-form-avatar">
+<a href="https://gravatar.com/site/signup/" target="_blank" sl-processed="1">				<img src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/ad516503a11cd5ca435acc9bb6523536" alt="Gravatar" width="25" class="no-grav">
+</a>			</div>
+
+				<div class="comment-form-fields">
+				<div class="comment-form-field comment-form-email">
+					<label for="email">Email <span class="required">(required)</span> <span class="nopublish">(Address never made public)</span></label>
+					<div class="comment-form-input"><input id="email" name="email" type="email" value=""></div>
+				</div>
+				<div class="comment-form-field comment-form-author">
+					<label for="author">Name <span class="required">(required)</span></label>
+					<div class="comment-form-input"><input id="author" name="author" type="text" value=""></div>
+				</div>
+				<div class="comment-form-field comment-form-url">
+					<label for="url">Website</label>
+					<div class="comment-form-input"><input id="url" name="url" type="text" value=""></div>
+				</div>
+			</div>
+	
+		</div>
+	</div>
+
+	<div id="comment-form-wordpress" class="comment-form-service">
+		<div class="comment-form-padder">
+			<div class="comment-form-avatar">
+				<img src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/wplogo.png" alt="WordPress.com Logo" width="25" class="no-grav">
+			</div>
+
+				<div class="comment-form-fields">
+				<input type="hidden" name="wp_avatar" id="wordpress-avatar" class="comment-meta-wordpress" value="">
+				<input type="hidden" name="wp_user_id" id="wordpress-user_id" class="comment-meta-wordpress" value="">
+				<input type="hidden" name="wp_access_token" id="wordpress-access_token" class="comment-meta-wordpress" value="">
+				<p class="comment-form-posting-as pa-wordpress"><strong></strong> You are commenting using your <span class="skimlinks-unlinked">WordPress.com</span> account. <span class="comment-form-log-out">(&nbsp;<a href="javascript:HighlanderComments.doExternalLogout( 'wordpress' );" sl-processed="1">Log&nbsp;Out</a>&nbsp;/&nbsp;<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#" onclick="javascript:HighlanderComments.switchAccount();return false;" sl-processed="1">Change</a>&nbsp;)</span></p>
+			</div>
+	
+		</div>
+	</div>
+
+	<div id="comment-form-twitter" class="comment-form-service">
+		<div class="comment-form-padder">
+			<div class="comment-form-avatar">
+				<img src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/ad516503a11cd5ca435acc9bb6523536" alt="Twitter picture" width="25" class="no-grav">
+			</div>
+
+				<div class="comment-form-fields">
+				<input type="hidden" name="twitter_avatar" id="twitter-avatar" class="comment-meta-twitter" value="">
+				<input type="hidden" name="twitter_user_id" id="twitter-user_id" class="comment-meta-twitter" value="">
+				<input type="hidden" name="twitter_access_token" id="twitter-access_token" class="comment-meta-twitter" value="">
+				<p class="comment-form-posting-as pa-twitter"><strong></strong> You are commenting using your Twitter account. <span class="comment-form-log-out">(&nbsp;<a href="javascript:HighlanderComments.doExternalLogout( 'twitter' );" sl-processed="1">Log&nbsp;Out</a>&nbsp;/&nbsp;<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#" onclick="javascript:HighlanderComments.switchAccount();return false;" sl-processed="1">Change</a>&nbsp;)</span></p>
+			</div>
+	
+		</div>
+	</div>
+
+	<div id="comment-form-facebook" class="comment-form-service">
+		<div class="comment-form-padder">
+			<div class="comment-form-avatar">
+				<img src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/ad516503a11cd5ca435acc9bb6523536" alt="Facebook photo" width="25" class="no-grav">
+			</div>
+
+				<div class="comment-form-fields">
+				<input type="hidden" name="fb_avatar" id="facebook-avatar" class="comment-meta-facebook" value="">
+				<input type="hidden" name="fb_user_id" id="facebook-user_id" class="comment-meta-facebook" value="">
+				<input type="hidden" name="fb_access_token" id="facebook-access_token" class="comment-meta-facebook" value="">
+				<p class="comment-form-posting-as pa-facebook"><strong></strong> You are commenting using your Facebook account. <span class="comment-form-log-out">(&nbsp;<a href="javascript:HighlanderComments.doExternalLogout( 'facebook' );" sl-processed="1">Log&nbsp;Out</a>&nbsp;/&nbsp;<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#" onclick="javascript:HighlanderComments.switchAccount();return false;" sl-processed="1">Change</a>&nbsp;)</span></p>
+			</div>
+	
+		</div>
+	</div>
+
+	<div id="comment-form-googleplus" class="comment-form-service">
+		<div class="comment-form-padder">
+			<div class="comment-form-avatar">
+				<img src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/ad516503a11cd5ca435acc9bb6523536" alt="Google+ photo" width="25" class="no-grav">
+			</div>
+
+				<div class="comment-form-fields">
+				<input type="hidden" name="googleplus_avatar" id="googleplus-avatar" class="comment-meta-googleplus" value="">
+				<input type="hidden" name="googleplus_user_id" id="googleplus-user_id" class="comment-meta-googleplus" value="">
+				<input type="hidden" name="googleplus_access_token" id="googleplus-access_token" class="comment-meta-googleplus" value="">
+				<p class="comment-form-posting-as pa-googleplus"><strong></strong> You are commenting using your Google+ account. <span class="comment-form-log-out">(&nbsp;<a href="javascript:HighlanderComments.doExternalLogout( 'googleplus' );" sl-processed="1">Log&nbsp;Out</a>&nbsp;/&nbsp;<a href="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/#" onclick="javascript:HighlanderComments.switchAccount();return false;" sl-processed="1">Change</a>&nbsp;)</span></p>
+			</div>
+	
+		</div>
+	</div>
+
+
+	<div id="comment-form-load-service" class="comment-form-service">
+		<div class="comment-form-posting-as-cancel"><a href="javascript:HighlanderComments.cancelExternalWindow();" sl-processed="1">Cancel</a></div>
+		<p>Connecting to %s</p>
+	</div>
+
+</div>
+
+<script type="text/javascript">
+var highlander_expando_javascript = function(){
+	var input = document.createElement( 'input' ),
+	    comment = jQuery( '#comment' );
+
+	if ( 'placeholder' in input ) {
+		comment.attr( 'placeholder', jQuery( '.comment-textarea label' ).remove().text() );
+	}
+
+	// Expando Mode: start small, then auto-resize on first click + text length
+	jQuery( '#comment-form-identity' ).hide();
+	jQuery( '#comment-form-subscribe' ).hide();
+	jQuery( '#commentform .form-submit' ).hide();
+
+	comment.css( { 'height':'10px' } ).one( 'focus', function() {
+		var timer = setInterval( HighlanderComments.resizeCallback, 10 )
+		jQuery( this ).animate( { 'height': HighlanderComments.initialHeight } ).delay( 100 ).queue( function(n) { clearInterval( timer ); HighlanderComments.resizeCallback(); n(); } );
+		jQuery( '#comment-form-identity' ).slideDown();
+		jQuery( '#comment-form-subscribe' ).slideDown();
+		jQuery( '#commentform .form-submit' ).slideDown();
+	});
+}
+jQuery(document).ready( highlander_expando_javascript );
+</script>
+
+<div id="comment-form-subscribe" style="display: none;">
+	<p class="comment-subscription-form"><input type="checkbox" name="subscribe" id="subscribe" value="subscribe" style="width: auto;" tabindex="6"> <label class="subscribe-label" id="subscribe-label" for="subscribe" style="display: inline;">Notify me of new comments via email.</label></p></div>
+
+												<p class="form-submit" style="display: none;">
+							<input name="submit" type="submit" id="comment-submit" class="submit" value="Post Comment">
+							<input type="hidden" name="comment_post_ID" value="70" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+						</p>
+						<p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="79d19d38e5"></p>
+<input type="hidden" name="genseq" value="1425799425">
+<p style="display: none;"></p>					<input type="hidden" id="ak_js" name="ak_js" value="1425799429368"></form>
+							</div><!-- #respond -->
+			<div style="clear: both"></div>
+</div><!-- #comments -->
+
+		
+		</div><!-- #content -->
+	</div><!-- #primary -->
+
+	<div id="secondary" class="widget-area" role="complementary">
+				<aside id="search-8" class="widget widget_search"><form method="get" id="searchform" class="searchform" action="https://initialneil.wordpress.com/" role="search">
+	<label for="s" class="screen-reader-text">Search</label>
+	<input type="search" class="field" name="s" value="" id="s" placeholder="Search …">
+	<input type="submit" class="submit" id="searchsubmit" value="Search">
+</form></aside>		<aside id="recent-posts-6" class="widget widget_recent_entries">		<h1 class="widget-title">Recent Posts</h1>		<ul>
+					<li>
+				<a href="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9.html" sl-processed="1">Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV&nbsp;2.4.9</a>
+						</li>
+					<li>
+				<a href="https://initialneil.wordpress.com/2014/09/25/opencv-2-4-9-cuda-6-5-visual-studio-2013/" sl-processed="1">OpenCV 2.4.9 + CUDA 6.5 + Visual Studio&nbsp;2013</a>
+						</li>
+				</ul>
+		</aside><aside id="calendar-6" class="widget widget_calendar"><div id="calendar_wrap"><table id="wp-calendar">
+	<caption>January 2015</caption>
+	<thead>
+	<tr>
+		<th scope="col" title="Monday">M</th>
+		<th scope="col" title="Tuesday">T</th>
+		<th scope="col" title="Wednesday">W</th>
+		<th scope="col" title="Thursday">T</th>
+		<th scope="col" title="Friday">F</th>
+		<th scope="col" title="Saturday">S</th>
+		<th scope="col" title="Sunday">S</th>
+	</tr>
+	</thead>
+
+	<tfoot>
+	<tr>
+		<td colspan="3" id="prev"><a href="https://initialneil.wordpress.com/2014/09/" sl-processed="1">« Sep</a></td>
+		<td class="pad">&nbsp;</td>
+		<td colspan="3" id="next" class="pad">&nbsp;</td>
+	</tr>
+	</tfoot>
+
+	<tbody>
+	<tr>
+		<td colspan="3" class="pad">&nbsp;</td><td>1</td><td>2</td><td>3</td><td>4</td>
+	</tr>
+	<tr>
+		<td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td><a href="https://initialneil.wordpress.com/2015/01/11/" title="Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9" sl-processed="1">11</a></td>
+	</tr>
+	<tr>
+		<td>12</td><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td>
+	</tr>
+	<tr>
+		<td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td>
+	</tr>
+	<tr>
+		<td>26</td><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td>
+		<td class="pad" colspan="1">&nbsp;</td>
+	</tr>
+	</tbody>
+	</table></div></aside><aside id="archives-8" class="widget widget_archive"><h1 class="widget-title">Archives</h1>		<ul>
+	<li><a href="https://initialneil.wordpress.com/2015/01/" sl-processed="1">January 2015</a></li>
+	<li><a href="https://initialneil.wordpress.com/2014/09/" sl-processed="1">September 2014</a></li>
+		</ul>
+</aside><aside id="blog-stats-3" class="widget widget_blog-stats"><h1 class="widget-title">Blog Stats</h1>		<ul>
+			<li>5,795 hits</li>
+		</ul>
+		</aside><aside id="meta-6" class="widget widget_meta"><h1 class="widget-title">Meta</h1>			<ul>
+			<li><a href="https://en.wordpress.com/signup/?ref=wplogin" sl-processed="1">Register</a></li>			<li><a href="https://initialneil.wordpress.com/wp-login.php" sl-processed="1">Log in</a></li>
+			<li><a href="https://initialneil.wordpress.com/feed/" sl-processed="1">Entries <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="https://initialneil.wordpress.com/comments/feed/" sl-processed="1">Comments <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+<li><a href="http://wordpress.com/" title="Powered by WordPress, state-of-the-art semantic personal publishing platform." sl-processed="1">WordPress.com</a></li>			</ul>
+</aside>	</div><!-- #secondary -->
+	</div><!-- #main -->
+
+	<footer id="colophon" class="site-footer" role="contentinfo">
+		<div class="site-info">
+						<a href="https://wordpress.com/?ref=footer_website" sl-processed="1">Create a free website or blog at WordPress.com</a>.
+			<span class="sep"> | </span>
+			<a href="https://wordpress.com/themes/zoren/" title="Learn more about this theme" sl-processed="1">The Zoren Theme</a>.		</div><!-- .site-info -->
+	</footer><!-- #colophon -->
+</div><!-- #page -->
+
+<!-- wpcom_wp_footer -->
+<script type="text/javascript" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/gprofiles.js"></script>
+<script type="text/javascript">
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script>
+<script type="text/javascript" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/wpgroho.js"></script>
+
+	<script>
+		//initialize and attach hovercards to all gravatars
+		jQuery( document ).ready( function( $ ) {
+
+			if (typeof Gravatar === "undefined"){
+				return;
+			}
+
+			if ( typeof Gravatar.init !== "function" ) {
+				return;
+			}			
+
+			Gravatar.profile_cb = function( hash, id ) {
+				WPGroHo.syncProfileData( hash, id );
+			};
+			Gravatar.my_hash = WPGroHo.my_hash;
+			Gravatar.init( 'body', '#wp-admin-bar-my-account' );
+		});
+	</script>
+
+		<div style="display:none">
+	<div class="grofile-hash-map-cbc5023c95d26c2d66440a73fcb93811">
+	</div>
+	<div class="grofile-hash-map-2d57c95a0c1b97633a17e7d4c3e39500">
+	</div>
+	<div class="grofile-hash-map-4ecdf74a5523b3fa31e39fe51726b9ba">
+	</div>
+	<div class="grofile-hash-map-0a7e1fe9ab2381fca9b5d8a630802680">
+	</div>
+	<div class="grofile-hash-map-44028e1faf313b929b2ed91065f8a903">
+	</div>
+	<div class="grofile-hash-map-d1eaa70b29a5a803c6ca67ce3604e59e">
+	</div>
+	</div>
+<script type="text/javascript">
+/* <![CDATA[ */
+var HighlanderComments = {"loggingInText":"Logging In\u2026","submittingText":"Posting Comment\u2026","postCommentText":"Post Comment","connectingToText":"Connecting to %s","commentingAsText":"%1$s: You are commenting using your %2$s account.","logoutText":"Log Out","loginText":"Log In","connectURL":"https:\/\/initialneil.wordpress.com\/public.api\/connect\/?action=request","logoutURL":"https:\/\/initialneil.wordpress.com\/wp-login.php?action=logout&_wpnonce=3f4677e299","homeURL":"https:\/\/initialneil.wordpress.com\/","postID":"70","gravDefault":"identicon","enterACommentError":"Please enter a comment","enterEmailError":"Please enter your email address here","invalidEmailError":"Invalid email address","enterAuthorError":"Please enter your name here","gravatarFromEmail":"This picture will show whenever you leave a comment. Click to customize it.","logInToExternalAccount":"Log in to use details from one of these accounts.","change":"Change","changeAccount":"Change Account","comment_registration":"0","userIsLoggedIn":"","isJetpack":"0","text_direction":"ltr"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/saved_resource(4)"></script>
+
+	<div id="bit" class="loggedout-follow-normal" style="bottom: -265px;">
+		<a class="bsub" href="javascript:void(0)" sl-processed="1"><span id="bsub-text">Follow</span></a>
+		<div id="bitsubscribe">
+
+					<h3><label for="loggedout-follow-field">Follow “Neil Z. SHAO's Blog”</label></h3>
+
+			<form action="https://subscribe.wordpress.com/" method="post" accept-charset="utf-8" id="loggedout-follow">
+			<p>Get every new post delivered to your Inbox.</p>
+
+			<p id="loggedout-follow-error" style="display: none;"></p>
+
+			
+			<p><input type="email" name="email" value="Enter your email address" onfocus="this.value=(this.value==&quot;Enter your email address&quot;) ? &quot;&quot; : this.value;" onblur="this.value=(this.value==&quot;&quot;) ? &quot;Enter your email address&quot; : this.value;" id="loggedout-follow-field"></p>
+
+			<input type="hidden" name="action" value="subscribe">
+			<input type="hidden" name="blog_id" value="27419486">
+			<input type="hidden" name="source" value="https://initialneil.wordpress.com/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/">
+			<input type="hidden" name="sub-type" value="loggedout-follow">
+
+			<input type="hidden" id="_wpnonce" name="_wpnonce" value="9d13d13ae2"><input type="hidden" name="_wp_http_referer" value="/2015/01/11/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9/">
+			<p id="bsub-subscribe-button"><input type="submit" value="Sign me up"></p>
+			</form>
+					<div id="bsub-credit"><a href="https://wordpress.com/?ref=lof" sl-processed="1">Build a website with WordPress.com</a></div>
+		</div><!-- #bitsubscribe -->
+	</div><!-- #bit -->
+
+	<script type="text/javascript">
+		WPCOM_sharing_counts = {"https:\/\/initialneil.wordpress.com\/2015\/01\/11\/build-caffe-in-windows-with-visual-studio-2013-cuda-6-5-opencv-2-4-9\/":70}	</script>
+		<script type="text/javascript">
+		jQuery(document).on( 'ready post-load', function(){
+			jQuery( 'a.share-twitter' ).on( 'click', function() {
+				window.open( jQuery(this).attr( 'href' ), 'wpcomtwitter', 'menubar=1,resizable=1,width=600,height=350' );
+				return false;
+			});
+		});
+		</script>
+				<script type="text/javascript">
+		jQuery(document).on( 'ready post-load', function(){
+			jQuery( 'a.share-facebook' ).on( 'click', function() {
+				window.open( jQuery(this).attr( 'href' ), 'wpcomfacebook', 'menubar=1,resizable=1,width=600,height=400' );
+				return false;
+			});
+		});
+		</script>
+				<iframe src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/master.html" scrolling="no" id="likes-master" name="likes-master" style="display:none;"></iframe>
+		<div id="likes-other-gravatars"><div class="likes-text"><span>%d</span> bloggers like this:</div><ul class="wpl-avatars sd-like-gravatars"></ul></div>
+		<script type="text/javascript">
+		//<![CDATA[
+			var jetpackLikesWidgetQueue = [];
+			var jetpackLikesWidgetBatch = [];
+			var jetpackLikesMasterReady = false;
+
+			function JetpackLikespostMessage( message, target ) {
+				if ( "string" === typeof message ){
+					try{
+						message = JSON.parse( message );
+					}
+					catch(e) {
+						return;
+					}
+				}
+
+				pm( {
+					target: target,
+					type: 'likesMessage',
+					data: message,
+					origin: '*'
+				} );
+			}
+
+			function JetpackLikesBatchHandler() {
+				var requests = [];
+				jQuery( 'div.jetpack-likes-widget-unloaded' ).each( function( i ) {
+					if ( jetpackLikesWidgetBatch.indexOf( this.id ) > -1 )
+						return;
+					jetpackLikesWidgetBatch.push( this.id );
+					var regex = /like-(post|comment)-wrapper-(\d+)-(\d+)-(\w+)/;
+					var match = regex.exec( this.id );
+					if ( ! match || match.length != 5 )
+						return;
+
+					var info = {
+						blog_id: match[2],
+						width:   this.width
+					};
+
+					if ( 'post' == match[1] ) {
+						info.post_id = match[3];
+					} else if ( 'comment' == match[1] ) {
+						info.comment_id = match[3];
+					}
+
+					info.obj_id = match[4];
+
+					requests.push( info );
+				});
+
+				if ( requests.length > 0 ) {
+					JetpackLikespostMessage( { event: 'initialBatch', requests: requests }, window.frames['likes-master'] );
+				}
+			}
+
+			function JetpackLikesMessageListener( event ) {
+				if ( "undefined" == typeof event.event )
+					return;
+
+				if ( 'masterReady' == event.event ) {
+					jQuery( document ).ready( function() {
+						jetpackLikesMasterReady = true;
+
+						var stylesData = {
+								event: 'injectStyles'
+						};
+
+						if ( jQuery( 'iframe.admin-bar-likes-widget' ).length > 0 ) {
+							JetpackLikespostMessage( { event: 'adminBarEnabled' }, window.frames[ 'likes-master' ] );
+
+							stylesData.adminBarStyles = {
+								background: jQuery( '#wpadminbar .quicklinks li#wp-admin-bar-wpl-like > a' ).css( 'background' ),
+								isRtl: ( 'rtl' == jQuery( '#wpadminbar' ).css( 'direction' ) )
+							};
+						}
+
+						if ( !window.addEventListener )
+							jQuery( '#wp-admin-bar-admin-bar-likes-widget' ).hide();
+
+						stylesData.textStyles = {
+							color: jQuery( '.sd-text-color').css( 'color' ),
+							fontFamily: jQuery( '.sd-text-color' ).css( 'font-family' ),
+							fontSize: jQuery( '.sd-text-color' ).css( 'font-size' ),
+							direction: jQuery( '.sd-text-color' ).css( 'direction' ),
+							fontWeight: jQuery( '.sd-text-color' ).css( 'font-weight' ),
+							fontStyle: jQuery( '.sd-text-color' ).css( 'font-style' ),
+							textDecoration: jQuery( '.sd-text-color' ).css('text-decoration')
+						};
+
+						stylesData.linkStyles = {
+							color: jQuery( '.sd-link-color' ).css('color'),
+							fontFamily: jQuery( '.sd-link-color' ).css('font-family'),
+							fontSize: jQuery( '.sd-link-color' ).css('font-size'),
+							textDecoration: jQuery( '.sd-link-color' ).css('text-decoration'),
+							fontWeight: jQuery( '.sd-link-color' ).css( 'font-weight' ),
+							fontStyle: jQuery( '.sd-link-color' ).css( 'font-style' )
+						};
+
+						JetpackLikespostMessage( stylesData, window.frames[ 'likes-master' ] );
+
+						JetpackLikesBatchHandler();
+
+						jQuery( document ).on( 'inview', 'div.jetpack-likes-widget-unloaded', function() {
+							jetpackLikesWidgetQueue.push( this.id );
+						});
+					});
+				}
+
+				if ( 'showLikeWidget' == event.event ) {
+					jQuery( '#' + event.id + ' .post-likes-widget-placeholder'  ).fadeOut( 'fast', function() {
+						jQuery( '#' + event.id + ' .post-likes-widget' ).fadeIn( 'fast', function() {
+							JetpackLikespostMessage( { event: 'likeWidgetDisplayed', blog_id: event.blog_id, post_id: event.post_id, obj_id: event.obj_id }, window.frames['likes-master'] );
+						});
+					});
+				}
+
+				if ( 'clickReblogFlair' == event.event ) {
+					wpcom_reblog.toggle_reblog_box_flair( event.obj_id );
+				}
+
+				if ( 'showOtherGravatars' == event.event ) {
+					var $container = jQuery( '#likes-other-gravatars' );
+					var $list = $container.find( 'ul' );
+
+					$container.hide();
+					$list.html( '' );
+
+					$container.find( '.likes-text span' ).text( event.total );
+
+					jQuery.each( event.likers, function( i, liker ) {
+						$list.append( '<li class="' + liker.css_class + '"><a href="' + liker.profile_URL + '" class="wpl-liker" rel="nofollow" target="_parent"><img src="' + liker.avatar_URL + '" alt="' + liker.name + '" width="30" height="30" style="padding-right: 3px;" /></a></li>');
+					} );
+
+					var offset = jQuery( "[name='" + event.parent + "']" ).offset();
+
+					$container.css( 'left', offset.left + event.position.left - 10 + 'px' );
+					$container.css( 'top', offset.top + event.position.top - 33 + 'px' );
+
+					var rowLength = Math.floor( event.width / 37 );
+					var height = ( Math.ceil( event.likers.length / rowLength ) * 37 ) + 13;
+					if ( height > 204 ) {
+						height = 204;
+					}
+
+					$container.css( 'height', height + 'px' );
+					$container.css( 'width', rowLength * 37 - 7 + 'px' );
+
+					$list.css( 'width', rowLength * 37 + 'px' );
+
+					$container.fadeIn( 'slow' );
+
+					var scrollbarWidth = $list[0].offsetWidth - $list[0].clientWidth;
+					if ( scrollbarWidth > 0 ) {
+						$container.width( $container.width() + scrollbarWidth );
+						$list.width( $list.width() + scrollbarWidth );
+					}
+				}
+			}
+
+			pm.bind( 'likesMessage', function(e) { JetpackLikesMessageListener(e); } );
+
+			jQuery( document ).click( function( e ) {
+				var $container = jQuery( '#likes-other-gravatars' );
+
+				if ( $container.has( e.target ).length === 0 ) {
+					$container.fadeOut( 'slow' );
+				}
+			});
+
+			function JetpackLikesWidgetQueueHandler() {
+				var wrapperID;
+				if ( ! jetpackLikesMasterReady ) {
+					setTimeout( JetpackLikesWidgetQueueHandler, 500 );
+					return;
+				}
+
+				if ( jetpackLikesWidgetQueue.length > 0 ) {
+					// We may have a widget that needs creating now
+					var found = false;
+					while( jetpackLikesWidgetQueue.length > 0 ) {
+						// Grab the first member of the queue that isn't already loading.
+						wrapperID = jetpackLikesWidgetQueue.splice( 0, 1 )[0];
+						if ( jQuery( '#' + wrapperID ).hasClass( 'jetpack-likes-widget-unloaded' ) ) {
+							found = true;
+							break;
+						}
+					}
+					if ( ! found ) {
+						setTimeout( JetpackLikesWidgetQueueHandler, 500 );
+						return;
+					}
+				} else if ( jQuery( 'div.jetpack-likes-widget-unloaded' ).length > 0 ) {
+					// Grab any unloaded widgets for a batch request
+					JetpackLikesBatchHandler();
+
+					// Get the next unloaded widget
+					wrapperID = jQuery( 'div.jetpack-likes-widget-unloaded' ).first()[0].id;
+					if ( ! wrapperID ) {
+						// Everything is currently loaded
+						setTimeout( JetpackLikesWidgetQueueHandler, 500 );
+						return;
+					}
+				}
+
+				if ( 'undefined' === typeof wrapperID ) {
+					setTimeout( JetpackLikesWidgetQueueHandler, 500 );
+					return;
+				}
+
+				var $wrapper = jQuery( '#' + wrapperID );
+				$wrapper.find( 'iframe' ).remove();
+
+				if ( $wrapper.hasClass( 'slim-likes-widget' ) ) {
+					$wrapper.find( '.post-likes-widget-placeholder' ).after( "<iframe class='post-likes-widget jetpack-likes-widget' name='" + $wrapper.data( 'name' ) + "' height='22px' width='68px' frameBorder='0' scrolling='no' src='" + $wrapper.data( 'src' ) + "'></iframe>" );
+				} else {
+					$wrapper.find( '.post-likes-widget-placeholder' ).after( "<iframe class='post-likes-widget jetpack-likes-widget' name='" + $wrapper.data( 'name' ) + "' height='55px' width='100%' frameBorder='0' src='" + $wrapper.data( 'src' ) + "'></iframe>" );
+				}
+
+				$wrapper.removeClass( 'jetpack-likes-widget-unloaded' ).addClass( 'jetpack-likes-widget-loading' );
+
+				$wrapper.find( 'iframe' ).load( function( e ) {
+					var $iframe = jQuery( e.target );
+					$wrapper.removeClass( 'jetpack-likes-widget-loading' ).addClass( 'jetpack-likes-widget-loaded' );
+
+					JetpackLikespostMessage( { event: 'loadLikeWidget', name: $iframe.attr( 'name' ), width: $iframe.width() }, window.frames[ 'likes-master' ] );
+
+					if ( $wrapper.hasClass( 'slim-likes-widget' ) ) {
+						$wrapper.find( 'iframe' ).Jetpack( 'resizeable' );
+					}
+				});
+				setTimeout( JetpackLikesWidgetQueueHandler, 250 );
+			}
+			JetpackLikesWidgetQueueHandler();
+		//]]>
+		</script>
+<script type="text/javascript" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/form.js"></script>
+<script type="text/javascript">
+/* <![CDATA[ */
+var JetpackEmojiSettings = {"base_url":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/emoji\/twemoji\/"};
+/* ]]> */
+</script>
+<script type="text/javascript">
+/* <![CDATA[ */
+var sharing_js_options = {"lang":"en","counts":"1"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/saved_resource(5)"></script>
+<script type="text/javascript">
+// <![CDATA[
+(function() {
+try{
+  if ( window.external &&'msIsSiteMode' in window.external) {
+    if (window.external.msIsSiteMode()) {
+      var jl = document.createElement('script');
+      jl.type='text/javascript';
+      jl.async=true;
+      jl.src='/wp-content/plugins/ie-sitemode/custom-jumplist.php';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(jl, s);
+    }
+  }
+}catch(e){}
+})();
+// ]]>
+</script>	<script type="text/javascript">
+	var skimlinks_pub_id = "725X584219"
+	var skimlinks_sitename = "initialneil.wordpress.com";
+	</script>
+	<script type="text/javascript" src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/725X1342.skimlinks.js"></script><script src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/w.js" type="text/javascript" async="" defer=""></script>
+<script type="text/javascript">
+_tkq = window._tkq || [];
+_stq = window._stq || [];
+_tkq.push(['storeContext', {'blog_id':'27419486','blog_tz':'0','user_lang':'en','blog_lang':'en','user_id':'0'}]);
+_stq.push(['view', {'blog':'27419486','v':'wpcom','tz':'0','user_id':'0','post':'70','subd':'initialneil'}]);
+_stq.push(['extra', {'crypt':'UE5XaGUuOTlwaD85flAmcm1mcmZsaDhkV11YdTdvUG14Q2VDQTR4LlUsLi82dU1mai9BMkV4eHdZdkVOWkIxLlE1THhwazE3K243fE9RZldzWWVndi11TU1pJUJmNXhocHJsQXdDcElzPVhYRnRERjgtdE5fNlNwXVJCdC9MZ2Y5bkFjMXNBUXRmN21iemZvTzl0TEFXLSxVRmE/flVfUlssNCt8OSZ2XXBYbVhraVJ6UHlTS0E2cHkzajJSMWg2NixPdlhMel1xLktidF1OdWJiakktNVdpLGFtdy8yUDc9Vm1GcHk4RitYfDZ8VDJJd3BmQkJvRThYc1V+a1plNlUyL2JlQWp4blMlRVdMfnRvV2w9N29tWjdNeUEzSi5FRnl4UEYvdlVuX2o4NFhMMm9KanNdJjl4XXR6MTZ1MVtOKzRZakR8'}]);
+_stq.push([ 'clickTrackerInit', '27419486', '70' ]);
+	</script>
+<noscript>&lt;img src="https://pixel.wp.com/b.gif?v=noscript" style="height:0px;width:0px;overflow:hidden" alt="" /&gt;</noscript>
+<script>
+if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
+
+	wpcom_mobile_user_agent_info.init();
+	var mobileStatsQueryString = "";
+	
+	if( false !== wpcom_mobile_user_agent_info.matchedPlatformName )
+		mobileStatsQueryString += "&x_" + 'mobile_platforms' + '=' + wpcom_mobile_user_agent_info.matchedPlatformName;
+	
+	if( false !== wpcom_mobile_user_agent_info.matchedUserAgentName )
+		mobileStatsQueryString += "&x_" + 'mobile_devices' + '=' + wpcom_mobile_user_agent_info.matchedUserAgentName;
+	
+	if( wpcom_mobile_user_agent_info.isIPad() )
+		mobileStatsQueryString += "&x_" + 'ipad_views' + '=' + 'views';
+
+	if( "" != mobileStatsQueryString ) {
+		new Image().src = document.location.protocol + '//pixel.wp.com/g.gif?v=wpcom-no-pv' + mobileStatsQueryString + '&baba=' + Math.random();
+	}
+	
+}
+</script>
+
+<img src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/g.gif" id="wpstats"><iframe id="google_osd_static_frame_6688569909892" name="google_osd_static_frame" style="display: none; width: 0px; height: 0px;"></iframe><img src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/saved_resource(6)" width="1" height="1" style="display: none;"><img src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/saved_resource(7)" width="1" height="1" style="display: none;"><img src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/saved_resource(8)" width="1" height="1" style="display: none;"><img src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/saved_resource(9)" width="1" height="1" style="display: none;"><img src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/saved_resource(10)" width="1" height="1" style="display: none;"><img src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/saved_resource(11)" width="1" height="1" style="display: none;"><img src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/saved_resource(12)" width="1" height="1" style="display: none;"><img src="./Build Caffe in Windows with Visual Studio 2013 + CUDA 6.5 + OpenCV 2.4.9_files/saved_resource(13)" width="1" height="1" style="display: none;"></body></html>
