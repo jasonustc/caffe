@@ -10,6 +10,7 @@ namespace caffe {
 
 template <typename Dtype>
 void DeconvolutionLayer<Dtype>::compute_output_shape() {
+	//remove padding
   this->height_out_ = this->stride_h_ * (this->height_ - 1) + this->kernel_h_
       - 2 * this->pad_h_;
   this->width_out_ = this->stride_w_ * (this->width_ - 1) + this->kernel_w_
@@ -19,6 +20,7 @@ void DeconvolutionLayer<Dtype>::compute_output_shape() {
 template <typename Dtype>
 void DeconvolutionLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
+	//weight already iniltialized in base_conv_layer
   const Dtype* weight = this->blobs_[0]->cpu_data();
   for (int i = 0; i < bottom.size(); ++i) {
     const Dtype* bottom_data = bottom[i]->cpu_data();

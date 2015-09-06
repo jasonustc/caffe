@@ -775,6 +775,7 @@ void Net<Dtype>::Update() {
 template <typename Dtype>
 void Net<Dtype>::ShareWeightData() {
   for (int i = 0; i < params_.size(); ++i) {
+	  //param_owners_:to solve the parameter sharing problem
     if (param_owners_[i] < 0) { continue; }
     params_[i]->ShareData(*params_[param_owners_[i]]);
     params_[i]->ShareDiff(*params_[param_owners_[i]]);

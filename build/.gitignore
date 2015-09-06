@@ -1,3 +1,5 @@
 # all files
 *.sdf
 *.pdb
+*.opensdf
+x64/

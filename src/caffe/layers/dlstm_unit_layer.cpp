@@ -16,6 +16,11 @@ namespace caffe{
 		return 2. * sigmoid(2. * x) - 1.;
 	}
 
+	//bottom[0], c_{t-1}, 1 x #instances x hidden_dim
+	//bottom[1], h_t, 1 x #instances x hidden_dim
+	//bottom[2], 1 x 1 x num_instances
+	//top[0], c_t, 1 x #instances x hidden_dim
+	//top[1], i_input, f_input, o_input, g_input: 1 x #instances x 4hidden_dim
 	//TODO: reverse the dim of bottom and top compared with LSTM layer
 	template <typename Dtype>
 	void DLSTMUnitLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
@@ -37,20 +42,21 @@ namespace caffe{
 
 	//forward process of DLSTM is just like the backward process of LSTM
 	//top: (#streams, #instances, ...)
-	//bottom[0]: C_prev
-	//bottom[1]: H_prev
-	//bottom[1]: weight
-	//bottom[2]: flush
+	//bottom[0]: C_prev, 1 x #instances x hidden_dim
+	//bottom[1]: H, 1 x #instances x hidden_dim
+	//bottom[2]: flush 1 x 1 x num_instances
+	//top[0], c_t
+	//top[1], X
 	template<typename Dtype>
 	void DLSTMUnitLayer<Dtype>::forward_cpu(const vector<Blob<Dtype>*>& bottom,
 		const vector<Blob<Dtype>*>& top){
 		const int num = bottom[0]->shape(1);
 		const int x_dim = hidden_dim_ * 4;
 		const Dtype* C_prev = bottom[0]->cpu_data();
-		const Dtype* X = bottom[1]->cpu_data();
+		const Dtype* H = bottom[1]->cpu_data();
 		const Dtype* flush = bottom[2]->cpu_data();
 		Dtype* C = top[0]->cpu_data();
-		Dtype* H = top[1]->cpu_data();
+		Dtype* X = top[1]->cpu_data();
 		for(int n = 0; n < num; n++){
 			for(int d = 0; d < hidden_dim_; ++d){
 				//it's the same for every sample in the mini-batch 
