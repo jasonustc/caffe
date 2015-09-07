@@ -78,6 +78,7 @@ __global__ void col2im_gpu_kernel(const int n, const Dtype* data_col,
     const int stride_h, const int stride_w,
     const int height_col, const int width_col,
     Dtype* data_im) {
+	//n: number of kernels
   CUDA_KERNEL_LOOP(index, n) {
     Dtype val = 0;
     int w = index % width + pad_w;

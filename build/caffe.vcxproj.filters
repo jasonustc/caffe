@@ -243,7 +243,7 @@
     <ClCompile Include="..\src\gtest\gtest-all.cpp">
       <Filter>src\test</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\code\caffe\examples\mnist\convert_mnist_data.cpp" />
+    <ClCompile Include="..\tools\convert_pairwise_multi_image_data.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">

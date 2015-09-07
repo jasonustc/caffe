@@ -152,12 +152,10 @@ void LocalLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 	Blob<Dtype> intermediate;
 	intermediate.Reshape(1, 1, K_, N_);
 
-	Blob<Dtype> x_diff_temp;
-	if (propagate_down[0])
-	{
-		x_diff_temp.Reshape(1, 1, 1, N_);
-	}
-	
+	Blob<Dtype> weight_diff_temp;
+	weight_diff_temp.Reshape(1, 1, K_, N_);
+
+	CUDA_CHECK(cudaMemset(weight_diff, 0, sizeof(Dtype) * this->blobs_[0]->count()));
 	for (int n = 0; n < num_; n++)
 	{
 		im2col_gpu(bottom_data + bottom[0]->offset(n), channels_, height_,
@@ -172,16 +170,14 @@ void LocalLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 			caffe_gpu_gemm<Dtype>(CblasTrans, CblasNoTrans, K_, N_, 1, 
 				(Dtype)1., E.gpu_data(), top_diff + top[0]->offset(n, m), 
 				(Dtype)0., intermediate.mutable_gpu_data());
-			caffe_gpu_mul(K_ * N_, intermediate.gpu_data(), x_data, weight_diff + this->blobs_[0]->offset(m));
+			caffe_gpu_mul(K_ * N_, intermediate.gpu_data(), x_data, weight_diff_temp.mutable_gpu_data());
+			caffe_gpu_add(K_ * N_, weight_diff + this->blobs_[0]->offset(m), weight_diff_temp.gpu_data(), weight_diff + this->blobs_[0]->offset(m));
 			if (propagate_down[0])
 			{
-				caffe_gpu_mul(K_ * N_, intermediate.gpu_data(), weight + this->blobs_[0]->offset(m), 
-					intermediate.mutable_gpu_data());
+				caffe_gpu_mul(K_ * N_, intermediate.gpu_data(), weight + this->blobs_[0]->offset(m), intermediate.mutable_gpu_data());
 				caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, 1, N_, K_,
 						(Dtype)1., E.gpu_data(), intermediate.gpu_data(),
-						(Dtype)0., x_diff_temp.mutable_gpu_data());
-
-				caffe_gpu_add(N_, x_diff, x_diff_temp.gpu_data(),  x_diff);
+						(Dtype)1., x_diff);
 			}
 		}
 		if (propagate_down[0])

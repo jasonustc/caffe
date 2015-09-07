@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\code\caffe\examples\mnist\convert_mnist_data.cpp" />
     <ClCompile Include="..\src\caffe\blob.cpp" />
     <ClCompile Include="..\src\caffe\common.cpp" />
     <ClCompile Include="..\src\caffe\data_transformer.cpp" />
@@ -91,6 +90,7 @@
     <ClCompile Include="..\src\caffe\util\math_functions.cpp" />
     <ClCompile Include="..\src\caffe\util\upgrade_proto.cpp" />
     <ClCompile Include="..\src\gtest\gtest-all.cpp" />
+    <ClCompile Include="..\tools\convert_pairwise_multi_image_data.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu" />

@@ -17,6 +17,7 @@ using std::max;
 int main(int argc, char** argv) 
 {
 	::google::InitGoogleLogging(argv[0]);
+	FLAGS_alsologtostderr = 1;
 
 	if (argc != 3) {
 		LOG(ERROR) << "Usage: leveldb_read input_leveldb output_file";
@@ -43,7 +44,7 @@ int main(int argc, char** argv)
 	{
 		// just a dummy operation
 		datum.ParseFromString(it->value().ToString());
-		const string& data = datum.data();
+		const std::string& data = datum.data();
 		int size_in_datum = std::max<int>(datum.data().size(), datum.float_data_size());
 		printf("size:%d\n",size_in_datum);
 		for (int i = 0; i < size_in_datum; ++i)
