@@ -3,3 +3,4 @@
 *.pdb
 *.opensdf
 x64/
+*.suo
