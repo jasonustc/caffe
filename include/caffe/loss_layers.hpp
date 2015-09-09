@@ -15,6 +15,7 @@ namespace caffe {
 
 const float kLOG_THRESHOLD = 1e-20;
 
+
 /**
  * @brief Computes the classification accuracy for a one-of-many
  *        classification task.
@@ -830,6 +831,30 @@ class SoftmaxWithLossLayer : public LossLayer<Dtype> {
   bool normalize_;
 
   int softmax_axis_, outer_num_, inner_num_;
+};
+
+template <typename Dtype>
+class NormLossLayer : public LossLayer<Dtype>{
+public:
+	explicit NormLossLayer(const LayerParameter& param) : LossLayer<Dtype>(param){}
+	virtual inline const char* type() const { return "NormLoss"; }
+	virtual inline int ExactNumBottomBlobs() const { return 1; }
+
+protected:
+	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+	virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+	virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+		const vector<bool>& propagate_down,
+		const vector<Blob<Dtype>*>& bottom);
+	virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+		const vector<bool>& propagate_down,
+		const vector<Blob<Dtype>*>& bottom);
+
+	//normalization type: l1 or l2
+	NormLossParameter_NormType norm_type_;
+
 };
 
 }  // namespace caffe

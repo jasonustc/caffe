@@ -67,6 +67,8 @@
     <ClCompile Include="..\src\caffe\layers\multinomial_logistic_loss_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\mvn_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\neuron_layer.cpp" />
+    <ClCompile Include="..\src\caffe\layers\noise_layer.cpp" />
+    <ClCompile Include="..\src\caffe\layers\norm_loss_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\pairwise_ranking_hinge_loss_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\part_sort_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\pooling_layer.cpp" />
@@ -104,8 +106,8 @@
     <ClCompile Include="..\src\caffe\util\io.cpp" />
     <ClCompile Include="..\src\caffe\util\math_functions.cpp" />
     <ClCompile Include="..\src\caffe\util\upgrade_proto.cpp" />
+    <ClCompile Include="..\src\gtest\gtest-all.cpp" />
     <ClCompile Include="..\tools\caffe.cpp" />
-    <ClCompile Include="dlstm_layer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu" />
@@ -134,6 +136,8 @@
     <CudaCompile Include="..\src\caffe\layers\lrn_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\lstm_unit_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\mvn_layer.cu" />
+    <CudaCompile Include="..\src\caffe\layers\noise_layer.cu" />
+    <CudaCompile Include="..\src\caffe\layers\norm_loss_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\pooling_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\power_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\prelu_layer.cu" />
@@ -168,9 +172,12 @@
     <ClInclude Include="..\include\caffe\net.hpp" />
     <ClInclude Include="..\include\caffe\neuron_layers.hpp" />
     <ClInclude Include="..\include\caffe\python_layer.hpp" />
+    <ClInclude Include="..\include\caffe\random_layers.hpp" />
     <ClInclude Include="..\include\caffe\sequence_layers.hpp" />
     <ClInclude Include="..\include\caffe\solver.hpp" />
     <ClInclude Include="..\include\caffe\syncedmem.hpp" />
+    <ClInclude Include="..\include\caffe\test\test_caffe_main.hpp" />
+    <ClInclude Include="..\include\caffe\test\test_gradient_check_util.hpp" />
     <ClInclude Include="..\include\caffe\util\benchmark.hpp" />
     <ClInclude Include="..\include\caffe\util\cudnn.hpp" />
     <ClInclude Include="..\include\caffe\util\db.hpp" />
@@ -185,6 +192,7 @@
     <ClInclude Include="..\include\caffe\video_layers.hpp" />
     <ClInclude Include="..\include\caffe\vision_layers.hpp" />
     <ClInclude Include="..\src\caffe\proto\caffe.pb.h" />
+    <ClInclude Include="..\src\gtest\gtest.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{47E4C7EF-EA64-486F-97C0-EE856A67CE44}</ProjectGuid>

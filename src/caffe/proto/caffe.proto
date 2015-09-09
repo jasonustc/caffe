@@ -346,6 +346,35 @@ message LayerParameter {
   optional ThresholdParameter threshold_param = 128;
   optional VideoUnrollParameter video_unroll_param=135;
   optional WindowDataParameter window_data_param = 129;
+  optional NoiseParameter noise_param = 143;
+  optional NormLossParameter norm_loss_param = 145;
+}
+
+//Message that stores parameters used to calculate l1/l2 loss
+message NormLossParameter{
+    enum NormType{
+        L1 = 1;
+        L2 = 2;
+    }
+    optional NormType norm_type = 1[default = L1];//norm type
+}
+
+//Message that stores parameters used to generate random noise
+message NoiseParameter{
+    enum NoiseType{
+        GAUSSIAN = 1;
+        UNIFORM = 2;
+    }
+    optional NoiseType noise_type = 1[default = GAUSSIAN]; //noise type
+    //noise parameters
+    optional float alpha = 2[default = 0];
+    optional float beta = 3[default = 0.01];
+    //TODO: impliment two types
+    enum ApplyType{
+        MULTIPLY = 1;
+        ADD = 2;
+    }
+    optional ApplyType apply_type = 4[default = ADD]; //apply type
 }
 
 // Message that stores parameters used to apply transformation

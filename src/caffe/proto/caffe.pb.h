@@ -46,6 +46,8 @@ class NetState;
 class NetStateRule;
 class ParamSpec;
 class LayerParameter;
+class NormLossParameter;
+class NoiseParameter;
 class TransformationParameter;
 class LossParameter;
 class AccuracyParameter;
@@ -150,6 +152,63 @@ inline bool ParamSpec_DimCheckMode_Parse(
     const ::std::string& name, ParamSpec_DimCheckMode* value) {
   return ::google::protobuf::internal::ParseNamedEnum<ParamSpec_DimCheckMode>(
     ParamSpec_DimCheckMode_descriptor(), name, value);
+}
+enum NormLossParameter_NormType {
+  NormLossParameter_NormType_L1 = 1,
+  NormLossParameter_NormType_L2 = 2
+};
+bool NormLossParameter_NormType_IsValid(int value);
+const NormLossParameter_NormType NormLossParameter_NormType_NormType_MIN = NormLossParameter_NormType_L1;
+const NormLossParameter_NormType NormLossParameter_NormType_NormType_MAX = NormLossParameter_NormType_L2;
+const int NormLossParameter_NormType_NormType_ARRAYSIZE = NormLossParameter_NormType_NormType_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* NormLossParameter_NormType_descriptor();
+inline const ::std::string& NormLossParameter_NormType_Name(NormLossParameter_NormType value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    NormLossParameter_NormType_descriptor(), value);
+}
+inline bool NormLossParameter_NormType_Parse(
+    const ::std::string& name, NormLossParameter_NormType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<NormLossParameter_NormType>(
+    NormLossParameter_NormType_descriptor(), name, value);
+}
+enum NoiseParameter_NoiseType {
+  NoiseParameter_NoiseType_GAUSSIAN = 1,
+  NoiseParameter_NoiseType_UNIFORM = 2
+};
+bool NoiseParameter_NoiseType_IsValid(int value);
+const NoiseParameter_NoiseType NoiseParameter_NoiseType_NoiseType_MIN = NoiseParameter_NoiseType_GAUSSIAN;
+const NoiseParameter_NoiseType NoiseParameter_NoiseType_NoiseType_MAX = NoiseParameter_NoiseType_UNIFORM;
+const int NoiseParameter_NoiseType_NoiseType_ARRAYSIZE = NoiseParameter_NoiseType_NoiseType_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* NoiseParameter_NoiseType_descriptor();
+inline const ::std::string& NoiseParameter_NoiseType_Name(NoiseParameter_NoiseType value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    NoiseParameter_NoiseType_descriptor(), value);
+}
+inline bool NoiseParameter_NoiseType_Parse(
+    const ::std::string& name, NoiseParameter_NoiseType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<NoiseParameter_NoiseType>(
+    NoiseParameter_NoiseType_descriptor(), name, value);
+}
+enum NoiseParameter_ApplyType {
+  NoiseParameter_ApplyType_MULTIPLY = 1,
+  NoiseParameter_ApplyType_ADD = 2
+};
+bool NoiseParameter_ApplyType_IsValid(int value);
+const NoiseParameter_ApplyType NoiseParameter_ApplyType_ApplyType_MIN = NoiseParameter_ApplyType_MULTIPLY;
+const NoiseParameter_ApplyType NoiseParameter_ApplyType_ApplyType_MAX = NoiseParameter_ApplyType_ADD;
+const int NoiseParameter_ApplyType_ApplyType_ARRAYSIZE = NoiseParameter_ApplyType_ApplyType_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* NoiseParameter_ApplyType_descriptor();
+inline const ::std::string& NoiseParameter_ApplyType_Name(NoiseParameter_ApplyType value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    NoiseParameter_ApplyType_descriptor(), value);
+}
+inline bool NoiseParameter_ApplyType_Parse(
+    const ::std::string& name, NoiseParameter_ApplyType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<NoiseParameter_ApplyType>(
+    NoiseParameter_ApplyType_descriptor(), name, value);
 }
 enum AxisPoolingParameter_PoolMethod {
   AxisPoolingParameter_PoolMethod_MAX = 0,
@@ -2891,6 +2950,24 @@ class LayerParameter : public ::google::protobuf::Message {
   inline ::caffe::WindowDataParameter* release_window_data_param();
   inline void set_allocated_window_data_param(::caffe::WindowDataParameter* window_data_param);
 
+  // optional .caffe.NoiseParameter noise_param = 143;
+  inline bool has_noise_param() const;
+  inline void clear_noise_param();
+  static const int kNoiseParamFieldNumber = 143;
+  inline const ::caffe::NoiseParameter& noise_param() const;
+  inline ::caffe::NoiseParameter* mutable_noise_param();
+  inline ::caffe::NoiseParameter* release_noise_param();
+  inline void set_allocated_noise_param(::caffe::NoiseParameter* noise_param);
+
+  // optional .caffe.NormLossParameter norm_loss_param = 145;
+  inline bool has_norm_loss_param() const;
+  inline void clear_norm_loss_param();
+  static const int kNormLossParamFieldNumber = 145;
+  inline const ::caffe::NormLossParameter& norm_loss_param() const;
+  inline ::caffe::NormLossParameter* mutable_norm_loss_param();
+  inline ::caffe::NormLossParameter* release_norm_loss_param();
+  inline void set_allocated_norm_loss_param(::caffe::NormLossParameter* norm_loss_param);
+
   // @@protoc_insertion_point(class_scope:caffe.LayerParameter)
  private:
   inline void set_has_name();
@@ -2987,6 +3064,10 @@ class LayerParameter : public ::google::protobuf::Message {
   inline void clear_has_video_unroll_param();
   inline void set_has_window_data_param();
   inline void clear_has_window_data_param();
+  inline void set_has_noise_param();
+  inline void clear_has_noise_param();
+  inline void set_has_norm_loss_param();
+  inline void clear_has_norm_loss_param();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -3044,6 +3125,8 @@ class LayerParameter : public ::google::protobuf::Message {
   ::caffe::ThresholdParameter* threshold_param_;
   ::caffe::VideoUnrollParameter* video_unroll_param_;
   ::caffe::WindowDataParameter* window_data_param_;
+  ::caffe::NoiseParameter* noise_param_;
+  ::caffe::NormLossParameter* norm_loss_param_;
   int phase_;
   mutable int _cached_size_;
   friend void  protobuf_AddDesc_caffe_2eproto();
@@ -3052,6 +3135,266 @@ class LayerParameter : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static LayerParameter* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class NormLossParameter : public ::google::protobuf::Message {
+ public:
+  NormLossParameter();
+  virtual ~NormLossParameter();
+
+  NormLossParameter(const NormLossParameter& from);
+
+  inline NormLossParameter& operator=(const NormLossParameter& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const NormLossParameter& default_instance();
+
+  void Swap(NormLossParameter* other);
+
+  // implements Message ----------------------------------------------
+
+  NormLossParameter* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const NormLossParameter& from);
+  void MergeFrom(const NormLossParameter& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  typedef NormLossParameter_NormType NormType;
+  static const NormType L1 = NormLossParameter_NormType_L1;
+  static const NormType L2 = NormLossParameter_NormType_L2;
+  static inline bool NormType_IsValid(int value) {
+    return NormLossParameter_NormType_IsValid(value);
+  }
+  static const NormType NormType_MIN =
+    NormLossParameter_NormType_NormType_MIN;
+  static const NormType NormType_MAX =
+    NormLossParameter_NormType_NormType_MAX;
+  static const int NormType_ARRAYSIZE =
+    NormLossParameter_NormType_NormType_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  NormType_descriptor() {
+    return NormLossParameter_NormType_descriptor();
+  }
+  static inline const ::std::string& NormType_Name(NormType value) {
+    return NormLossParameter_NormType_Name(value);
+  }
+  static inline bool NormType_Parse(const ::std::string& name,
+      NormType* value) {
+    return NormLossParameter_NormType_Parse(name, value);
+  }
+
+  // accessors -------------------------------------------------------
+
+  // optional .caffe.NormLossParameter.NormType norm_type = 1 [default = L1];
+  inline bool has_norm_type() const;
+  inline void clear_norm_type();
+  static const int kNormTypeFieldNumber = 1;
+  inline ::caffe::NormLossParameter_NormType norm_type() const;
+  inline void set_norm_type(::caffe::NormLossParameter_NormType value);
+
+  // @@protoc_insertion_point(class_scope:caffe.NormLossParameter)
+ private:
+  inline void set_has_norm_type();
+  inline void clear_has_norm_type();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  int norm_type_;
+  friend void  protobuf_AddDesc_caffe_2eproto();
+  friend void protobuf_AssignDesc_caffe_2eproto();
+  friend void protobuf_ShutdownFile_caffe_2eproto();
+
+  void InitAsDefaultInstance();
+  static NormLossParameter* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class NoiseParameter : public ::google::protobuf::Message {
+ public:
+  NoiseParameter();
+  virtual ~NoiseParameter();
+
+  NoiseParameter(const NoiseParameter& from);
+
+  inline NoiseParameter& operator=(const NoiseParameter& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const NoiseParameter& default_instance();
+
+  void Swap(NoiseParameter* other);
+
+  // implements Message ----------------------------------------------
+
+  NoiseParameter* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const NoiseParameter& from);
+  void MergeFrom(const NoiseParameter& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  typedef NoiseParameter_NoiseType NoiseType;
+  static const NoiseType GAUSSIAN = NoiseParameter_NoiseType_GAUSSIAN;
+  static const NoiseType UNIFORM = NoiseParameter_NoiseType_UNIFORM;
+  static inline bool NoiseType_IsValid(int value) {
+    return NoiseParameter_NoiseType_IsValid(value);
+  }
+  static const NoiseType NoiseType_MIN =
+    NoiseParameter_NoiseType_NoiseType_MIN;
+  static const NoiseType NoiseType_MAX =
+    NoiseParameter_NoiseType_NoiseType_MAX;
+  static const int NoiseType_ARRAYSIZE =
+    NoiseParameter_NoiseType_NoiseType_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  NoiseType_descriptor() {
+    return NoiseParameter_NoiseType_descriptor();
+  }
+  static inline const ::std::string& NoiseType_Name(NoiseType value) {
+    return NoiseParameter_NoiseType_Name(value);
+  }
+  static inline bool NoiseType_Parse(const ::std::string& name,
+      NoiseType* value) {
+    return NoiseParameter_NoiseType_Parse(name, value);
+  }
+
+  typedef NoiseParameter_ApplyType ApplyType;
+  static const ApplyType MULTIPLY = NoiseParameter_ApplyType_MULTIPLY;
+  static const ApplyType ADD = NoiseParameter_ApplyType_ADD;
+  static inline bool ApplyType_IsValid(int value) {
+    return NoiseParameter_ApplyType_IsValid(value);
+  }
+  static const ApplyType ApplyType_MIN =
+    NoiseParameter_ApplyType_ApplyType_MIN;
+  static const ApplyType ApplyType_MAX =
+    NoiseParameter_ApplyType_ApplyType_MAX;
+  static const int ApplyType_ARRAYSIZE =
+    NoiseParameter_ApplyType_ApplyType_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  ApplyType_descriptor() {
+    return NoiseParameter_ApplyType_descriptor();
+  }
+  static inline const ::std::string& ApplyType_Name(ApplyType value) {
+    return NoiseParameter_ApplyType_Name(value);
+  }
+  static inline bool ApplyType_Parse(const ::std::string& name,
+      ApplyType* value) {
+    return NoiseParameter_ApplyType_Parse(name, value);
+  }
+
+  // accessors -------------------------------------------------------
+
+  // optional .caffe.NoiseParameter.NoiseType noise_type = 1 [default = GAUSSIAN];
+  inline bool has_noise_type() const;
+  inline void clear_noise_type();
+  static const int kNoiseTypeFieldNumber = 1;
+  inline ::caffe::NoiseParameter_NoiseType noise_type() const;
+  inline void set_noise_type(::caffe::NoiseParameter_NoiseType value);
+
+  // optional float alpha = 2 [default = 0];
+  inline bool has_alpha() const;
+  inline void clear_alpha();
+  static const int kAlphaFieldNumber = 2;
+  inline float alpha() const;
+  inline void set_alpha(float value);
+
+  // optional float beta = 3 [default = 0.01];
+  inline bool has_beta() const;
+  inline void clear_beta();
+  static const int kBetaFieldNumber = 3;
+  inline float beta() const;
+  inline void set_beta(float value);
+
+  // optional .caffe.NoiseParameter.ApplyType apply_type = 4 [default = ADD];
+  inline bool has_apply_type() const;
+  inline void clear_apply_type();
+  static const int kApplyTypeFieldNumber = 4;
+  inline ::caffe::NoiseParameter_ApplyType apply_type() const;
+  inline void set_apply_type(::caffe::NoiseParameter_ApplyType value);
+
+  // @@protoc_insertion_point(class_scope:caffe.NoiseParameter)
+ private:
+  inline void set_has_noise_type();
+  inline void clear_has_noise_type();
+  inline void set_has_alpha();
+  inline void clear_has_alpha();
+  inline void set_has_beta();
+  inline void clear_has_beta();
+  inline void set_has_apply_type();
+  inline void clear_has_apply_type();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  int noise_type_;
+  float alpha_;
+  float beta_;
+  int apply_type_;
+  friend void  protobuf_AddDesc_caffe_2eproto();
+  friend void protobuf_AssignDesc_caffe_2eproto();
+  friend void protobuf_ShutdownFile_caffe_2eproto();
+
+  void InitAsDefaultInstance();
+  static NoiseParameter* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -14578,6 +14921,219 @@ inline void LayerParameter::set_allocated_window_data_param(::caffe::WindowDataP
   // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.window_data_param)
 }
 
+// optional .caffe.NoiseParameter noise_param = 143;
+inline bool LayerParameter::has_noise_param() const {
+  return (_has_bits_[1] & 0x00400000u) != 0;
+}
+inline void LayerParameter::set_has_noise_param() {
+  _has_bits_[1] |= 0x00400000u;
+}
+inline void LayerParameter::clear_has_noise_param() {
+  _has_bits_[1] &= ~0x00400000u;
+}
+inline void LayerParameter::clear_noise_param() {
+  if (noise_param_ != NULL) noise_param_->::caffe::NoiseParameter::Clear();
+  clear_has_noise_param();
+}
+inline const ::caffe::NoiseParameter& LayerParameter::noise_param() const {
+  // @@protoc_insertion_point(field_get:caffe.LayerParameter.noise_param)
+  return noise_param_ != NULL ? *noise_param_ : *default_instance_->noise_param_;
+}
+inline ::caffe::NoiseParameter* LayerParameter::mutable_noise_param() {
+  set_has_noise_param();
+  if (noise_param_ == NULL) noise_param_ = new ::caffe::NoiseParameter;
+  // @@protoc_insertion_point(field_mutable:caffe.LayerParameter.noise_param)
+  return noise_param_;
+}
+inline ::caffe::NoiseParameter* LayerParameter::release_noise_param() {
+  clear_has_noise_param();
+  ::caffe::NoiseParameter* temp = noise_param_;
+  noise_param_ = NULL;
+  return temp;
+}
+inline void LayerParameter::set_allocated_noise_param(::caffe::NoiseParameter* noise_param) {
+  delete noise_param_;
+  noise_param_ = noise_param;
+  if (noise_param) {
+    set_has_noise_param();
+  } else {
+    clear_has_noise_param();
+  }
+  // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.noise_param)
+}
+
+// optional .caffe.NormLossParameter norm_loss_param = 145;
+inline bool LayerParameter::has_norm_loss_param() const {
+  return (_has_bits_[1] & 0x00800000u) != 0;
+}
+inline void LayerParameter::set_has_norm_loss_param() {
+  _has_bits_[1] |= 0x00800000u;
+}
+inline void LayerParameter::clear_has_norm_loss_param() {
+  _has_bits_[1] &= ~0x00800000u;
+}
+inline void LayerParameter::clear_norm_loss_param() {
+  if (norm_loss_param_ != NULL) norm_loss_param_->::caffe::NormLossParameter::Clear();
+  clear_has_norm_loss_param();
+}
+inline const ::caffe::NormLossParameter& LayerParameter::norm_loss_param() const {
+  // @@protoc_insertion_point(field_get:caffe.LayerParameter.norm_loss_param)
+  return norm_loss_param_ != NULL ? *norm_loss_param_ : *default_instance_->norm_loss_param_;
+}
+inline ::caffe::NormLossParameter* LayerParameter::mutable_norm_loss_param() {
+  set_has_norm_loss_param();
+  if (norm_loss_param_ == NULL) norm_loss_param_ = new ::caffe::NormLossParameter;
+  // @@protoc_insertion_point(field_mutable:caffe.LayerParameter.norm_loss_param)
+  return norm_loss_param_;
+}
+inline ::caffe::NormLossParameter* LayerParameter::release_norm_loss_param() {
+  clear_has_norm_loss_param();
+  ::caffe::NormLossParameter* temp = norm_loss_param_;
+  norm_loss_param_ = NULL;
+  return temp;
+}
+inline void LayerParameter::set_allocated_norm_loss_param(::caffe::NormLossParameter* norm_loss_param) {
+  delete norm_loss_param_;
+  norm_loss_param_ = norm_loss_param;
+  if (norm_loss_param) {
+    set_has_norm_loss_param();
+  } else {
+    clear_has_norm_loss_param();
+  }
+  // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.norm_loss_param)
+}
+
+// -------------------------------------------------------------------
+
+// NormLossParameter
+
+// optional .caffe.NormLossParameter.NormType norm_type = 1 [default = L1];
+inline bool NormLossParameter::has_norm_type() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void NormLossParameter::set_has_norm_type() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void NormLossParameter::clear_has_norm_type() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void NormLossParameter::clear_norm_type() {
+  norm_type_ = 1;
+  clear_has_norm_type();
+}
+inline ::caffe::NormLossParameter_NormType NormLossParameter::norm_type() const {
+  // @@protoc_insertion_point(field_get:caffe.NormLossParameter.norm_type)
+  return static_cast< ::caffe::NormLossParameter_NormType >(norm_type_);
+}
+inline void NormLossParameter::set_norm_type(::caffe::NormLossParameter_NormType value) {
+  assert(::caffe::NormLossParameter_NormType_IsValid(value));
+  set_has_norm_type();
+  norm_type_ = value;
+  // @@protoc_insertion_point(field_set:caffe.NormLossParameter.norm_type)
+}
+
+// -------------------------------------------------------------------
+
+// NoiseParameter
+
+// optional .caffe.NoiseParameter.NoiseType noise_type = 1 [default = GAUSSIAN];
+inline bool NoiseParameter::has_noise_type() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void NoiseParameter::set_has_noise_type() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void NoiseParameter::clear_has_noise_type() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void NoiseParameter::clear_noise_type() {
+  noise_type_ = 1;
+  clear_has_noise_type();
+}
+inline ::caffe::NoiseParameter_NoiseType NoiseParameter::noise_type() const {
+  // @@protoc_insertion_point(field_get:caffe.NoiseParameter.noise_type)
+  return static_cast< ::caffe::NoiseParameter_NoiseType >(noise_type_);
+}
+inline void NoiseParameter::set_noise_type(::caffe::NoiseParameter_NoiseType value) {
+  assert(::caffe::NoiseParameter_NoiseType_IsValid(value));
+  set_has_noise_type();
+  noise_type_ = value;
+  // @@protoc_insertion_point(field_set:caffe.NoiseParameter.noise_type)
+}
+
+// optional float alpha = 2 [default = 0];
+inline bool NoiseParameter::has_alpha() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void NoiseParameter::set_has_alpha() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void NoiseParameter::clear_has_alpha() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void NoiseParameter::clear_alpha() {
+  alpha_ = 0;
+  clear_has_alpha();
+}
+inline float NoiseParameter::alpha() const {
+  // @@protoc_insertion_point(field_get:caffe.NoiseParameter.alpha)
+  return alpha_;
+}
+inline void NoiseParameter::set_alpha(float value) {
+  set_has_alpha();
+  alpha_ = value;
+  // @@protoc_insertion_point(field_set:caffe.NoiseParameter.alpha)
+}
+
+// optional float beta = 3 [default = 0.01];
+inline bool NoiseParameter::has_beta() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void NoiseParameter::set_has_beta() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void NoiseParameter::clear_has_beta() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void NoiseParameter::clear_beta() {
+  beta_ = 0.01f;
+  clear_has_beta();
+}
+inline float NoiseParameter::beta() const {
+  // @@protoc_insertion_point(field_get:caffe.NoiseParameter.beta)
+  return beta_;
+}
+inline void NoiseParameter::set_beta(float value) {
+  set_has_beta();
+  beta_ = value;
+  // @@protoc_insertion_point(field_set:caffe.NoiseParameter.beta)
+}
+
+// optional .caffe.NoiseParameter.ApplyType apply_type = 4 [default = ADD];
+inline bool NoiseParameter::has_apply_type() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void NoiseParameter::set_has_apply_type() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void NoiseParameter::clear_has_apply_type() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void NoiseParameter::clear_apply_type() {
+  apply_type_ = 2;
+  clear_has_apply_type();
+}
+inline ::caffe::NoiseParameter_ApplyType NoiseParameter::apply_type() const {
+  // @@protoc_insertion_point(field_get:caffe.NoiseParameter.apply_type)
+  return static_cast< ::caffe::NoiseParameter_ApplyType >(apply_type_);
+}
+inline void NoiseParameter::set_apply_type(::caffe::NoiseParameter_ApplyType value) {
+  assert(::caffe::NoiseParameter_ApplyType_IsValid(value));
+  set_has_apply_type();
+  apply_type_ = value;
+  // @@protoc_insertion_point(field_set:caffe.NoiseParameter.apply_type)
+}
+
 // -------------------------------------------------------------------
 
 // TransformationParameter
@@ -22971,6 +23527,21 @@ template <> struct is_proto_enum< ::caffe::ParamSpec_DimCheckMode> : ::google::p
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::caffe::ParamSpec_DimCheckMode>() {
   return ::caffe::ParamSpec_DimCheckMode_descriptor();
+}
+template <> struct is_proto_enum< ::caffe::NormLossParameter_NormType> : ::google::protobuf::internal::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::caffe::NormLossParameter_NormType>() {
+  return ::caffe::NormLossParameter_NormType_descriptor();
+}
+template <> struct is_proto_enum< ::caffe::NoiseParameter_NoiseType> : ::google::protobuf::internal::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::caffe::NoiseParameter_NoiseType>() {
+  return ::caffe::NoiseParameter_NoiseType_descriptor();
+}
+template <> struct is_proto_enum< ::caffe::NoiseParameter_ApplyType> : ::google::protobuf::internal::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::caffe::NoiseParameter_ApplyType>() {
+  return ::caffe::NoiseParameter_ApplyType_descriptor();
 }
 template <> struct is_proto_enum< ::caffe::AxisPoolingParameter_PoolMethod> : ::google::protobuf::internal::true_type {};
 template <>
