@@ -11,7 +11,6 @@ namespace caffe{
 	template <typename Dtype>
 	void NoiseLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 		const vector<Blob<Dtype>*>& top){
-		Layer<Dtype>::SetUp(bottom, top);
 		alpha_ = this->layer_param_.noise_param().alpha();
 		beta_ = this->layer_param_.noise_param().beta();
 		noise_type_ = this->layer_param_.noise_param().noise_type();
