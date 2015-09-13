@@ -38,6 +38,7 @@ void Net<Dtype>::Init(const NetParameter& in_param) {
   // Filter layers based on their include/exclude rules and
   // the current NetState.
   NetParameter filtered_param;
+  //build test and train net
   FilterNet(in_param, &filtered_param);
   LOG(INFO) << "Initializing net from parameters: " << std::endl
             << filtered_param.DebugString();

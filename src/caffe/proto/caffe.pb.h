@@ -46,6 +46,7 @@ class NetState;
 class NetStateRule;
 class ParamSpec;
 class LayerParameter;
+class TransParameter;
 class NormLossParameter;
 class NoiseParameter;
 class TransformationParameter;
@@ -2968,6 +2969,15 @@ class LayerParameter : public ::google::protobuf::Message {
   inline ::caffe::NormLossParameter* release_norm_loss_param();
   inline void set_allocated_norm_loss_param(::caffe::NormLossParameter* norm_loss_param);
 
+  // optional .caffe.TransParameter cnn_transform_param = 146;
+  inline bool has_cnn_transform_param() const;
+  inline void clear_cnn_transform_param();
+  static const int kCnnTransformParamFieldNumber = 146;
+  inline const ::caffe::TransParameter& cnn_transform_param() const;
+  inline ::caffe::TransParameter* mutable_cnn_transform_param();
+  inline ::caffe::TransParameter* release_cnn_transform_param();
+  inline void set_allocated_cnn_transform_param(::caffe::TransParameter* cnn_transform_param);
+
   // @@protoc_insertion_point(class_scope:caffe.LayerParameter)
  private:
   inline void set_has_name();
@@ -3068,6 +3078,8 @@ class LayerParameter : public ::google::protobuf::Message {
   inline void clear_has_noise_param();
   inline void set_has_norm_loss_param();
   inline void clear_has_norm_loss_param();
+  inline void set_has_cnn_transform_param();
+  inline void clear_has_cnn_transform_param();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -3127,6 +3139,7 @@ class LayerParameter : public ::google::protobuf::Message {
   ::caffe::WindowDataParameter* window_data_param_;
   ::caffe::NoiseParameter* noise_param_;
   ::caffe::NormLossParameter* norm_loss_param_;
+  ::caffe::TransParameter* cnn_transform_param_;
   int phase_;
   mutable int _cached_size_;
   friend void  protobuf_AddDesc_caffe_2eproto();
@@ -3135,6 +3148,155 @@ class LayerParameter : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static LayerParameter* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class TransParameter : public ::google::protobuf::Message {
+ public:
+  TransParameter();
+  virtual ~TransParameter();
+
+  TransParameter(const TransParameter& from);
+
+  inline TransParameter& operator=(const TransParameter& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const TransParameter& default_instance();
+
+  void Swap(TransParameter* other);
+
+  // implements Message ----------------------------------------------
+
+  TransParameter* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const TransParameter& from);
+  void MergeFrom(const TransParameter& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional float scale = 1 [default = 1];
+  inline bool has_scale() const;
+  inline void clear_scale();
+  static const int kScaleFieldNumber = 1;
+  inline float scale() const;
+  inline void set_scale(float value);
+
+  // optional float rotation = 2 [default = 0];
+  inline bool has_rotation() const;
+  inline void clear_rotation();
+  static const int kRotationFieldNumber = 2;
+  inline float rotation() const;
+  inline void set_rotation(float value);
+
+  // optional int32 dx = 7 [default = 0];
+  inline bool has_dx() const;
+  inline void clear_dx();
+  static const int kDxFieldNumber = 7;
+  inline ::google::protobuf::int32 dx() const;
+  inline void set_dx(::google::protobuf::int32 value);
+
+  // optional int32 dy = 8 [default = 0];
+  inline bool has_dy() const;
+  inline void clear_dy();
+  static const int kDyFieldNumber = 8;
+  inline ::google::protobuf::int32 dy() const;
+  inline void set_dy(::google::protobuf::int32 value);
+
+  // optional int32 border = 3 [default = 0];
+  inline bool has_border() const;
+  inline void clear_border();
+  static const int kBorderFieldNumber = 3;
+  inline ::google::protobuf::int32 border() const;
+  inline void set_border(::google::protobuf::int32 value);
+
+  // optional int32 interp = 4 [default = 1];
+  inline bool has_interp() const;
+  inline void clear_interp();
+  static const int kInterpFieldNumber = 4;
+  inline ::google::protobuf::int32 interp() const;
+  inline void set_interp(::google::protobuf::int32 value);
+
+  // optional int32 final_width = 5;
+  inline bool has_final_width() const;
+  inline void clear_final_width();
+  static const int kFinalWidthFieldNumber = 5;
+  inline ::google::protobuf::int32 final_width() const;
+  inline void set_final_width(::google::protobuf::int32 value);
+
+  // optional int32 final_height = 6;
+  inline bool has_final_height() const;
+  inline void clear_final_height();
+  static const int kFinalHeightFieldNumber = 6;
+  inline ::google::protobuf::int32 final_height() const;
+  inline void set_final_height(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:caffe.TransParameter)
+ private:
+  inline void set_has_scale();
+  inline void clear_has_scale();
+  inline void set_has_rotation();
+  inline void clear_has_rotation();
+  inline void set_has_dx();
+  inline void clear_has_dx();
+  inline void set_has_dy();
+  inline void clear_has_dy();
+  inline void set_has_border();
+  inline void clear_has_border();
+  inline void set_has_interp();
+  inline void clear_has_interp();
+  inline void set_has_final_width();
+  inline void clear_has_final_width();
+  inline void set_has_final_height();
+  inline void clear_has_final_height();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  float scale_;
+  float rotation_;
+  ::google::protobuf::int32 dx_;
+  ::google::protobuf::int32 dy_;
+  ::google::protobuf::int32 border_;
+  ::google::protobuf::int32 interp_;
+  ::google::protobuf::int32 final_width_;
+  ::google::protobuf::int32 final_height_;
+  friend void  protobuf_AddDesc_caffe_2eproto();
+  friend void protobuf_AssignDesc_caffe_2eproto();
+  friend void protobuf_ShutdownFile_caffe_2eproto();
+
+  void InitAsDefaultInstance();
+  static TransParameter* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -15001,6 +15163,243 @@ inline void LayerParameter::set_allocated_norm_loss_param(::caffe::NormLossParam
     clear_has_norm_loss_param();
   }
   // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.norm_loss_param)
+}
+
+// optional .caffe.TransParameter cnn_transform_param = 146;
+inline bool LayerParameter::has_cnn_transform_param() const {
+  return (_has_bits_[1] & 0x01000000u) != 0;
+}
+inline void LayerParameter::set_has_cnn_transform_param() {
+  _has_bits_[1] |= 0x01000000u;
+}
+inline void LayerParameter::clear_has_cnn_transform_param() {
+  _has_bits_[1] &= ~0x01000000u;
+}
+inline void LayerParameter::clear_cnn_transform_param() {
+  if (cnn_transform_param_ != NULL) cnn_transform_param_->::caffe::TransParameter::Clear();
+  clear_has_cnn_transform_param();
+}
+inline const ::caffe::TransParameter& LayerParameter::cnn_transform_param() const {
+  // @@protoc_insertion_point(field_get:caffe.LayerParameter.cnn_transform_param)
+  return cnn_transform_param_ != NULL ? *cnn_transform_param_ : *default_instance_->cnn_transform_param_;
+}
+inline ::caffe::TransParameter* LayerParameter::mutable_cnn_transform_param() {
+  set_has_cnn_transform_param();
+  if (cnn_transform_param_ == NULL) cnn_transform_param_ = new ::caffe::TransParameter;
+  // @@protoc_insertion_point(field_mutable:caffe.LayerParameter.cnn_transform_param)
+  return cnn_transform_param_;
+}
+inline ::caffe::TransParameter* LayerParameter::release_cnn_transform_param() {
+  clear_has_cnn_transform_param();
+  ::caffe::TransParameter* temp = cnn_transform_param_;
+  cnn_transform_param_ = NULL;
+  return temp;
+}
+inline void LayerParameter::set_allocated_cnn_transform_param(::caffe::TransParameter* cnn_transform_param) {
+  delete cnn_transform_param_;
+  cnn_transform_param_ = cnn_transform_param;
+  if (cnn_transform_param) {
+    set_has_cnn_transform_param();
+  } else {
+    clear_has_cnn_transform_param();
+  }
+  // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.cnn_transform_param)
+}
+
+// -------------------------------------------------------------------
+
+// TransParameter
+
+// optional float scale = 1 [default = 1];
+inline bool TransParameter::has_scale() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void TransParameter::set_has_scale() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void TransParameter::clear_has_scale() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void TransParameter::clear_scale() {
+  scale_ = 1;
+  clear_has_scale();
+}
+inline float TransParameter::scale() const {
+  // @@protoc_insertion_point(field_get:caffe.TransParameter.scale)
+  return scale_;
+}
+inline void TransParameter::set_scale(float value) {
+  set_has_scale();
+  scale_ = value;
+  // @@protoc_insertion_point(field_set:caffe.TransParameter.scale)
+}
+
+// optional float rotation = 2 [default = 0];
+inline bool TransParameter::has_rotation() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void TransParameter::set_has_rotation() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void TransParameter::clear_has_rotation() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void TransParameter::clear_rotation() {
+  rotation_ = 0;
+  clear_has_rotation();
+}
+inline float TransParameter::rotation() const {
+  // @@protoc_insertion_point(field_get:caffe.TransParameter.rotation)
+  return rotation_;
+}
+inline void TransParameter::set_rotation(float value) {
+  set_has_rotation();
+  rotation_ = value;
+  // @@protoc_insertion_point(field_set:caffe.TransParameter.rotation)
+}
+
+// optional int32 dx = 7 [default = 0];
+inline bool TransParameter::has_dx() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void TransParameter::set_has_dx() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void TransParameter::clear_has_dx() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void TransParameter::clear_dx() {
+  dx_ = 0;
+  clear_has_dx();
+}
+inline ::google::protobuf::int32 TransParameter::dx() const {
+  // @@protoc_insertion_point(field_get:caffe.TransParameter.dx)
+  return dx_;
+}
+inline void TransParameter::set_dx(::google::protobuf::int32 value) {
+  set_has_dx();
+  dx_ = value;
+  // @@protoc_insertion_point(field_set:caffe.TransParameter.dx)
+}
+
+// optional int32 dy = 8 [default = 0];
+inline bool TransParameter::has_dy() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void TransParameter::set_has_dy() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void TransParameter::clear_has_dy() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void TransParameter::clear_dy() {
+  dy_ = 0;
+  clear_has_dy();
+}
+inline ::google::protobuf::int32 TransParameter::dy() const {
+  // @@protoc_insertion_point(field_get:caffe.TransParameter.dy)
+  return dy_;
+}
+inline void TransParameter::set_dy(::google::protobuf::int32 value) {
+  set_has_dy();
+  dy_ = value;
+  // @@protoc_insertion_point(field_set:caffe.TransParameter.dy)
+}
+
+// optional int32 border = 3 [default = 0];
+inline bool TransParameter::has_border() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void TransParameter::set_has_border() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void TransParameter::clear_has_border() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void TransParameter::clear_border() {
+  border_ = 0;
+  clear_has_border();
+}
+inline ::google::protobuf::int32 TransParameter::border() const {
+  // @@protoc_insertion_point(field_get:caffe.TransParameter.border)
+  return border_;
+}
+inline void TransParameter::set_border(::google::protobuf::int32 value) {
+  set_has_border();
+  border_ = value;
+  // @@protoc_insertion_point(field_set:caffe.TransParameter.border)
+}
+
+// optional int32 interp = 4 [default = 1];
+inline bool TransParameter::has_interp() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void TransParameter::set_has_interp() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void TransParameter::clear_has_interp() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void TransParameter::clear_interp() {
+  interp_ = 1;
+  clear_has_interp();
+}
+inline ::google::protobuf::int32 TransParameter::interp() const {
+  // @@protoc_insertion_point(field_get:caffe.TransParameter.interp)
+  return interp_;
+}
+inline void TransParameter::set_interp(::google::protobuf::int32 value) {
+  set_has_interp();
+  interp_ = value;
+  // @@protoc_insertion_point(field_set:caffe.TransParameter.interp)
+}
+
+// optional int32 final_width = 5;
+inline bool TransParameter::has_final_width() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void TransParameter::set_has_final_width() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void TransParameter::clear_has_final_width() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void TransParameter::clear_final_width() {
+  final_width_ = 0;
+  clear_has_final_width();
+}
+inline ::google::protobuf::int32 TransParameter::final_width() const {
+  // @@protoc_insertion_point(field_get:caffe.TransParameter.final_width)
+  return final_width_;
+}
+inline void TransParameter::set_final_width(::google::protobuf::int32 value) {
+  set_has_final_width();
+  final_width_ = value;
+  // @@protoc_insertion_point(field_set:caffe.TransParameter.final_width)
+}
+
+// optional int32 final_height = 6;
+inline bool TransParameter::has_final_height() const {
+  return (_has_bits_[0] & 0x00000080u) != 0;
+}
+inline void TransParameter::set_has_final_height() {
+  _has_bits_[0] |= 0x00000080u;
+}
+inline void TransParameter::clear_has_final_height() {
+  _has_bits_[0] &= ~0x00000080u;
+}
+inline void TransParameter::clear_final_height() {
+  final_height_ = 0;
+  clear_has_final_height();
+}
+inline ::google::protobuf::int32 TransParameter::final_height() const {
+  // @@protoc_insertion_point(field_get:caffe.TransParameter.final_height)
+  return final_height_;
+}
+inline void TransParameter::set_final_height(::google::protobuf::int32 value) {
+  set_has_final_height();
+  final_height_ = value;
+  // @@protoc_insertion_point(field_set:caffe.TransParameter.final_height)
 }
 
 // -------------------------------------------------------------------
