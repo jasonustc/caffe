@@ -142,7 +142,9 @@ class RecurrentLayer : public Layer<Dtype> {
   bool static_input_;
 
   vector<Blob<Dtype>* > recur_input_blobs_;
+  //this is only the C_T and h_T
   vector<Blob<Dtype>* > recur_output_blobs_;
+  //this is all the features catencated: (h_1, h_2,..., h_T)
   vector<Blob<Dtype>* > output_blobs_;
   Blob<Dtype>* x_input_blob_;
   Blob<Dtype>* x_static_input_blob_;

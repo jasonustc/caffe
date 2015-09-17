@@ -29,6 +29,7 @@ void RecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   LOG(INFO) << "Initializing recurrent layer: assuming input batch contains "
             << T_ << " timesteps of " << N_ << " independent streams.";
 
+  //the cont indicator
   CHECK_EQ(bottom[1]->num_axes(), 2)
       << "bottom[1] must have exactly 2 axes -- (#timesteps, #streams)";
   CHECK_EQ(T_, bottom[1]->shape(0));
@@ -60,6 +61,7 @@ void RecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   for (int i = 0; i < bottom[1]->num_axes(); ++i) {
     input_shape.add_dim(bottom[1]->shape(i));
   }
+  //cont: 1 x T x N
   net_param.add_input("cont");
   net_param.add_input_shape()->CopyFrom(input_shape);
 
@@ -86,6 +88,7 @@ void RecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   }
 
   // Create the unrolled net.
+  //call the Init() function to build the net.
   unrolled_net_.reset(new Net<Dtype>(net_param));
   unrolled_net_->set_debug_info(
       this->layer_param_.recurrent_param().debug_info());
@@ -104,10 +107,12 @@ void RecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   vector<string> recur_output_names;
   RecurrentOutputBlobNames(&recur_output_names);
   const int num_recur_blobs = recur_input_names.size();
+  //number of recurrent input blobs must be equal to number of output blobs
   CHECK_EQ(num_recur_blobs, recur_output_names.size());
   recur_input_blobs_.resize(num_recur_blobs);
   recur_output_blobs_.resize(num_recur_blobs);
   for (int i = 0; i < recur_input_names.size(); ++i) {
+	  //make sure they are defined and built in recurr architec
     recur_input_blobs_[i] =
         CHECK_NOTNULL(unrolled_net_->blob_by_name(recur_input_names[i]).get());
     recur_output_blobs_[i] =
@@ -121,6 +126,7 @@ void RecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       << "OutputBlobNames must provide an output blob name for each top.";
   output_blobs_.resize(output_names.size());
   for (int i = 0; i < output_names.size(); ++i) {
+	//blob_by_name: get blob by name
     output_blobs_[i] =
         CHECK_NOTNULL(unrolled_net_->blob_by_name(output_names[i]).get());
   }
