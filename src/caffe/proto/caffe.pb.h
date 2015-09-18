@@ -46,7 +46,7 @@ class NetState;
 class NetStateRule;
 class ParamSpec;
 class LayerParameter;
-class TransParameter;
+class RandTransformParameter;
 class NormLossParameter;
 class NoiseParameter;
 class TransformationParameter;
@@ -2969,14 +2969,14 @@ class LayerParameter : public ::google::protobuf::Message {
   inline ::caffe::NormLossParameter* release_norm_loss_param();
   inline void set_allocated_norm_loss_param(::caffe::NormLossParameter* norm_loss_param);
 
-  // optional .caffe.TransParameter cnn_transform_param = 146;
-  inline bool has_cnn_transform_param() const;
-  inline void clear_cnn_transform_param();
-  static const int kCnnTransformParamFieldNumber = 146;
-  inline const ::caffe::TransParameter& cnn_transform_param() const;
-  inline ::caffe::TransParameter* mutable_cnn_transform_param();
-  inline ::caffe::TransParameter* release_cnn_transform_param();
-  inline void set_allocated_cnn_transform_param(::caffe::TransParameter* cnn_transform_param);
+  // optional .caffe.RandTransformParameter rand_trans_param = 146;
+  inline bool has_rand_trans_param() const;
+  inline void clear_rand_trans_param();
+  static const int kRandTransParamFieldNumber = 146;
+  inline const ::caffe::RandTransformParameter& rand_trans_param() const;
+  inline ::caffe::RandTransformParameter* mutable_rand_trans_param();
+  inline ::caffe::RandTransformParameter* release_rand_trans_param();
+  inline void set_allocated_rand_trans_param(::caffe::RandTransformParameter* rand_trans_param);
 
   // @@protoc_insertion_point(class_scope:caffe.LayerParameter)
  private:
@@ -3078,8 +3078,8 @@ class LayerParameter : public ::google::protobuf::Message {
   inline void clear_has_noise_param();
   inline void set_has_norm_loss_param();
   inline void clear_has_norm_loss_param();
-  inline void set_has_cnn_transform_param();
-  inline void clear_has_cnn_transform_param();
+  inline void set_has_rand_trans_param();
+  inline void clear_has_rand_trans_param();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -3139,7 +3139,7 @@ class LayerParameter : public ::google::protobuf::Message {
   ::caffe::WindowDataParameter* window_data_param_;
   ::caffe::NoiseParameter* noise_param_;
   ::caffe::NormLossParameter* norm_loss_param_;
-  ::caffe::TransParameter* cnn_transform_param_;
+  ::caffe::RandTransformParameter* rand_trans_param_;
   int phase_;
   mutable int _cached_size_;
   friend void  protobuf_AddDesc_caffe_2eproto();
@@ -3151,14 +3151,14 @@ class LayerParameter : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class TransParameter : public ::google::protobuf::Message {
+class RandTransformParameter : public ::google::protobuf::Message {
  public:
-  TransParameter();
-  virtual ~TransParameter();
+  RandTransformParameter();
+  virtual ~RandTransformParameter();
 
-  TransParameter(const TransParameter& from);
+  RandTransformParameter(const RandTransformParameter& from);
 
-  inline TransParameter& operator=(const TransParameter& from) {
+  inline RandTransformParameter& operator=(const RandTransformParameter& from) {
     CopyFrom(from);
     return *this;
   }
@@ -3172,17 +3172,17 @@ class TransParameter : public ::google::protobuf::Message {
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const TransParameter& default_instance();
+  static const RandTransformParameter& default_instance();
 
-  void Swap(TransParameter* other);
+  void Swap(RandTransformParameter* other);
 
   // implements Message ----------------------------------------------
 
-  TransParameter* New() const;
+  RandTransformParameter* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const TransParameter& from);
-  void MergeFrom(const TransParameter& from);
+  void CopyFrom(const RandTransformParameter& from);
+  void MergeFrom(const RandTransformParameter& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -3204,99 +3204,99 @@ class TransParameter : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // optional float scale = 1 [default = 1];
-  inline bool has_scale() const;
-  inline void clear_scale();
-  static const int kScaleFieldNumber = 1;
-  inline float scale() const;
-  inline void set_scale(float value);
-
-  // optional float rotation = 2 [default = 0];
+  // optional bool rotation = 1 [default = true];
   inline bool has_rotation() const;
   inline void clear_rotation();
-  static const int kRotationFieldNumber = 2;
-  inline float rotation() const;
-  inline void set_rotation(float value);
+  static const int kRotationFieldNumber = 1;
+  inline bool rotation() const;
+  inline void set_rotation(bool value);
 
-  // optional int32 dx = 7 [default = 0];
-  inline bool has_dx() const;
-  inline void clear_dx();
-  static const int kDxFieldNumber = 7;
-  inline ::google::protobuf::int32 dx() const;
-  inline void set_dx(::google::protobuf::int32 value);
+  // optional bool scale = 2 [default = true];
+  inline bool has_scale() const;
+  inline void clear_scale();
+  static const int kScaleFieldNumber = 2;
+  inline bool scale() const;
+  inline void set_scale(bool value);
 
-  // optional int32 dy = 8 [default = 0];
-  inline bool has_dy() const;
-  inline void clear_dy();
-  static const int kDyFieldNumber = 8;
-  inline ::google::protobuf::int32 dy() const;
-  inline void set_dy(::google::protobuf::int32 value);
+  // optional bool shift = 3 [default = true];
+  inline bool has_shift() const;
+  inline void clear_shift();
+  static const int kShiftFieldNumber = 3;
+  inline bool shift() const;
+  inline void set_shift(bool value);
 
-  // optional int32 border = 3 [default = 0];
-  inline bool has_border() const;
-  inline void clear_border();
-  static const int kBorderFieldNumber = 3;
-  inline ::google::protobuf::int32 border() const;
-  inline void set_border(::google::protobuf::int32 value);
+  // optional float start_angle = 4 [default = 0];
+  inline bool has_start_angle() const;
+  inline void clear_start_angle();
+  static const int kStartAngleFieldNumber = 4;
+  inline float start_angle() const;
+  inline void set_start_angle(float value);
 
-  // optional int32 interp = 4 [default = 1];
-  inline bool has_interp() const;
-  inline void clear_interp();
-  static const int kInterpFieldNumber = 4;
-  inline ::google::protobuf::int32 interp() const;
-  inline void set_interp(::google::protobuf::int32 value);
+  // optional float end_angle = 5 [default = 0];
+  inline bool has_end_angle() const;
+  inline void clear_end_angle();
+  static const int kEndAngleFieldNumber = 5;
+  inline float end_angle() const;
+  inline void set_end_angle(float value);
 
-  // optional int32 final_width = 5;
-  inline bool has_final_width() const;
-  inline void clear_final_width();
-  static const int kFinalWidthFieldNumber = 5;
-  inline ::google::protobuf::int32 final_width() const;
-  inline void set_final_width(::google::protobuf::int32 value);
+  // optional float scale_coeff = 6 [default = 1];
+  inline bool has_scale_coeff() const;
+  inline void clear_scale_coeff();
+  static const int kScaleCoeffFieldNumber = 6;
+  inline float scale_coeff() const;
+  inline void set_scale_coeff(float value);
 
-  // optional int32 final_height = 6;
-  inline bool has_final_height() const;
-  inline void clear_final_height();
-  static const int kFinalHeightFieldNumber = 6;
-  inline ::google::protobuf::int32 final_height() const;
-  inline void set_final_height(::google::protobuf::int32 value);
+  // optional float dx_prop = 7 [default = 0];
+  inline bool has_dx_prop() const;
+  inline void clear_dx_prop();
+  static const int kDxPropFieldNumber = 7;
+  inline float dx_prop() const;
+  inline void set_dx_prop(float value);
 
-  // @@protoc_insertion_point(class_scope:caffe.TransParameter)
+  // optional float dy_prop = 8 [default = 0];
+  inline bool has_dy_prop() const;
+  inline void clear_dy_prop();
+  static const int kDyPropFieldNumber = 8;
+  inline float dy_prop() const;
+  inline void set_dy_prop(float value);
+
+  // @@protoc_insertion_point(class_scope:caffe.RandTransformParameter)
  private:
-  inline void set_has_scale();
-  inline void clear_has_scale();
   inline void set_has_rotation();
   inline void clear_has_rotation();
-  inline void set_has_dx();
-  inline void clear_has_dx();
-  inline void set_has_dy();
-  inline void clear_has_dy();
-  inline void set_has_border();
-  inline void clear_has_border();
-  inline void set_has_interp();
-  inline void clear_has_interp();
-  inline void set_has_final_width();
-  inline void clear_has_final_width();
-  inline void set_has_final_height();
-  inline void clear_has_final_height();
+  inline void set_has_scale();
+  inline void clear_has_scale();
+  inline void set_has_shift();
+  inline void clear_has_shift();
+  inline void set_has_start_angle();
+  inline void clear_has_start_angle();
+  inline void set_has_end_angle();
+  inline void clear_has_end_angle();
+  inline void set_has_scale_coeff();
+  inline void clear_has_scale_coeff();
+  inline void set_has_dx_prop();
+  inline void clear_has_dx_prop();
+  inline void set_has_dy_prop();
+  inline void clear_has_dy_prop();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
-  float scale_;
-  float rotation_;
-  ::google::protobuf::int32 dx_;
-  ::google::protobuf::int32 dy_;
-  ::google::protobuf::int32 border_;
-  ::google::protobuf::int32 interp_;
-  ::google::protobuf::int32 final_width_;
-  ::google::protobuf::int32 final_height_;
+  bool rotation_;
+  bool scale_;
+  bool shift_;
+  float start_angle_;
+  float end_angle_;
+  float scale_coeff_;
+  float dx_prop_;
+  float dy_prop_;
   friend void  protobuf_AddDesc_caffe_2eproto();
   friend void protobuf_AssignDesc_caffe_2eproto();
   friend void protobuf_ShutdownFile_caffe_2eproto();
 
   void InitAsDefaultInstance();
-  static TransParameter* default_instance_;
+  static RandTransformParameter* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -7481,6 +7481,20 @@ class RecurrentParameter : public ::google::protobuf::Message {
   inline bool debug_info() const;
   inline void set_debug_info(bool value);
 
+  // optional bool no_memory_cell = 5 [default = false];
+  inline bool has_no_memory_cell() const;
+  inline void clear_no_memory_cell();
+  static const int kNoMemoryCellFieldNumber = 5;
+  inline bool no_memory_cell() const;
+  inline void set_no_memory_cell(bool value);
+
+  // optional bool transpose = 6 [default = false];
+  inline bool has_transpose() const;
+  inline void clear_transpose();
+  static const int kTransposeFieldNumber = 6;
+  inline bool transpose() const;
+  inline void set_transpose(bool value);
+
   // @@protoc_insertion_point(class_scope:caffe.RecurrentParameter)
  private:
   inline void set_has_num_output();
@@ -7491,15 +7505,21 @@ class RecurrentParameter : public ::google::protobuf::Message {
   inline void clear_has_bias_filler();
   inline void set_has_debug_info();
   inline void clear_has_debug_info();
+  inline void set_has_no_memory_cell();
+  inline void clear_has_no_memory_cell();
+  inline void set_has_transpose();
+  inline void clear_has_transpose();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
   ::caffe::FillerParameter* weight_filler_;
+  ::caffe::FillerParameter* bias_filler_;
   ::google::protobuf::uint32 num_output_;
   bool debug_info_;
-  ::caffe::FillerParameter* bias_filler_;
+  bool no_memory_cell_;
+  bool transpose_;
   friend void  protobuf_AddDesc_caffe_2eproto();
   friend void protobuf_AssignDesc_caffe_2eproto();
   friend void protobuf_ShutdownFile_caffe_2eproto();
@@ -15165,241 +15185,241 @@ inline void LayerParameter::set_allocated_norm_loss_param(::caffe::NormLossParam
   // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.norm_loss_param)
 }
 
-// optional .caffe.TransParameter cnn_transform_param = 146;
-inline bool LayerParameter::has_cnn_transform_param() const {
+// optional .caffe.RandTransformParameter rand_trans_param = 146;
+inline bool LayerParameter::has_rand_trans_param() const {
   return (_has_bits_[1] & 0x01000000u) != 0;
 }
-inline void LayerParameter::set_has_cnn_transform_param() {
+inline void LayerParameter::set_has_rand_trans_param() {
   _has_bits_[1] |= 0x01000000u;
 }
-inline void LayerParameter::clear_has_cnn_transform_param() {
+inline void LayerParameter::clear_has_rand_trans_param() {
   _has_bits_[1] &= ~0x01000000u;
 }
-inline void LayerParameter::clear_cnn_transform_param() {
-  if (cnn_transform_param_ != NULL) cnn_transform_param_->::caffe::TransParameter::Clear();
-  clear_has_cnn_transform_param();
+inline void LayerParameter::clear_rand_trans_param() {
+  if (rand_trans_param_ != NULL) rand_trans_param_->::caffe::RandTransformParameter::Clear();
+  clear_has_rand_trans_param();
 }
-inline const ::caffe::TransParameter& LayerParameter::cnn_transform_param() const {
-  // @@protoc_insertion_point(field_get:caffe.LayerParameter.cnn_transform_param)
-  return cnn_transform_param_ != NULL ? *cnn_transform_param_ : *default_instance_->cnn_transform_param_;
+inline const ::caffe::RandTransformParameter& LayerParameter::rand_trans_param() const {
+  // @@protoc_insertion_point(field_get:caffe.LayerParameter.rand_trans_param)
+  return rand_trans_param_ != NULL ? *rand_trans_param_ : *default_instance_->rand_trans_param_;
 }
-inline ::caffe::TransParameter* LayerParameter::mutable_cnn_transform_param() {
-  set_has_cnn_transform_param();
-  if (cnn_transform_param_ == NULL) cnn_transform_param_ = new ::caffe::TransParameter;
-  // @@protoc_insertion_point(field_mutable:caffe.LayerParameter.cnn_transform_param)
-  return cnn_transform_param_;
+inline ::caffe::RandTransformParameter* LayerParameter::mutable_rand_trans_param() {
+  set_has_rand_trans_param();
+  if (rand_trans_param_ == NULL) rand_trans_param_ = new ::caffe::RandTransformParameter;
+  // @@protoc_insertion_point(field_mutable:caffe.LayerParameter.rand_trans_param)
+  return rand_trans_param_;
 }
-inline ::caffe::TransParameter* LayerParameter::release_cnn_transform_param() {
-  clear_has_cnn_transform_param();
-  ::caffe::TransParameter* temp = cnn_transform_param_;
-  cnn_transform_param_ = NULL;
+inline ::caffe::RandTransformParameter* LayerParameter::release_rand_trans_param() {
+  clear_has_rand_trans_param();
+  ::caffe::RandTransformParameter* temp = rand_trans_param_;
+  rand_trans_param_ = NULL;
   return temp;
 }
-inline void LayerParameter::set_allocated_cnn_transform_param(::caffe::TransParameter* cnn_transform_param) {
-  delete cnn_transform_param_;
-  cnn_transform_param_ = cnn_transform_param;
-  if (cnn_transform_param) {
-    set_has_cnn_transform_param();
+inline void LayerParameter::set_allocated_rand_trans_param(::caffe::RandTransformParameter* rand_trans_param) {
+  delete rand_trans_param_;
+  rand_trans_param_ = rand_trans_param;
+  if (rand_trans_param) {
+    set_has_rand_trans_param();
   } else {
-    clear_has_cnn_transform_param();
+    clear_has_rand_trans_param();
   }
-  // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.cnn_transform_param)
+  // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.rand_trans_param)
 }
 
 // -------------------------------------------------------------------
 
-// TransParameter
+// RandTransformParameter
 
-// optional float scale = 1 [default = 1];
-inline bool TransParameter::has_scale() const {
+// optional bool rotation = 1 [default = true];
+inline bool RandTransformParameter::has_rotation() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void TransParameter::set_has_scale() {
+inline void RandTransformParameter::set_has_rotation() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void TransParameter::clear_has_scale() {
+inline void RandTransformParameter::clear_has_rotation() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void TransParameter::clear_scale() {
-  scale_ = 1;
-  clear_has_scale();
-}
-inline float TransParameter::scale() const {
-  // @@protoc_insertion_point(field_get:caffe.TransParameter.scale)
-  return scale_;
-}
-inline void TransParameter::set_scale(float value) {
-  set_has_scale();
-  scale_ = value;
-  // @@protoc_insertion_point(field_set:caffe.TransParameter.scale)
-}
-
-// optional float rotation = 2 [default = 0];
-inline bool TransParameter::has_rotation() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void TransParameter::set_has_rotation() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void TransParameter::clear_has_rotation() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void TransParameter::clear_rotation() {
-  rotation_ = 0;
+inline void RandTransformParameter::clear_rotation() {
+  rotation_ = true;
   clear_has_rotation();
 }
-inline float TransParameter::rotation() const {
-  // @@protoc_insertion_point(field_get:caffe.TransParameter.rotation)
+inline bool RandTransformParameter::rotation() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.rotation)
   return rotation_;
 }
-inline void TransParameter::set_rotation(float value) {
+inline void RandTransformParameter::set_rotation(bool value) {
   set_has_rotation();
   rotation_ = value;
-  // @@protoc_insertion_point(field_set:caffe.TransParameter.rotation)
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.rotation)
 }
 
-// optional int32 dx = 7 [default = 0];
-inline bool TransParameter::has_dx() const {
+// optional bool scale = 2 [default = true];
+inline bool RandTransformParameter::has_scale() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void RandTransformParameter::set_has_scale() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void RandTransformParameter::clear_has_scale() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void RandTransformParameter::clear_scale() {
+  scale_ = true;
+  clear_has_scale();
+}
+inline bool RandTransformParameter::scale() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.scale)
+  return scale_;
+}
+inline void RandTransformParameter::set_scale(bool value) {
+  set_has_scale();
+  scale_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.scale)
+}
+
+// optional bool shift = 3 [default = true];
+inline bool RandTransformParameter::has_shift() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void TransParameter::set_has_dx() {
+inline void RandTransformParameter::set_has_shift() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void TransParameter::clear_has_dx() {
+inline void RandTransformParameter::clear_has_shift() {
   _has_bits_[0] &= ~0x00000004u;
 }
-inline void TransParameter::clear_dx() {
-  dx_ = 0;
-  clear_has_dx();
+inline void RandTransformParameter::clear_shift() {
+  shift_ = true;
+  clear_has_shift();
 }
-inline ::google::protobuf::int32 TransParameter::dx() const {
-  // @@protoc_insertion_point(field_get:caffe.TransParameter.dx)
-  return dx_;
+inline bool RandTransformParameter::shift() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.shift)
+  return shift_;
 }
-inline void TransParameter::set_dx(::google::protobuf::int32 value) {
-  set_has_dx();
-  dx_ = value;
-  // @@protoc_insertion_point(field_set:caffe.TransParameter.dx)
+inline void RandTransformParameter::set_shift(bool value) {
+  set_has_shift();
+  shift_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.shift)
 }
 
-// optional int32 dy = 8 [default = 0];
-inline bool TransParameter::has_dy() const {
+// optional float start_angle = 4 [default = 0];
+inline bool RandTransformParameter::has_start_angle() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void TransParameter::set_has_dy() {
+inline void RandTransformParameter::set_has_start_angle() {
   _has_bits_[0] |= 0x00000008u;
 }
-inline void TransParameter::clear_has_dy() {
+inline void RandTransformParameter::clear_has_start_angle() {
   _has_bits_[0] &= ~0x00000008u;
 }
-inline void TransParameter::clear_dy() {
-  dy_ = 0;
-  clear_has_dy();
+inline void RandTransformParameter::clear_start_angle() {
+  start_angle_ = 0;
+  clear_has_start_angle();
 }
-inline ::google::protobuf::int32 TransParameter::dy() const {
-  // @@protoc_insertion_point(field_get:caffe.TransParameter.dy)
-  return dy_;
+inline float RandTransformParameter::start_angle() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.start_angle)
+  return start_angle_;
 }
-inline void TransParameter::set_dy(::google::protobuf::int32 value) {
-  set_has_dy();
-  dy_ = value;
-  // @@protoc_insertion_point(field_set:caffe.TransParameter.dy)
+inline void RandTransformParameter::set_start_angle(float value) {
+  set_has_start_angle();
+  start_angle_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.start_angle)
 }
 
-// optional int32 border = 3 [default = 0];
-inline bool TransParameter::has_border() const {
+// optional float end_angle = 5 [default = 0];
+inline bool RandTransformParameter::has_end_angle() const {
   return (_has_bits_[0] & 0x00000010u) != 0;
 }
-inline void TransParameter::set_has_border() {
+inline void RandTransformParameter::set_has_end_angle() {
   _has_bits_[0] |= 0x00000010u;
 }
-inline void TransParameter::clear_has_border() {
+inline void RandTransformParameter::clear_has_end_angle() {
   _has_bits_[0] &= ~0x00000010u;
 }
-inline void TransParameter::clear_border() {
-  border_ = 0;
-  clear_has_border();
+inline void RandTransformParameter::clear_end_angle() {
+  end_angle_ = 0;
+  clear_has_end_angle();
 }
-inline ::google::protobuf::int32 TransParameter::border() const {
-  // @@protoc_insertion_point(field_get:caffe.TransParameter.border)
-  return border_;
+inline float RandTransformParameter::end_angle() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.end_angle)
+  return end_angle_;
 }
-inline void TransParameter::set_border(::google::protobuf::int32 value) {
-  set_has_border();
-  border_ = value;
-  // @@protoc_insertion_point(field_set:caffe.TransParameter.border)
+inline void RandTransformParameter::set_end_angle(float value) {
+  set_has_end_angle();
+  end_angle_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.end_angle)
 }
 
-// optional int32 interp = 4 [default = 1];
-inline bool TransParameter::has_interp() const {
+// optional float scale_coeff = 6 [default = 1];
+inline bool RandTransformParameter::has_scale_coeff() const {
   return (_has_bits_[0] & 0x00000020u) != 0;
 }
-inline void TransParameter::set_has_interp() {
+inline void RandTransformParameter::set_has_scale_coeff() {
   _has_bits_[0] |= 0x00000020u;
 }
-inline void TransParameter::clear_has_interp() {
+inline void RandTransformParameter::clear_has_scale_coeff() {
   _has_bits_[0] &= ~0x00000020u;
 }
-inline void TransParameter::clear_interp() {
-  interp_ = 1;
-  clear_has_interp();
+inline void RandTransformParameter::clear_scale_coeff() {
+  scale_coeff_ = 1;
+  clear_has_scale_coeff();
 }
-inline ::google::protobuf::int32 TransParameter::interp() const {
-  // @@protoc_insertion_point(field_get:caffe.TransParameter.interp)
-  return interp_;
+inline float RandTransformParameter::scale_coeff() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.scale_coeff)
+  return scale_coeff_;
 }
-inline void TransParameter::set_interp(::google::protobuf::int32 value) {
-  set_has_interp();
-  interp_ = value;
-  // @@protoc_insertion_point(field_set:caffe.TransParameter.interp)
+inline void RandTransformParameter::set_scale_coeff(float value) {
+  set_has_scale_coeff();
+  scale_coeff_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.scale_coeff)
 }
 
-// optional int32 final_width = 5;
-inline bool TransParameter::has_final_width() const {
+// optional float dx_prop = 7 [default = 0];
+inline bool RandTransformParameter::has_dx_prop() const {
   return (_has_bits_[0] & 0x00000040u) != 0;
 }
-inline void TransParameter::set_has_final_width() {
+inline void RandTransformParameter::set_has_dx_prop() {
   _has_bits_[0] |= 0x00000040u;
 }
-inline void TransParameter::clear_has_final_width() {
+inline void RandTransformParameter::clear_has_dx_prop() {
   _has_bits_[0] &= ~0x00000040u;
 }
-inline void TransParameter::clear_final_width() {
-  final_width_ = 0;
-  clear_has_final_width();
+inline void RandTransformParameter::clear_dx_prop() {
+  dx_prop_ = 0;
+  clear_has_dx_prop();
 }
-inline ::google::protobuf::int32 TransParameter::final_width() const {
-  // @@protoc_insertion_point(field_get:caffe.TransParameter.final_width)
-  return final_width_;
+inline float RandTransformParameter::dx_prop() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.dx_prop)
+  return dx_prop_;
 }
-inline void TransParameter::set_final_width(::google::protobuf::int32 value) {
-  set_has_final_width();
-  final_width_ = value;
-  // @@protoc_insertion_point(field_set:caffe.TransParameter.final_width)
+inline void RandTransformParameter::set_dx_prop(float value) {
+  set_has_dx_prop();
+  dx_prop_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.dx_prop)
 }
 
-// optional int32 final_height = 6;
-inline bool TransParameter::has_final_height() const {
+// optional float dy_prop = 8 [default = 0];
+inline bool RandTransformParameter::has_dy_prop() const {
   return (_has_bits_[0] & 0x00000080u) != 0;
 }
-inline void TransParameter::set_has_final_height() {
+inline void RandTransformParameter::set_has_dy_prop() {
   _has_bits_[0] |= 0x00000080u;
 }
-inline void TransParameter::clear_has_final_height() {
+inline void RandTransformParameter::clear_has_dy_prop() {
   _has_bits_[0] &= ~0x00000080u;
 }
-inline void TransParameter::clear_final_height() {
-  final_height_ = 0;
-  clear_has_final_height();
+inline void RandTransformParameter::clear_dy_prop() {
+  dy_prop_ = 0;
+  clear_has_dy_prop();
 }
-inline ::google::protobuf::int32 TransParameter::final_height() const {
-  // @@protoc_insertion_point(field_get:caffe.TransParameter.final_height)
-  return final_height_;
+inline float RandTransformParameter::dy_prop() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.dy_prop)
+  return dy_prop_;
 }
-inline void TransParameter::set_final_height(::google::protobuf::int32 value) {
-  set_has_final_height();
-  final_height_ = value;
-  // @@protoc_insertion_point(field_set:caffe.TransParameter.final_height)
+inline void RandTransformParameter::set_dy_prop(float value) {
+  set_has_dy_prop();
+  dy_prop_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.dy_prop)
 }
 
 // -------------------------------------------------------------------
@@ -19800,6 +19820,54 @@ inline void RecurrentParameter::set_debug_info(bool value) {
   set_has_debug_info();
   debug_info_ = value;
   // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.debug_info)
+}
+
+// optional bool no_memory_cell = 5 [default = false];
+inline bool RecurrentParameter::has_no_memory_cell() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void RecurrentParameter::set_has_no_memory_cell() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void RecurrentParameter::clear_has_no_memory_cell() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void RecurrentParameter::clear_no_memory_cell() {
+  no_memory_cell_ = false;
+  clear_has_no_memory_cell();
+}
+inline bool RecurrentParameter::no_memory_cell() const {
+  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.no_memory_cell)
+  return no_memory_cell_;
+}
+inline void RecurrentParameter::set_no_memory_cell(bool value) {
+  set_has_no_memory_cell();
+  no_memory_cell_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.no_memory_cell)
+}
+
+// optional bool transpose = 6 [default = false];
+inline bool RecurrentParameter::has_transpose() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void RecurrentParameter::set_has_transpose() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void RecurrentParameter::clear_has_transpose() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void RecurrentParameter::clear_transpose() {
+  transpose_ = false;
+  clear_has_transpose();
+}
+inline bool RecurrentParameter::transpose() const {
+  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.transpose)
+  return transpose_;
+}
+inline void RecurrentParameter::set_transpose(bool value) {
+  set_has_transpose();
+  transpose_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.transpose)
 }
 
 // -------------------------------------------------------------------

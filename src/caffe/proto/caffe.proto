@@ -263,6 +263,7 @@ message ParamSpec {
 // LayerParameter next available layer-specific ID: 144 (last added:
 // RCS)
 message LayerParameter {
+  //this are some common parameters
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
   repeated string bottom = 3; // the name of each bottom blob
@@ -348,24 +349,20 @@ message LayerParameter {
   optional WindowDataParameter window_data_param = 129;
   optional NoiseParameter noise_param = 143;
   optional NormLossParameter norm_loss_param = 145;
-  optional TransParameter cnn_transform_param = 146;
+  optional RandTransformParameter rand_trans_param = 146;
 }
 
-//Message that stores transform parameter for CNN
-message TransParameter{
-    //Parameter for transformation
-    //TODO: chagne this to double
-    optional float scale = 1[default = 1];
-    optional float rotation = 2[default = 0];
-    optional int32 dx = 7[default = 0];
-    optional int32 dy = 8[default = 0];
-    //0 = CROP, 1 = CLAMP, 2 = REFLECT
-    optional int32 border = 3[default = 0];
-    //0 = NN, 1 = BILINEAR
-    optional int32 interp = 4[default = 1];
-    //Crops/pads the transformed image to this specific image size.
-    optional int32 final_width = 5;
-    optional int32 final_height = 6;
+//Message that stores parameters used to do random transformation
+message RandTransformParameter{
+    optional bool rotation = 1[default = true]; //if we do random rotation
+    optional bool scale = 2[default = true]; //if we do random scale
+    optional bool shift = 3[default = true]; //if we do random shift
+
+    optional float start_angle = 4[default = 0];
+    optional float end_angle = 5[default = 0];
+    optional float scale_coeff = 6[default = 1];
+    optional float dx_prop = 7[default = 0];//shift proportion of x axis
+    optional float dy_prop = 8[default = 0];//shift proportion of y axis
 }
 
 //Message that stores parameters used to calculate l1/l2 loss
@@ -841,6 +838,10 @@ message RecurrentParameter {
 
   // Whether to enable displaying debug_info in the unrolled recurrent net.
   optional bool debug_info = 4 [default = false];
+
+  //added by xu shen
+  optional bool no_memory_cell = 5 [default = false];
+  optional bool transpose = 6 [default = false];
 }
 
 // Message that stores parameters used by ReLULayer

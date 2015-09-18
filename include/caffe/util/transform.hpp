@@ -12,7 +12,7 @@ namespace caffe{
 
 	//Crop is zero-padding, CLAMP is border replicate, REFLECT is mirror.
 	enum Border {CROP, CLAMP, REFLECT};
-	enum Interp {NN, BILNEAR};
+	enum Interp {NN, BILINEAR};
 
 	struct ImageSize
 	{
@@ -36,9 +36,9 @@ namespace caffe{
 		Blob<float> *coord, int &height_new, int &width_new,
 		const Border &border = CROP, const Interp &interp = NN);
 
-	void generate_nn_cord(const int &height, const int &width,
-		Blob<float> *coord, int &height_new, int &width_new,
-		const Border &border = CROP, const Interp &interp = NN);
+	void generate_nn_coord(const int &height, const int &width,
+		const int &height_new,const int &width_new, const Border &border, 
+		const float* coord_data_res, float* &coord_data);
 
 	void generate_bilinear_coord(const int &height, const int &width,
 		const int &height_new, const int &width_new,
@@ -64,7 +64,7 @@ namespace caffe{
 		const ImageSize &target, const Interp &interp,
 		float *coord_new);
 
-	template <typename Dytpe>
+	template <typename Dtype>
 	void InterpImageNN_cpu(const Blob<Dtype> *orig, const float *coord,
 		Blob<Dtype> *warped, const Interp &interp = NN);
 

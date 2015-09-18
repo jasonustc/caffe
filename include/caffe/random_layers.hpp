@@ -61,6 +61,48 @@ namespace caffe{
 		//noise value
 		Blob<Dtype> noise_;
 	};
+
+	template <typename Dtype>
+	class RandomTransformLayer : public Layer<Dtype>{
+	public: 
+		RandomTransformLayer(const LayerParameter& param) :Layer<Dtype>(param){}
+		virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+		virtual void Reshape(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+
+		virtual inline const char* type(){ return "random_transform"; }
+
+	protected:
+		virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+		virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+		virtual void Backward_cpu(const vector<Blob<Dtype>*>& bottom,
+			const vector<bool>& propagate_down,
+			const vector<Blob<Dtype>*>& top);
+		virtual void Backward_gpu(const vector<Blob<Dtype>*>& bottom,
+			const vector<bool>& propagate_down,
+			const vector<Blob<Dtype>*>& top);
+
+
+		virtual inline bool EqualNumBottomTopBlobs() const { return true; }
+		virtual inline int ExtactNumBottomBlobs() const { return 1; }
+		virtual inline int ExtactNumTopBlobs() const { return 1; }
+
+		Blob<Dtype> trans_mat; //3 x 3 transform mat
+		Blob<Dtype> trans_coord; //the corresponding coordinate matrix index for transform
+
+		bool rotation_;
+		bool scale_;
+		bool shift_;
+
+		float start_angle_;
+		float end_angle_;
+		float scale_coeff_;
+		float dx_prop_;
+		float dy_prop_;
+
+	};
 }
 
 #endif
