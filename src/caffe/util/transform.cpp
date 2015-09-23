@@ -11,7 +11,7 @@ using std::max;
 
 namespace caffe{
 
-	void TMatFromProto(const TransParameter &param, float *tmat, bool invert){
+	void TMatFromProto(const RandTransformParameter &param, float *tmat, bool invert){
 		//initialize to identity
 		std::fill(tmat, tmat + 9, 0);
 		tmat[0] = tmat[4] = tmat[9] = 1;
@@ -25,7 +25,7 @@ namespace caffe{
 			}
 		}
 		//scale
-		if (param.scale() != 1){
+		if (param.scale() != 0){
 			CHECK(param.scale() > 0) << "Scale has to be >= 0" << param.scale();
 			if (invert){
 				AddScale(1. / param.scale(), tmat);
@@ -35,12 +35,12 @@ namespace caffe{
 			}
 		}
 		//shift
-		if (param.dx() != 0 || param.dy() != 0){
+		if (param.dx_prop() != 0 || param.dy_prop() != 0){
 			if (invert){
-				AddShift(-param.dx(), -param.dy(), tmat);
+				AddShift(-param.dx_prop(), -param.dy_prop(), tmat);
 			}
 			else{
-				AddShift(param.dx(), param.dy(), tmat);
+				AddShift(param.dx_prop(), param.dy_prop(), tmat);
 			}
 		}
 	}

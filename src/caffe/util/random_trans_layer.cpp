@@ -11,7 +11,7 @@
 namespace caffe{
 	template <typename Dtype>
 	void RandomTransformLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
-		vector<Blob<Dtype>*>& top){
+		const vector<Blob<Dtype>*>& top){
 		CHECK_EQ(bottom.size(), 1) << "RandomTranform Layer only takes one single blob as input.";
 		CHECK_EQ(top.size(), 1) << "RandomTransform Layer only takes one single blob as output.";
 
@@ -26,5 +26,11 @@ namespace caffe{
 		scale_coeff_ = this->layer_param_.rand_trans_param().scale_coeff();
 		dx_prop_ = this->layer_param_.rand_trans_param().dx_prop();
 		dy_prop_ = this->layer_param_.rand_trans_param().dy_prop();
+	}
+
+	template <typename Dtype>
+	void RandomTransformLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top){
+
 	}
 }
