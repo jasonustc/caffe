@@ -26,7 +26,15 @@ void DropoutLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   DCHECK(threshold_ < 1.);
   DCHECK(a_ < b_);
   DCHECK(sigma_ > 0.);
-  scale_ = 1. / (1. - threshold_);
+  if (drop_type_ == DropoutParameter_DROPTYPE_UNIFORM){
+	  scale_ = 2. / (b_ + a_);
+  }
+  else if (drop_type_ == DropoutParameter_DROPTYPE_GAUSSIAN){
+	  scale_ = 1. / mu_;
+  }
+  else{
+	  scale_ = 1. / (1. - threshold_);
+  }
   uint_thres_ = static_cast<unsigned int>(UINT_MAX * threshold_);
 }
 
@@ -50,11 +58,9 @@ void DropoutLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     // Create random numbers
 	  if (this->drop_type_ == DropoutParameter_DROPTYPE_UNIFORM){
 		caffe_rng_uniform(count, (Dtype)a_, (Dtype)b_, mask);
-		scale_ = 2. / (b_ - a_);
 	  }
 	  else if(this->drop_type_ == DropoutParameter_DROPTYPE_GAUSSIAN){
 		caffe_rng_gaussian(count, (Dtype)mu_, (Dtype)sigma_, mask);
-		scale_ = 1. / mu_;
 	  }
 	  else{
 		caffe_rng_bernoulli_c<Dtype>(count, 1. - threshold_, mask);
