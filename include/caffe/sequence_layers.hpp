@@ -35,7 +35,9 @@ class RecurrentLayer : public Layer<Dtype> {
   virtual inline const char* type() const { return "Recurrent"; }
   virtual inline int MinBottomBlobs() const { return 2; }
   virtual inline int MaxBottomBlobs() const { return 3; }
-  virtual inline int ExactNumTopBlobs() const { return 1; }
+  //here added by xu shen
+//  virtual inline int ExactNumTopBlobs() const { return 1; }
+  virtual inline int MinTopBlobs(){ return 2; }
 
   virtual inline bool AllowForceBackward(const int bottom_index) const {
     // Can't propagate to sequence continuation indicators.

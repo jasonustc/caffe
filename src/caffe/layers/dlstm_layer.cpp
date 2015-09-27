@@ -25,8 +25,9 @@ namespace caffe{
 
 	template <typename Dtype>
 	void DLSTMLayer<Dtype>::OutputBlobNames(vector<string>* names) const {
-		names->resize(1);
-		(*names)[0] = "h";
+		names->resize(2);
+		(*names)[0] = "h_mem";
+		(*names)[1] = "h_tut";
 	}
 
 	//TODO: split the process of encoding and decoding
@@ -56,18 +57,18 @@ namespace caffe{
 		//parameter for reconstruction layer
 		//TODO: make this more adaptive from layer parameters
 		//here just hack for run the experiment
-		const int dec_num_output = 4096;
-		LayerParameter dec_hidden_param;
-		dec_hidden_param.set_type("InnerProduct");
-		//i_t, f_t, o_t, g_t
-		dec_hidden_param.mutable_inner_product_param()->set_num_output(dec_num_output * 4);
-		dec_hidden_param.mutable_inner_product_param()->set_bias_term(false);
-		dec_hidden_param.mutable_inner_product_param()->set_axis(2);
-		dec_hidden_param.mutable_inner_product_param()->mutable_weight_filler()->CopyFrom(weight_filler);
-		//bias
-		LayerParameter dec_biased_hidden_param(dec_hidden_param);
-		dec_biased_hidden_param.mutable_inner_product_param()->set_bias_term(true);
-		dec_biased_hidden_param.mutable_inner_product_param()->mutable_bias_filler()->CopyFrom(bias_filler);
+//		const int dec_num_output = 4096;
+//		LayerParameter dec_hidden_param;
+//		dec_hidden_param.set_type("InnerProduct");
+//		//i_t, f_t, o_t, g_t
+//		dec_hidden_param.mutable_inner_product_param()->set_num_output(dec_num_output * 4);
+//		dec_hidden_param.mutable_inner_product_param()->set_bias_term(false);
+//		dec_hidden_param.mutable_inner_product_param()->set_axis(2);
+//		dec_hidden_param.mutable_inner_product_param()->mutable_weight_filler()->CopyFrom(weight_filler);
+//		//bias
+//		LayerParameter dec_biased_hidden_param(dec_hidden_param);
+//		dec_biased_hidden_param.mutable_inner_product_param()->set_bias_term(true);
+//		dec_biased_hidden_param.mutable_inner_product_param()->mutable_bias_filler()->CopyFrom(bias_filler);
 
 		//sum
 		LayerParameter sum_param;
@@ -147,12 +148,19 @@ namespace caffe{
 		x_slice_param->add_bottom("W_xc_x");
 		x_slice_param->set_name("W_xc_x_slice");
 
-		LayerParameter output_concat_layer;
-		output_concat_layer.set_name("h_concat");
-		output_concat_layer.set_type("Concat");
-		output_concat_layer.add_top("h");
+		LayerParameter output_concat_layer_mem;
+		output_concat_layer_mem.set_name("h_concat_mem");
+		output_concat_layer_mem.set_type("Concat");
+		output_concat_layer_mem.add_top("h_mem");
 		//concatenate along axis 0(time)
-		output_concat_layer.mutable_concat_param()->set_axis(0);
+		output_concat_layer_mem.mutable_concat_param()->set_axis(0);
+
+		LayerParameter output_concat_layer_tut;
+		output_concat_layer_tut.set_name("h_concat_tut");
+		output_concat_layer_tut.set_type("Concat");
+		output_concat_layer_tut.add_top("h_tut");
+		//concatenate along axis 0(time)
+		output_concat_layer_tut.mutable_concat_param()->set_axis(0);
 
 		//save parameter for every time step
 		for (int t = 1; t <= this->T_; ++t){
@@ -231,7 +239,7 @@ namespace caffe{
 				lstm_unit_param->set_name("unit_" + ts);
 			}
 
-//			output_concat_layer.add_bottom("h_" + ts);
+			output_concat_layer_tut.add_bottom("h_" + ts);
 		}//for (int t =1; t <= this->T_; ++t)
 
 		//set up decoding LSTM
@@ -261,7 +269,7 @@ namespace caffe{
 			//W_xc_x = W_xc * h_{t-1} + b_c
 			{
 				LayerParameter* input_transform_param = net_param->add_layer();
-				input_transform_param->CopyFrom(dec_biased_hidden_param);
+				input_transform_param->CopyFrom(biased_hidden_param);
 				//use independent weight and bias from encoder
 				input_transform_param->add_param()->set_name("w_xc_d");
 				input_transform_param->add_param()->set_name("b_c_d");
@@ -274,7 +282,7 @@ namespace caffe{
 			//   W_hc_h_{t-1} := W_hc * h_conted_{t-1}
 			{
 				LayerParameter* dw_param = net_param->add_layer();
-				dw_param->CopyFrom(dec_hidden_param);
+				dw_param->CopyFrom(hidden_param);
 				dw_param->set_name("transform_" + dtm1s);
 				//use different decoding weight here, need to train independently
 				dw_param->add_param()->set_name("dW_hc");
@@ -309,7 +317,7 @@ namespace caffe{
 			}
 
 			//output decoding result
-			output_concat_layer.add_bottom("h_" + dts);
+			output_concat_layer_mem.add_bottom("h_" + dts);
 		}// for (int dt = 1; dt <= this->T_; ++dt)
 
 		{
@@ -319,7 +327,8 @@ namespace caffe{
 			c_T_copy_param->add_top("c_T");
 		}
 
-		net_param->add_layer()->CopyFrom(output_concat_layer);
+		net_param->add_layer()->CopyFrom(output_concat_layer_tut);
+		net_param->add_layer()->CopyFrom(output_concat_layer_mem);
 	}
 
 	INSTANTIATE_CLASS(DLSTMLayer);

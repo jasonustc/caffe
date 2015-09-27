@@ -361,6 +361,9 @@ void Net<Dtype>::AppendTop(const NetParameter& param, const int layer_id,
       net_input_blob_indices_.push_back(blob_id);
       net_input_blobs_.push_back(blob_pointer.get());
     } else {
+		//here just allocate pointers and blob index to a new blob
+		//but the shape parameters and memory for data still need to be
+		//allocated in layer
       top_id_vecs_[layer_id].push_back(blob_id);
       top_vecs_[layer_id].push_back(blob_pointer.get());
     }

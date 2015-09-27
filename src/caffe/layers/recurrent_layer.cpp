@@ -170,22 +170,33 @@ void RecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void RecurrentLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
-  CHECK_EQ(top.size(), output_blobs_.size());
-  for (int i = 0; i < top.size(); ++i) {
-    top[i]->ReshapeLike(*output_blobs_[i]);
-	  //!!!!
-    //output_blobs_[i]->ShareData(*top[i]); 
-    //output_blobs_[i]->ShareDiff(*top[i]);
+//  CHECK_EQ(top.size(), output_blobs_.size());
+	CHECK_GE(top.size(), output_blobs_.size());
+	for (int i = 0; i < top.size(); ++i) {
+		top[i]->ReshapeLike(*output_blobs_[i]);
+		//!!!!
+		//output_blobs_[i]->ShareData(*top[i]); 
+		//output_blobs_[i]->ShareDiff(*top[i]);
 		top[i]->ShareData(*output_blobs_[i]);
 		top[i]->ShareDiff(*output_blobs_[i]);
-  }
-  x_input_blob_->ShareData(*bottom[0]);
-  x_input_blob_->ShareDiff(*bottom[0]);
-  cont_input_blob_->ShareData(*bottom[1]);
-  if (static_input_) {
-    x_static_input_blob_->ShareData(*bottom[2]);
-    x_static_input_blob_->ShareDiff(*bottom[2]);
-  }
+	}
+	//added by xu shen: to get the c_T and h_T as output
+	if (top.size() > output_blobs_.size()){
+		for (size_t r = output_blobs_.size(); r < top.size(); r++){
+			//allocate memory 
+			top[r]->ReshapeLike(*recur_output_blobs_[r - output_blobs_.size()]);
+			top[r]->ShareData(*recur_output_blobs_[r - output_blobs_.size()]);
+			top[r]->ShareDiff(*recur_output_blobs_[r - output_blobs_.size()]);
+		}
+	}
+
+	x_input_blob_->ShareData(*bottom[0]);
+	x_input_blob_->ShareDiff(*bottom[0]);
+	cont_input_blob_->ShareData(*bottom[1]);
+	if (static_input_) {
+		x_static_input_blob_->ShareData(*bottom[2]);
+		x_static_input_blob_->ShareDiff(*bottom[2]);
+	}
 }
 
 template <typename Dtype>
