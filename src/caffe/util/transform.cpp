@@ -11,36 +11,45 @@ using std::max;
 
 namespace caffe{
 
-	void TMatFromProto(const RandTransformParameter &param, float *tmat, bool invert){
+	/*
+	 *Compute the transformation parameters in transform matrix
+	 * 1) trans_type == 0: rotation, rotation angle is stored in param1
+	 * 2) trans_type == 1: scale, scale proportion is stored in param1
+	 * 3) trans_type == 2: shift, shift_x and shift_y(pixel) is stored in param1, param2, respectively.
+	 * the last transform parameter in tmat will be updated, not reset: tmat_new = transform(tmat_old)
+	 */
+	void TMatFromParam(const int trans_type, const float param1, const float param2, float *tmat, bool invert){
 		//initialize to identity
 		std::fill(tmat, tmat + 9, 0);
 		tmat[0] = tmat[4] = tmat[9] = 1;
 		//rotation
-		if (param.rotation() != 0.){
+		if (trans_type == 0){
 			if (invert){
-				AddRotation(-param.rotation(), tmat);
+				AddRotation(-param1, tmat);
 			}
 			else{
-				AddRotation(param.rotation(), tmat);
+				AddRotation(param1, tmat);
 			}
 		}
 		//scale
-		if (param.scale() != 0){
-			CHECK(param.scale() > 0) << "Scale has to be >= 0" << param.scale();
+		if (trans_type == 1){
+			CHECK(param1 > 0) << "Scale has to be >= 0: " << param1;
 			if (invert){
-				AddScale(1. / param.scale(), tmat);
+				AddScale(1. / param1, tmat);
 			}
 			else{
-				AddScale(param.scale(), tmat);
+				AddScale(param1, tmat);
 			}
 		}
 		//shift
-		if (param.dx_prop() != 0 || param.dy_prop() != 0){
-			if (invert){
-				AddShift(-param.dx_prop(), -param.dy_prop(), tmat);
-			}
-			else{
-				AddShift(param.dx_prop(), param.dy_prop(), tmat);
+		if (trans_type == 2){
+			if (param1 != 0 || param2 != 0){
+				if (invert){
+					AddShift(-param1, -param2, tmat);
+				}
+				else{
+					AddShift(param1, param2, tmat);
+				}
 			}
 		}
 	}
@@ -48,6 +57,7 @@ namespace caffe{
 	void AddScale(const float &scale, float *mat, const Direction dir){
 		float tmp[9] = { scale, 0, 0, 0, scale, 0, 0, 0, 1 };
 		AddTransform(mat, tmp, dir);
+		delete[] tmp;
 	}
 
 
@@ -56,12 +66,16 @@ namespace caffe{
 		float rad = angle * PI_F / 180;
 		float tmp[9] = { cos(rad), sin(rad), 0, -sin(rad), cos(rad), 0, 0, 0, 1 };
 		AddTransform(mat, tmp, dir);
+		//clean up
+		delete[] tmp;
 	}
 
 	void AddShift(const float &dx, const float &dy, float *mat, const Direction dir){
 		//dx is width, dy is height
 		float tmp[9] = { 1, 0, 0, 0, 1, 0, dx, dy, 1};
 		AddTransform(mat, tmp, dir);
+		//clean up
+		delete[] tmp;
 	}
 
 	/*
@@ -91,6 +105,8 @@ namespace caffe{
 			A_copy, B, 0.f, A) :
 			caffe_cpu_gemm<float>(CblasNoTrans, CblasNoTrans, 3, 3, 3, 1.f,
 			B, A_copy, 0.f, A);
+		//clean up
+		delete[] A_copy;
 	}
 	
 	//TODO(AJ): this is computing the offset. with affine transformation computing
@@ -126,6 +142,8 @@ namespace caffe{
 		float min_row = min(min(res[0], res[3]), min(res[6], res[9]));
 		height_new = static_cast<int>(max_row - min_row);
 		width_new = static_cast<int>(max_col - min_col);
+		delete[] corners;
+		delete[] res;
 	}
 
 	//Following the inverse rule of 3x3 matrices using determinats
@@ -148,7 +166,7 @@ namespace caffe{
 		float d2 = A[0] * A[5] * A[7] + A[2] * A[4] * A[6] + A[8] * A[1] * A[3];
 		float det = d1 - d2;
 		printf("det: %.2f - %.2f = %.2f", d1, d2, det);
-		CHECK_GT(det, 0);
+		CHECK_NE(det, 0);
 		inv[0] = (A[8] * A[4] - A[5] * A[7]) / det;
 		inv[1] = (A[7] * A[2] - A[1] * A[8]) / det;
 		inv[2] = (A[1] * A[5] - A[4] * A[2]) / det;
@@ -159,6 +177,8 @@ namespace caffe{
 		inv[7] = (A[6] * A[1] - A[0] * A[7]) / det;
 		inv[8] = (A[0] * A[4] - A[3] * A[1]) / det;
 		caffe_copy(9, inv, A);
+		//clean up
+		delete[] inv;
 	}
 
 	//get the reflect location in matrix
@@ -274,7 +294,7 @@ namespace caffe{
 		int N = height_new * width_new;
 		for (int ind = 0; ind < N; ++ind){
 			row = coord_data_res[3 * ind] + old_cy;
-			col = coord_data_res[3 * ind] + old_cx;
+			col = coord_data_res[3 * ind + 1] + old_cx;
 			//p00=>(r0, c0) p11=>(r1, c1)
 			//save index
 			switch (border)
@@ -367,6 +387,7 @@ namespace caffe{
 		//clean up
 		delete[] coord_data_tmp;
 		delete[] coord_data_res;
+		delete[] tmat;
 	}
 
 	void GenCoordMat(float *tmat, const int &height, const int &width,
@@ -383,7 +404,7 @@ namespace caffe{
 		{
 		case NN:
 			//set the size of coord blob
-			coord->Reshape(1, 1, height_new * width_new * 4, 1);
+			coord->Reshape(1, 1, height_new * width_new, 1);
 			coord_data = coord->mutable_cpu_data();
 			generate_nn_coord(height, width, height_new, width_new, border,
 				coord_data_res, coord_data);
@@ -538,6 +559,8 @@ namespace caffe{
 
 	template void InterpImageNN_cpu(const Blob<float>* orig, const float* coord,
 		Blob<float>* warped, const Interp &interp);
+//	template void InterpImageNN_cpu(const Blob<double>* orig, const float* coord,
+//		Blob<double>* warped, const Interp &interp);
 
 	//just like crop
 	template <typename Dtype>
@@ -659,6 +682,8 @@ namespace caffe{
 	//Explicit instantiation
 	template void PropagateErrorNN_cpu(const Blob<float>* top, const float* coord,
 		Blob<float>* bottom, const Interp &interp);
+//	template void PropagateErrorNN_cpu(const Blob<double>* top, const float* coord,
+//		Blob<double>* bottom, const Interp &interp);
 
 	template <typename Dtype>
 	void nn_propagation(const Blob<Dtype>* & top, const float* &coord,

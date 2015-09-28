@@ -22,6 +22,9 @@ namespace caffe{
 		int height;
 	};
 
+	//compute parameters in transformation matrix by given transform type
+	void TMatFromParam(const int trans_type, const float param1, const float param2, float *tmat, bool invert = false);
+
 	//matrix is multiplied to the existing one from the right
 	void AddRotation(const float &angle, float *mat, const Direction dir = RIGHT);
 	void AddScale(const float &scale, float* mat, const Direction dir = RIGHT);

@@ -354,15 +354,18 @@ message LayerParameter {
 
 //Message that stores parameters used to do random transformation
 message RandTransformParameter{
-    optional bool rotation = 1[default = true]; //if we do random rotation
-    optional bool scale = 2[default = true]; //if we do random scale
-    optional bool shift = 3[default = true]; //if we do random shift
-
-    optional float start_angle = 4[default = 0];
-    optional float end_angle = 5[default = 0];
-    optional float scale_coeff = 6[default = 1];
-    optional float dx_prop = 7[default = 0];//shift proportion of x axis
-    optional float dy_prop = 8[default = 0];//shift proportion of y axis
+    //rotation angle in [start_angle, end_angle]
+    optional float start_angle = 1;
+    optional float end_angle = 2;
+    //scale in [start_scale, end_scale]
+    optional float start_scale = 3;
+    optional float end_scale = 8;
+    optional float dx_prop = 4;//shift proportion of x axis
+    optional float dy_prop = 5;//shift proportion of y axis
+    //0 = CROP, 1 = CLAMP, 2 = REFLECT
+    optional int32 border = 6 [default = 0];
+    //0 = NN, 1 = BILINEAR
+    optional int32 interp = 7 [default = 1];
 }
 
 //Message that stores parameters used to calculate l1/l2 loss

@@ -10,6 +10,7 @@
 #include "caffe/layer.hpp"
 #include "caffe/net.hpp"
 #include "caffe/proto/caffe.pb.h"
+#include "caffe/util/transform.hpp"
 
 namespace caffe{
 	template <typename Dtype> class NoiseLayer;
@@ -65,7 +66,7 @@ namespace caffe{
 	template <typename Dtype>
 	class RandomTransformLayer : public Layer<Dtype>{
 	public: 
-		RandomTransformLayer(const LayerParameter& param) :Layer<Dtype>(param){}
+		explicit RandomTransformLayer(const LayerParameter& param) : Layer<Dtype>(param){}
 		virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 			const vector<Blob<Dtype>*>& top);
 		virtual void Reshape(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
@@ -89,18 +90,38 @@ namespace caffe{
 		virtual inline int ExtactNumBottomBlobs() const { return 1; }
 		virtual inline int ExtactNumTopBlobs() const { return 1; }
 
-		Blob<Dtype> trans_mat; //3 x 3 transform mat
-		Blob<Dtype> trans_coord; //the corresponding coordinate matrix index for transform
+		//added by xu shen here
+		//get the coordination matrix after transformation
+		void GetTransCoord();
 
 		bool rotation_;
 		bool scale_;
 		bool shift_;
 
+		int Height_;
+		int Width_;
+
 		float start_angle_;
 		float end_angle_;
-		float scale_coeff_;
+		float start_scale_;
+		float end_scale_;
 		float dx_prop_;
 		float dy_prop_;
+
+		float curr_scale_;
+		float curr_angle_;
+		//shift by #pixels
+		float curr_shift_x_;
+		float curr_shift_y_;
+
+		Border BORDER_; // border type
+		Interp INTERP_; //interpolation type
+		//3x3 transform matrix buffer, row order
+		float tmat_[9];
+
+		//Indices for image transformation
+		//We use blob's data to be fwd and diff to be backward indices
+		shared_ptr<Blob<float>> coord_idx_;
 
 	};
 }

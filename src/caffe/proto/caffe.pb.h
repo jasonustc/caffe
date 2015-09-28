@@ -3204,93 +3204,93 @@ class RandTransformParameter : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // optional bool rotation = 1 [default = true];
-  inline bool has_rotation() const;
-  inline void clear_rotation();
-  static const int kRotationFieldNumber = 1;
-  inline bool rotation() const;
-  inline void set_rotation(bool value);
-
-  // optional bool scale = 2 [default = true];
-  inline bool has_scale() const;
-  inline void clear_scale();
-  static const int kScaleFieldNumber = 2;
-  inline bool scale() const;
-  inline void set_scale(bool value);
-
-  // optional bool shift = 3 [default = true];
-  inline bool has_shift() const;
-  inline void clear_shift();
-  static const int kShiftFieldNumber = 3;
-  inline bool shift() const;
-  inline void set_shift(bool value);
-
-  // optional float start_angle = 4 [default = 0];
+  // optional float start_angle = 1;
   inline bool has_start_angle() const;
   inline void clear_start_angle();
-  static const int kStartAngleFieldNumber = 4;
+  static const int kStartAngleFieldNumber = 1;
   inline float start_angle() const;
   inline void set_start_angle(float value);
 
-  // optional float end_angle = 5 [default = 0];
+  // optional float end_angle = 2;
   inline bool has_end_angle() const;
   inline void clear_end_angle();
-  static const int kEndAngleFieldNumber = 5;
+  static const int kEndAngleFieldNumber = 2;
   inline float end_angle() const;
   inline void set_end_angle(float value);
 
-  // optional float scale_coeff = 6 [default = 1];
-  inline bool has_scale_coeff() const;
-  inline void clear_scale_coeff();
-  static const int kScaleCoeffFieldNumber = 6;
-  inline float scale_coeff() const;
-  inline void set_scale_coeff(float value);
+  // optional float start_scale = 3;
+  inline bool has_start_scale() const;
+  inline void clear_start_scale();
+  static const int kStartScaleFieldNumber = 3;
+  inline float start_scale() const;
+  inline void set_start_scale(float value);
 
-  // optional float dx_prop = 7 [default = 0];
+  // optional float end_scale = 8;
+  inline bool has_end_scale() const;
+  inline void clear_end_scale();
+  static const int kEndScaleFieldNumber = 8;
+  inline float end_scale() const;
+  inline void set_end_scale(float value);
+
+  // optional float dx_prop = 4;
   inline bool has_dx_prop() const;
   inline void clear_dx_prop();
-  static const int kDxPropFieldNumber = 7;
+  static const int kDxPropFieldNumber = 4;
   inline float dx_prop() const;
   inline void set_dx_prop(float value);
 
-  // optional float dy_prop = 8 [default = 0];
+  // optional float dy_prop = 5;
   inline bool has_dy_prop() const;
   inline void clear_dy_prop();
-  static const int kDyPropFieldNumber = 8;
+  static const int kDyPropFieldNumber = 5;
   inline float dy_prop() const;
   inline void set_dy_prop(float value);
 
+  // optional int32 border = 6 [default = 0];
+  inline bool has_border() const;
+  inline void clear_border();
+  static const int kBorderFieldNumber = 6;
+  inline ::google::protobuf::int32 border() const;
+  inline void set_border(::google::protobuf::int32 value);
+
+  // optional int32 interp = 7 [default = 1];
+  inline bool has_interp() const;
+  inline void clear_interp();
+  static const int kInterpFieldNumber = 7;
+  inline ::google::protobuf::int32 interp() const;
+  inline void set_interp(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:caffe.RandTransformParameter)
  private:
-  inline void set_has_rotation();
-  inline void clear_has_rotation();
-  inline void set_has_scale();
-  inline void clear_has_scale();
-  inline void set_has_shift();
-  inline void clear_has_shift();
   inline void set_has_start_angle();
   inline void clear_has_start_angle();
   inline void set_has_end_angle();
   inline void clear_has_end_angle();
-  inline void set_has_scale_coeff();
-  inline void clear_has_scale_coeff();
+  inline void set_has_start_scale();
+  inline void clear_has_start_scale();
+  inline void set_has_end_scale();
+  inline void clear_has_end_scale();
   inline void set_has_dx_prop();
   inline void clear_has_dx_prop();
   inline void set_has_dy_prop();
   inline void clear_has_dy_prop();
+  inline void set_has_border();
+  inline void clear_has_border();
+  inline void set_has_interp();
+  inline void clear_has_interp();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
-  bool rotation_;
-  bool scale_;
-  bool shift_;
   float start_angle_;
   float end_angle_;
-  float scale_coeff_;
+  float start_scale_;
+  float end_scale_;
   float dx_prop_;
   float dy_prop_;
+  ::google::protobuf::int32 border_;
+  ::google::protobuf::int32 interp_;
   friend void  protobuf_AddDesc_caffe_2eproto();
   friend void protobuf_AssignDesc_caffe_2eproto();
   friend void protobuf_ShutdownFile_caffe_2eproto();
@@ -15230,87 +15230,15 @@ inline void LayerParameter::set_allocated_rand_trans_param(::caffe::RandTransfor
 
 // RandTransformParameter
 
-// optional bool rotation = 1 [default = true];
-inline bool RandTransformParameter::has_rotation() const {
+// optional float start_angle = 1;
+inline bool RandTransformParameter::has_start_angle() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void RandTransformParameter::set_has_rotation() {
+inline void RandTransformParameter::set_has_start_angle() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void RandTransformParameter::clear_has_rotation() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void RandTransformParameter::clear_rotation() {
-  rotation_ = true;
-  clear_has_rotation();
-}
-inline bool RandTransformParameter::rotation() const {
-  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.rotation)
-  return rotation_;
-}
-inline void RandTransformParameter::set_rotation(bool value) {
-  set_has_rotation();
-  rotation_ = value;
-  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.rotation)
-}
-
-// optional bool scale = 2 [default = true];
-inline bool RandTransformParameter::has_scale() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void RandTransformParameter::set_has_scale() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void RandTransformParameter::clear_has_scale() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void RandTransformParameter::clear_scale() {
-  scale_ = true;
-  clear_has_scale();
-}
-inline bool RandTransformParameter::scale() const {
-  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.scale)
-  return scale_;
-}
-inline void RandTransformParameter::set_scale(bool value) {
-  set_has_scale();
-  scale_ = value;
-  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.scale)
-}
-
-// optional bool shift = 3 [default = true];
-inline bool RandTransformParameter::has_shift() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void RandTransformParameter::set_has_shift() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void RandTransformParameter::clear_has_shift() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void RandTransformParameter::clear_shift() {
-  shift_ = true;
-  clear_has_shift();
-}
-inline bool RandTransformParameter::shift() const {
-  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.shift)
-  return shift_;
-}
-inline void RandTransformParameter::set_shift(bool value) {
-  set_has_shift();
-  shift_ = value;
-  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.shift)
-}
-
-// optional float start_angle = 4 [default = 0];
-inline bool RandTransformParameter::has_start_angle() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
-}
-inline void RandTransformParameter::set_has_start_angle() {
-  _has_bits_[0] |= 0x00000008u;
-}
 inline void RandTransformParameter::clear_has_start_angle() {
-  _has_bits_[0] &= ~0x00000008u;
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline void RandTransformParameter::clear_start_angle() {
   start_angle_ = 0;
@@ -15326,15 +15254,15 @@ inline void RandTransformParameter::set_start_angle(float value) {
   // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.start_angle)
 }
 
-// optional float end_angle = 5 [default = 0];
+// optional float end_angle = 2;
 inline bool RandTransformParameter::has_end_angle() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
+  return (_has_bits_[0] & 0x00000002u) != 0;
 }
 inline void RandTransformParameter::set_has_end_angle() {
-  _has_bits_[0] |= 0x00000010u;
+  _has_bits_[0] |= 0x00000002u;
 }
 inline void RandTransformParameter::clear_has_end_angle() {
-  _has_bits_[0] &= ~0x00000010u;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline void RandTransformParameter::clear_end_angle() {
   end_angle_ = 0;
@@ -15350,39 +15278,63 @@ inline void RandTransformParameter::set_end_angle(float value) {
   // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.end_angle)
 }
 
-// optional float scale_coeff = 6 [default = 1];
-inline bool RandTransformParameter::has_scale_coeff() const {
-  return (_has_bits_[0] & 0x00000020u) != 0;
+// optional float start_scale = 3;
+inline bool RandTransformParameter::has_start_scale() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void RandTransformParameter::set_has_scale_coeff() {
-  _has_bits_[0] |= 0x00000020u;
+inline void RandTransformParameter::set_has_start_scale() {
+  _has_bits_[0] |= 0x00000004u;
 }
-inline void RandTransformParameter::clear_has_scale_coeff() {
-  _has_bits_[0] &= ~0x00000020u;
+inline void RandTransformParameter::clear_has_start_scale() {
+  _has_bits_[0] &= ~0x00000004u;
 }
-inline void RandTransformParameter::clear_scale_coeff() {
-  scale_coeff_ = 1;
-  clear_has_scale_coeff();
+inline void RandTransformParameter::clear_start_scale() {
+  start_scale_ = 0;
+  clear_has_start_scale();
 }
-inline float RandTransformParameter::scale_coeff() const {
-  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.scale_coeff)
-  return scale_coeff_;
+inline float RandTransformParameter::start_scale() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.start_scale)
+  return start_scale_;
 }
-inline void RandTransformParameter::set_scale_coeff(float value) {
-  set_has_scale_coeff();
-  scale_coeff_ = value;
-  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.scale_coeff)
+inline void RandTransformParameter::set_start_scale(float value) {
+  set_has_start_scale();
+  start_scale_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.start_scale)
 }
 
-// optional float dx_prop = 7 [default = 0];
+// optional float end_scale = 8;
+inline bool RandTransformParameter::has_end_scale() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void RandTransformParameter::set_has_end_scale() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void RandTransformParameter::clear_has_end_scale() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void RandTransformParameter::clear_end_scale() {
+  end_scale_ = 0;
+  clear_has_end_scale();
+}
+inline float RandTransformParameter::end_scale() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.end_scale)
+  return end_scale_;
+}
+inline void RandTransformParameter::set_end_scale(float value) {
+  set_has_end_scale();
+  end_scale_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.end_scale)
+}
+
+// optional float dx_prop = 4;
 inline bool RandTransformParameter::has_dx_prop() const {
-  return (_has_bits_[0] & 0x00000040u) != 0;
+  return (_has_bits_[0] & 0x00000010u) != 0;
 }
 inline void RandTransformParameter::set_has_dx_prop() {
-  _has_bits_[0] |= 0x00000040u;
+  _has_bits_[0] |= 0x00000010u;
 }
 inline void RandTransformParameter::clear_has_dx_prop() {
-  _has_bits_[0] &= ~0x00000040u;
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline void RandTransformParameter::clear_dx_prop() {
   dx_prop_ = 0;
@@ -15398,15 +15350,15 @@ inline void RandTransformParameter::set_dx_prop(float value) {
   // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.dx_prop)
 }
 
-// optional float dy_prop = 8 [default = 0];
+// optional float dy_prop = 5;
 inline bool RandTransformParameter::has_dy_prop() const {
-  return (_has_bits_[0] & 0x00000080u) != 0;
+  return (_has_bits_[0] & 0x00000020u) != 0;
 }
 inline void RandTransformParameter::set_has_dy_prop() {
-  _has_bits_[0] |= 0x00000080u;
+  _has_bits_[0] |= 0x00000020u;
 }
 inline void RandTransformParameter::clear_has_dy_prop() {
-  _has_bits_[0] &= ~0x00000080u;
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline void RandTransformParameter::clear_dy_prop() {
   dy_prop_ = 0;
@@ -15420,6 +15372,54 @@ inline void RandTransformParameter::set_dy_prop(float value) {
   set_has_dy_prop();
   dy_prop_ = value;
   // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.dy_prop)
+}
+
+// optional int32 border = 6 [default = 0];
+inline bool RandTransformParameter::has_border() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void RandTransformParameter::set_has_border() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void RandTransformParameter::clear_has_border() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void RandTransformParameter::clear_border() {
+  border_ = 0;
+  clear_has_border();
+}
+inline ::google::protobuf::int32 RandTransformParameter::border() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.border)
+  return border_;
+}
+inline void RandTransformParameter::set_border(::google::protobuf::int32 value) {
+  set_has_border();
+  border_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.border)
+}
+
+// optional int32 interp = 7 [default = 1];
+inline bool RandTransformParameter::has_interp() const {
+  return (_has_bits_[0] & 0x00000080u) != 0;
+}
+inline void RandTransformParameter::set_has_interp() {
+  _has_bits_[0] |= 0x00000080u;
+}
+inline void RandTransformParameter::clear_has_interp() {
+  _has_bits_[0] &= ~0x00000080u;
+}
+inline void RandTransformParameter::clear_interp() {
+  interp_ = 1;
+  clear_has_interp();
+}
+inline ::google::protobuf::int32 RandTransformParameter::interp() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.interp)
+  return interp_;
+}
+inline void RandTransformParameter::set_interp(::google::protobuf::int32 value) {
+  set_has_interp();
+  interp_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.interp)
 }
 
 // -------------------------------------------------------------------

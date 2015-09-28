@@ -102,6 +102,8 @@ namespace caffe{
 	//explicit instantiation
 	template void InterpImageNN_gpu(const Blob<float>* orig, const float* coord,
 		Blob<float>* warped, const Interp& interp);
+//	template void InterpImageNN_gpu(const Blob<double>* orig, const float* coord,
+//		Blob<double>* warped, const Interp& interp);
 
 	/*
 	 *******PropagateErrorNN_gpu********
@@ -236,6 +238,8 @@ namespace caffe{
 	//explicit instantiation
 	template void PropagateErrorNN_gpu(const Blob<float>* top, const float* coord,
 		Blob<float>* bottom, const Interp &interp);
+//	template void PropagateErrorNN_gpu(const Blob<double>* top, const float* coord,
+//		Blob<double>* bottom, const Interp &interp);
 
 	template <typename Dtype>
 	__global__ void MaxTransSetSwitch_kernel(const Dtype* A, Dtype* B, int count,
