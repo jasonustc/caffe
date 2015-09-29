@@ -11,6 +11,7 @@
 #include "caffe/net.hpp"
 #include "caffe/proto/caffe.pb.h"
 #include "caffe/util/transform.hpp"
+#include "caffe/neuron_layers.hpp"
 
 namespace caffe{
 	template <typename Dtype> class NoiseLayer;
@@ -123,6 +124,36 @@ namespace caffe{
 		//We use blob's data to be fwd and diff to be backward indices
 		shared_ptr<Blob<float>> coord_idx_;
 
+	};
+
+	template <typename Dtype>
+	class SamplingLayer : public NeuronLayer<Dtype> {
+	public:
+		explicit SamplingLayer(const LayerParameter& param) : Layer<Dtype>(param){}
+		virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+//		virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+//			const vector<Blob<Dtype>*>& top);
+
+		virtual inline const char* type(){ return "SamplingLayer"; }
+
+	protected:
+		virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+		virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+		virtual void Backward_cpu(const vector<Blob<Dtype>*>& bottom,
+			const vector<bool>& propagate_down,
+			const vector<Blob<Dtype>*>& top);
+		virtual void Backward_gpu(const vector<Blob<Dtype>*>& bottom,
+			const vector<bool>& propagate_down,
+			const vector<Blob<Dtype>*>& top);
+
+		virtual inline bool EqualNumBottomTopBlobs{ return true; }
+
+		//sampling parameters of gaussian distribution
+		float mu_;
+		float sigma_;
 	};
 }
 
