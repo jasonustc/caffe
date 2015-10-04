@@ -211,6 +211,16 @@ void caffe_exp<double>(const int n, const double* a, double* y) {
 }
 
 template <>
+void caffe_log<float>(const int n, const float* a, float* y){
+	vsLog(n, a, y);
+}
+
+template <>
+void caffe_log<double>(const int n, const double* a, double* y){
+	vdLog(n, a, y);
+}
+
+template <>
 void caffe_abs<float>(const int n, const float* a, float* y) {
     vsAbs(n, a, y);
 }
@@ -278,6 +288,29 @@ void caffe_rng_gaussian<float>(const int n, const float mu,
 template
 void caffe_rng_gaussian<double>(const int n, const double mu,
                                 const double sigma, double* r);
+
+//add by xu shen, to generate gaussian values of vector mu and vector sigma
+template <typename Dtype>
+void caffe_rng_gaussian(const int n, const Dtype* a,
+                        const Dtype* sigma, Dtype* r) {
+  CHECK_GE(n, 0);
+  CHECK(r);
+  for (int i = 0; i < n; ++i) {
+	CHECK_GT(sigma[i], 0);
+	boost::normal_distribution<Dtype> random_distribution(a[i], sigma[i]);
+	boost::variate_generator<caffe::rng_t*, boost::normal_distribution<Dtype> >
+		variate_generator(caffe_rng(), random_distribution);
+    r[i] = variate_generator();
+  }
+}
+
+template
+void caffe_rng_gaussian<float>(const int n, const float* a,
+	const float* sigma, float* r);
+
+template
+void caffe_rng_gaussian<double>(const int n, const double* a,
+	const double* sigma, double* r);
 
 template <typename Dtype>
 void caffe_rng_bernoulli(const int n, const Dtype p, int* r) {

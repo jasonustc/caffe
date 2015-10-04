@@ -90,14 +90,7 @@ template <typename Dtype>
 void caffe_rng_bernoulli(const int n, const Dtype p, unsigned int* r);
 
 template <typename Dtype>
-void caffe_gpu_mul_b(const int N, const Dtype* a, const unsigned int* b, Dtype* y);
-
-template <typename Dtype>
 void caffe_exp(const int n, const Dtype* a, Dtype* y);
-
-//y[i] = log(a[i])
-template <typename Dtype>
-void caffe_log(const int n, const Dtype* a, Dtype* y);
 
 template <typename Dtype>
 void caffe_abs(const int n, const Dtype* a, Dtype* y);
@@ -215,9 +208,6 @@ template <typename Dtype>
 void caffe_gpu_exp(const int n, const Dtype* a, Dtype* y);
 
 template <typename Dtype>
-void caffe_gpu_log(const int n, const Dtype* a, Dtype* y);
-
-template <typename Dtype>
 void caffe_gpu_powx(const int n, const Dtype* a, const Dtype b, Dtype* y);
 
 // caffe_gpu_rng_uniform with two arguments generates integers in the range
@@ -241,12 +231,6 @@ void caffe_gpu_rng_gaussian(const int n, const Dtype* mu, const Dtype* sigma,
 
 template <typename Dtype>
 void caffe_gpu_rng_bernoulli(const int n, const Dtype p, int* r);
-
-template <typename Dtype>
-void caffe_gpu_rng_bernoulli(const int n, const Dtype* p, int* r);
-
-template <typename Dtype>
-void caffe_gpu_rng_bernoulli(const int n, const Dtype* p, unsigned int* r);
 
 template <typename Dtype>
 void caffe_gpu_dot(const int n, const Dtype* x, const Dtype* y, Dtype* out);

@@ -771,6 +771,7 @@ class SoftmaxWithLossLayer : public LossLayer<Dtype> {
       const vector<Blob<Dtype>*>& top);
 
   virtual inline const char* type() const { return "SoftmaxWithLoss"; }
+  //don't need to check for this in softmax layer
   virtual inline int ExactNumTopBlobs() const { return -1; }
   virtual inline int MinTopBlobs() const { return 1; }
   virtual inline int MaxTopBlobs() const { return 2; }
@@ -855,6 +856,34 @@ protected:
 	//normalization type: l1 or l2
 	NormLossParameter_NormType norm_type_;
 
+};
+
+/*
+ * Please refer to paper DRAW: A Recurrent Neural Network For Image Generation for 
+ * more information
+ * L^z = 1/2(\sum_{t=1}^{T}(\mu_t^2 + \sigma_t^2 - log\sigma_t^2) - T/2
+ * @param Bottom input blob vector(length 2): \mu and \sigma
+ */
+
+template <typename Dtype>
+class LatentLossLayer : public LossLayer<Dtype>{
+public:
+	explicit LatentLossLayer(const LayerParameter& param) : LossLayer<Dtype>(param){}
+	virtual void Reshape(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+	virtual inline const char* type(){ return "LatentLayer loss"; }
+
+protected:
+	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+	virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+	virtual void Backward_cpu(const vector<Blob<Dtype>*>& top, const vector<bool>& propagate_down,
+		const vector<Blob<Dtype>*>& bottom);
+	virtual void Backward_gpu(const vector<Blob<Dtype>*>& top, const vector<bool>& propagate_down,
+		const vector<Blob<Dtype>*>& bottom);
+
+	virtual inline const int ExactNumBottomBlobs(){ return 2; }
+
+	Blob<Dtype> log_square_sigma_;
+	Blob<Dtype> sum_multiplier_;
 };
 
 }  // namespace caffe
