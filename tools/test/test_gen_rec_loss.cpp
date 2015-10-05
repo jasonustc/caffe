@@ -70,7 +70,7 @@ namespace caffe{
 		void SetUp(){
 			mu_->Reshape(2, 1, 2, 3);
 			sigma_->ReshapeLike(*mu_);
-			x_->ReshapeLike(*x_);
+			x_->ReshapeLike(*mu_);
 			FillerParameter filler_param;
 			filler_param.set_mean(0.);
 			filler_param.set_std(1.);
@@ -118,13 +118,13 @@ namespace caffe{
 
 		Dtype true_loss_;
 	};
+}
 
-	int main(int argc, char** argv){
-		caffe::GenRecLossLayerTest<float> test;
-		test.TestSetUp();
-		test.TestCPUForward();
-		test.TestGPUForward();
-		test.TestCPUGradients();
-		test.TestGPUGradients();
-	}
+int main(int argc, char** argv){
+	caffe::GenRecLossLayerTest<float> test;
+	test.TestSetUp();
+	test.TestCPUForward();
+	test.TestGPUForward();
+	test.TestCPUGradients();
+	test.TestGPUGradients();
 }

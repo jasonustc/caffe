@@ -911,7 +911,7 @@ namespace caffe {
 		virtual void Backward_gpu(const vector<Blob<Dtype>*>& top, const vector<bool>& propagate_down,
 			const vector<Blob<Dtype>*>& bottom);
 
-		virtual inline const int ExactNumBottomBlobs(){ return 3; }
+		virtual inline int ExactNumBottomBlobs() const { return 3; }
 		//can not propagate error to data x
 		virtual inline bool AllowForceBackward(const int index){ return index != 2; }
 

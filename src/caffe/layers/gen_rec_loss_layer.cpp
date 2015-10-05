@@ -14,12 +14,13 @@ namespace caffe{
 		CHECK(bottom[0]->shape() == bottom[1]->shape())<<"\mu and \sigma should have the \
 			same shape.";
 		CHECK(bottom[0]->shape() == bottom[2]->shape()) << "\mu and x should have the \
-			same shape.";
+			same shape. " << "mu: " <<bottom[0]->shape_string()<<" x: " << bottom[2]->shape_string();
 		//get number of features: H x W
 		this->num_feats_ = bottom[0]->count(2);
 		vector<int> top_shape(0);
 		top[0]->Reshape(top_shape);
 		sum_multiplier_.ReshapeLike(*bottom[0]);
+		mu_sigma_buffer_.ReshapeLike(*bottom[0]);
 		caffe_set(bottom[0]->count(), Dtype(1.), sum_multiplier_.mutable_cpu_data());
 	}
 

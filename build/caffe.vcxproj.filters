@@ -309,7 +309,7 @@
     <ClCompile Include="..\src\caffe\layers\gen_rec_loss_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\caffe.cpp" />
+    <ClCompile Include="..\tools\test\test_gen_rec_loss.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
