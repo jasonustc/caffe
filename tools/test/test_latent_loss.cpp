@@ -20,7 +20,7 @@ namespace caffe{
 			this->SetUp();
 		}
 		
-		~LatentLossLayerTest(){ delete blob_bottom_; delete blob_top_; }
+		~LatentLossLayerTest(){ delete blob_bottom_mu_; delete blob_bottom_sigma_; delete blob_top_; }
 
 	public:
 		void TestSetUp(){
@@ -48,23 +48,25 @@ namespace caffe{
 			blob_bottom_vec_[1]->mutable_cpu_data()[5] = 2;
 
 			LayerParameter layer_param;
-			shared_ptr<Blob<Dtype>> latent_layer(new LatentLossLayer<Dtype>(layer_param));
+			shared_ptr<Layer<Dtype>> latent_layer(new LatentLossLayer<Dtype>(layer_param));
 			latent_layer->SetUp(blob_bottom_vec_, blob_top_vec_);
 			Caffe::set_mode(Caffe::CPU);
 			latent_layer->Forward(blob_bottom_vec_, blob_top_vec_);
-			Dtype true_loss;
+			Dtype true_loss = 0;
 			const int count = blob_bottom_vec_[0]->count();
 			const Dtype* mu_data = blob_bottom_vec_[0]->cpu_data();
 			const Dtype* sigma_data = blob_bottom_vec_[1]->cpu_data();
 			for (int i = 0; i < count; i++){
 				true_loss += mu_data[i] * mu_data[i] + sigma_data[i] * sigma_data[i] + log(sigma_data[i] * sigma_data[i]);
 			}
+			true_loss = true_loss / blob_bottom_mu_->num() / Dtype(2.);
 			EXPECT_NEAR(true_loss, blob_top_vec_[0]->cpu_data()[0], 1e-4);
 		}
 
 		void TestGPULatentLoss(){
 			FillerParameter filler_param;
 			filler_param.set_value(Dtype(1.));
+			ConstantFiller<Dtype> const_filler(filler_param);
 			const_filler.Fill(blob_bottom_mu_);
 			const_filler.Fill(blob_bottom_sigma_);
 			blob_bottom_vec_[0]->mutable_cpu_data()[10] = 1.5;
@@ -75,23 +77,25 @@ namespace caffe{
 			blob_bottom_vec_[1]->mutable_cpu_data()[5] = 2;
 
 			LayerParameter layer_param;
-			shared_ptr<Blob<Dtype>> latent_layer(new LatentLossLayer<Dtype>(layer_param));
+			shared_ptr<Layer<Dtype>> latent_layer(new LatentLossLayer<Dtype>(layer_param));
 			latent_layer->SetUp(blob_bottom_vec_, blob_top_vec_);
 			Caffe::set_mode(Caffe::GPU);
 			latent_layer->Forward(blob_bottom_vec_, blob_top_vec_);
-			Dtype true_loss;
+			Dtype true_loss = 0;
 			const int count = blob_bottom_vec_[0]->count();
 			const Dtype* mu_data = blob_bottom_vec_[0]->cpu_data();
 			const Dtype* sigma_data = blob_bottom_vec_[1]->cpu_data();
 			for (int i = 0; i < count; i++){
 				true_loss += mu_data[i] * mu_data[i] + sigma_data[i] * sigma_data[i] + log(sigma_data[i] * sigma_data[i]);
 			}
+			true_loss = true_loss / blob_bottom_mu_->num() / Dtype(2.);
 			EXPECT_NEAR(true_loss, blob_top_vec_[0]->cpu_data()[0], 1e-4);
 		}
 
 		void TestCPULatentLossGradient(){
 			FillerParameter filler_param;
 			filler_param.set_value(Dtype(1.));
+			ConstantFiller<Dtype> const_filler(filler_param);
 			const_filler.Fill(blob_bottom_mu_);
 			const_filler.Fill(blob_bottom_sigma_);
 			blob_bottom_vec_[0]->mutable_cpu_data()[10] = 1.5;
@@ -102,17 +106,17 @@ namespace caffe{
 			blob_bottom_vec_[1]->mutable_cpu_data()[5] = 2;
 
 			LayerParameter layer_param;
-			shared_ptr<Blob<Dtype>> latent_layer(new LatentLossLayer<Dtype>(layer_param));
-			latent_layer->SetUp(blob_bottom_vec_, blob_top_vec_);
+			LatentLossLayer<Dtype> latent_layer(layer_param);
 			Caffe::set_mode(Caffe::CPU);
 			//check(step_size, step_range,...)
 			GradientChecker<Dtype> checker(1e-2, 1e-3);
-			checker.CheckGradientExhaustive(latent_layer, blob_bottom_vec_, blob_top_vec_);
+			checker.CheckGradientExhaustive(&latent_layer, blob_bottom_vec_, blob_top_vec_);
 		}
 
 		void TestGPULatentLossGradient(){
 			FillerParameter filler_param;
 			filler_param.set_value(Dtype(1.));
+			ConstantFiller<Dtype> const_filler(filler_param);
 			const_filler.Fill(blob_bottom_mu_);
 			const_filler.Fill(blob_bottom_sigma_);
 			blob_bottom_vec_[0]->mutable_cpu_data()[10] = 1.5;
@@ -123,12 +127,11 @@ namespace caffe{
 			blob_bottom_vec_[1]->mutable_cpu_data()[5] = 2;
 
 			LayerParameter layer_param;
-			shared_ptr<Blob<Dtype>> latent_layer(new LatentLossLayer<Dtype>(layer_param));
-			latent_layer->SetUp(blob_bottom_vec_, blob_top_vec_);
+			LatentLossLayer<Dtype> latent_layer(layer_param);
 			Caffe::set_mode(Caffe::GPU);
 			//check(step_size, step_range,...)
 			GradientChecker<Dtype> checker(1e-2, 1e-3);
-			checker.CheckGradientExhaustive(latent_layer, blob_bottom_vec_, blob_top_vec_);
+			checker.CheckGradientExhaustive(&latent_layer, blob_bottom_vec_, blob_top_vec_);
 		}
 	protected:
 		void SetUp(){

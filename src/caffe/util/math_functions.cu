@@ -371,6 +371,25 @@ void caffe_gpu_log<double>(const int N, const double* a, double* y){
 }
 
 template <typename Dtype>
+__global__ void sqr_kernel(const int n, const Dtype* a, Dtype* y){
+	CUDA_KERNEL_LOOP(index, n){
+		y[index] = a[index] * a[index];
+	}
+}
+
+template <>
+void caffe_gpu_sqr<float>(const int N, const float* a, float* y){
+	sqr_kernel<float><<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS>>>(
+		N, a, y);
+}
+
+template <>
+void caffe_gpu_sqr<double>(const int N, const double* a, double* y){
+	sqr_kernel<double> <<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS>>>(
+		N, a, y);
+}
+
+template <typename Dtype>
 __global__ void powx_kernel(const int n, const Dtype* a,
     const Dtype alpha, Dtype* y) {
   CUDA_KERNEL_LOOP(index, n) {

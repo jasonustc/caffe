@@ -54,6 +54,7 @@
     <ClCompile Include="..\src\caffe\layers\feature_pooling_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\flatten_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\frames_roll_layer.cpp" />
+    <ClCompile Include="..\src\caffe\layers\gen_rec_loss_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\hdf5_data_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\hdf5_output_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\hinge_loss_layer.cpp" />
@@ -111,7 +112,7 @@
     <ClCompile Include="..\src\caffe\util\math_functions.cpp" />
     <ClCompile Include="..\src\caffe\util\upgrade_proto.cpp" />
     <ClCompile Include="..\src\gtest\gtest-all.cpp" />
-    <ClCompile Include="..\tools\caffe.cpp" />
+    <ClCompile Include="..\tools\test\test_gen_rec_loss.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu" />
@@ -134,6 +135,7 @@
     <CudaCompile Include="..\src\caffe\layers\embed_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\euclidean_loss_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\exp_layer.cu" />
+    <CudaCompile Include="..\src\caffe\layers\gen_rec_loss_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\hdf5_data_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\hdf5_output_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\im2col_layer.cu" />
