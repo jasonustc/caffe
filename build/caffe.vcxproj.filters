@@ -192,9 +192,6 @@
     <ClCompile Include="..\src\caffe\util\io.cpp">
       <Filter>src\util</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\caffe\util\math_functions.cpp">
-      <Filter>src\util</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\caffe\util\upgrade_proto.cpp">
       <Filter>src\util</Filter>
     </ClCompile>
@@ -294,7 +291,25 @@
     <ClCompile Include="..\src\gtest\gtest-all.cpp">
       <Filter>src\test</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\caffe.cpp" />
+    <ClCompile Include="..\src\caffe\layers\dlstm_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\dlstm_unit_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\sampling_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\util\math_functions.cpp">
+      <Filter>src\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\latent_loss_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\gen_rec_loss_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tools\test\test_gen_rec_loss.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
@@ -405,9 +420,6 @@
     <CudaCompile Include="..\src\caffe\util\im2col.cu">
       <Filter>src\util</Filter>
     </CudaCompile>
-    <CudaCompile Include="..\src\caffe\util\math_functions.cu">
-      <Filter>src\util</Filter>
-    </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\embed_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
@@ -433,6 +445,21 @@
       <Filter>src\layers</Filter>
     </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\norm_loss_layer.cu">
+      <Filter>src\layers</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\src\caffe\layers\dlstm_unit_layer.cu">
+      <Filter>src\layers</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\src\caffe\layers\sampling_layer.cu">
+      <Filter>src\layers</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\src\caffe\util\math_functions.cu">
+      <Filter>src\util</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\src\caffe\layers\latent_loss_layer.cu">
+      <Filter>src\layers</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\src\caffe\layers\gen_rec_loss_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
   </ItemGroup>
@@ -509,9 +536,6 @@
     <ClInclude Include="..\include\caffe\util\io.hpp">
       <Filter>include\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\caffe\util\math_functions.hpp">
-      <Filter>include\util</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\caffe\util\mkl_alternate.hpp">
       <Filter>include\util</Filter>
     </ClInclude>
@@ -541,6 +565,9 @@
     </ClInclude>
     <ClInclude Include="..\src\gtest\gtest.h">
       <Filter>include\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\caffe\util\math_functions.hpp">
+      <Filter>include\util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

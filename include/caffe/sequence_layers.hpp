@@ -35,7 +35,9 @@ class RecurrentLayer : public Layer<Dtype> {
   virtual inline const char* type() const { return "Recurrent"; }
   virtual inline int MinBottomBlobs() const { return 2; }
   virtual inline int MaxBottomBlobs() const { return 3; }
-  virtual inline int ExactNumTopBlobs() const { return 1; }
+  //here added by xu shen
+//  virtual inline int ExactNumTopBlobs() const { return 1; }
+  virtual inline int MinTopBlobs(){ return 2; }
 
   virtual inline bool AllowForceBackward(const int bottom_index) const {
     // Can't propagate to sequence continuation indicators.
@@ -142,7 +144,9 @@ class RecurrentLayer : public Layer<Dtype> {
   bool static_input_;
 
   vector<Blob<Dtype>* > recur_input_blobs_;
+  //this is only the C_T and h_T
   vector<Blob<Dtype>* > recur_output_blobs_;
+  //this is all the features catencated: (h_1, h_2,..., h_T)
   vector<Blob<Dtype>* > output_blobs_;
   Blob<Dtype>* x_input_blob_;
   Blob<Dtype>* x_static_input_blob_;

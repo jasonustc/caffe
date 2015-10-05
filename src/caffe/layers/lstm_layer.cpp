@@ -27,6 +27,7 @@ void LSTMLayer<Dtype>::RecurrentOutputBlobNames(vector<string>* names) const {
 template <typename Dtype>
 void LSTMLayer<Dtype>::OutputBlobNames(vector<string>* names) const {
   names->resize(1);
+  //output h: all hidden units of time steps
   (*names)[0] = "h";
 }
 
@@ -52,7 +53,6 @@ void LSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
   hidden_param.mutable_inner_product_param()->
       mutable_weight_filler()->CopyFrom(weight_filler);
 
-  //why copy?
   LayerParameter biased_hidden_param(hidden_param);
   biased_hidden_param.mutable_inner_product_param()->set_bias_term(true);
   biased_hidden_param.mutable_inner_product_param()->
@@ -83,8 +83,8 @@ void LSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
   net_param->add_input_shape()->CopyFrom(input_shape);
   
 
-  //contencate in dim 1.
-  //slice in dim 0.
+  //add a shape dim to cont
+  //so still slice in Time
   LayerParameter* cont_slice_param = net_param->add_layer();
   cont_slice_param->CopyFrom(slice_param);
   cont_slice_param->set_name("cont_slice");
@@ -130,6 +130,7 @@ void LSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
 
   LayerParameter* x_slice_param = net_param->add_layer();
   x_slice_param->CopyFrom(slice_param);
+  //no top here
   x_slice_param->add_bottom("W_xc_x");
   x_slice_param->set_name("W_xc_x_slice");
 
@@ -158,6 +159,8 @@ void LSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
     {
       LayerParameter* cont_h_param = net_param->add_layer();
       cont_h_param->CopyFrom(sum_param);
+	  //the last(cont_) is the coefficient for the first N-1(h_) blobs,
+	  //so here I think is the same as eltwise muliply
       cont_h_param->mutable_eltwise_param()->set_coeff_blob(true);
       cont_h_param->set_name("h_conted_" + tm1s);
       cont_h_param->add_bottom("h_" + tm1s);
@@ -171,6 +174,9 @@ void LSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
       LayerParameter* w_param = net_param->add_layer();
       w_param->CopyFrom(hidden_param);
       w_param->set_name("transform_" + ts);
+	  //so here set the same explicit name of InnerProduct weight parameter for
+	  //every unrolled t layer. Let the layer at all time(t) will share the same
+	  //weight parameter
       w_param->add_param()->set_name("W_hc");
       w_param->add_bottom("h_conted_" + tm1s);
       w_param->add_top("W_hc_h_" + tm1s);
@@ -209,6 +215,8 @@ void LSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
     {
       LayerParameter* lstm_unit_param = net_param->add_layer();
       lstm_unit_param->set_type("LSTMUnit");
+	  //the add order of bottom and top layer names should be 
+	  //strictly consensus
       lstm_unit_param->add_bottom("c_" + tm1s);
       lstm_unit_param->add_bottom("gate_input_" + ts);
       lstm_unit_param->add_bottom("cont_" + ts);
@@ -220,6 +228,7 @@ void LSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
   }  // for (int t = 1; t <= this->T_; ++t)
 
   {
+	//just a copy layer here, never mind.
     LayerParameter* c_T_copy_param = net_param->add_layer();
     c_T_copy_param->CopyFrom(split_param);
     c_T_copy_param->add_bottom("c_" + this->int_to_str(this->T_));

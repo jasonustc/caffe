@@ -56,10 +56,16 @@ namespace caffe{
 	void NoiseLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 		const vector<bool>& propagate_down,
 		const vector<Blob<Dtype>*>& bottom){
+		const int count = bottom[0]->count();
 		Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
 		const Dtype* top_diff = top[0]->cpu_diff();
-		const int count = bottom[0]->count();
-		caffe_copy(count, top_diff, bottom_diff);
+		const Dtype* noise_data = noise_.cpu_data();
+		if (this->apply_type_ == NoiseParameter_ApplyType_MULTIPLY){
+			caffe_mul(count, top_diff, noise_data, bottom_diff);
+		}
+		else{
+			caffe_copy(count, top_diff, bottom_diff);
+		}
 	}
 
 #ifdef CPU_ONLY

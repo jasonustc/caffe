@@ -7319,6 +7319,20 @@ class RecurrentParameter : public ::google::protobuf::Message {
   inline bool debug_info() const;
   inline void set_debug_info(bool value);
 
+  // optional bool no_memory_cell = 5 [default = false];
+  inline bool has_no_memory_cell() const;
+  inline void clear_no_memory_cell();
+  static const int kNoMemoryCellFieldNumber = 5;
+  inline bool no_memory_cell() const;
+  inline void set_no_memory_cell(bool value);
+
+  // optional bool transpose = 6 [default = false];
+  inline bool has_transpose() const;
+  inline void clear_transpose();
+  static const int kTransposeFieldNumber = 6;
+  inline bool transpose() const;
+  inline void set_transpose(bool value);
+
   // @@protoc_insertion_point(class_scope:caffe.RecurrentParameter)
  private:
   inline void set_has_num_output();
@@ -7329,15 +7343,21 @@ class RecurrentParameter : public ::google::protobuf::Message {
   inline void clear_has_bias_filler();
   inline void set_has_debug_info();
   inline void clear_has_debug_info();
+  inline void set_has_no_memory_cell();
+  inline void clear_has_no_memory_cell();
+  inline void set_has_transpose();
+  inline void clear_has_transpose();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
   ::caffe::FillerParameter* weight_filler_;
+  ::caffe::FillerParameter* bias_filler_;
   ::google::protobuf::uint32 num_output_;
   bool debug_info_;
-  ::caffe::FillerParameter* bias_filler_;
+  bool no_memory_cell_;
+  bool transpose_;
   friend void  protobuf_AddDesc_caffe_2eproto();
   friend void protobuf_AssignDesc_caffe_2eproto();
   friend void protobuf_ShutdownFile_caffe_2eproto();
@@ -19401,6 +19421,54 @@ inline void RecurrentParameter::set_debug_info(bool value) {
   set_has_debug_info();
   debug_info_ = value;
   // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.debug_info)
+}
+
+// optional bool no_memory_cell = 5 [default = false];
+inline bool RecurrentParameter::has_no_memory_cell() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void RecurrentParameter::set_has_no_memory_cell() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void RecurrentParameter::clear_has_no_memory_cell() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void RecurrentParameter::clear_no_memory_cell() {
+  no_memory_cell_ = false;
+  clear_has_no_memory_cell();
+}
+inline bool RecurrentParameter::no_memory_cell() const {
+  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.no_memory_cell)
+  return no_memory_cell_;
+}
+inline void RecurrentParameter::set_no_memory_cell(bool value) {
+  set_has_no_memory_cell();
+  no_memory_cell_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.no_memory_cell)
+}
+
+// optional bool transpose = 6 [default = false];
+inline bool RecurrentParameter::has_transpose() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void RecurrentParameter::set_has_transpose() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void RecurrentParameter::clear_has_transpose() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void RecurrentParameter::clear_transpose() {
+  transpose_ = false;
+  clear_has_transpose();
+}
+inline bool RecurrentParameter::transpose() const {
+  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.transpose)
+  return transpose_;
+}
+inline void RecurrentParameter::set_transpose(bool value) {
+  set_has_transpose();
+  transpose_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.transpose)
 }
 
 // -------------------------------------------------------------------

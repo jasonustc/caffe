@@ -41,8 +41,14 @@ namespace caffe{
 		const vector<Blob<Dtype>*>& top){
 		Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
 		const Dtype* top_diff = top[0]->gpu_diff();
+		const Dtype* noise_data = noise_.gpu_data();
 		const int count = bottom[0]->count();
-		caffe_copy(count, top_diff, bottom_diff);
+		if (this->apply_type_ == NoiseParameter_ApplyType_MULTIPLY){
+			caffe_mul(count, top_diff, noise_data, bottom_diff);
+		}
+		else{
+			caffe_copy(count, top_diff, bottom_diff);
+		}
 	}
 
 	INSTANTIATE_LAYER_GPU_FUNCS(NoiseLayer);

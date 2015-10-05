@@ -18,7 +18,7 @@ namespace caffe {
 	}
 
 	//bottom[0], c_{t-1}: 1 x #instances x hidden_dim 
-	//bottom[1], i_input, f_input, o_input, g_input: 1x #instances x 4hidden_dim
+	//bottom[1], i_input, f_input, o_input, g_input: 1x #instances x 4 * hidden_dim
 	//bottom[2], 1 x 1 x num_instances
 	//top[0], c_t, 1 x #instances x hidden_dim
 	//top[1], h_t, 1 x #instances x hidden_dim

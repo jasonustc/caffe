@@ -123,12 +123,12 @@ void caffe_gpu_asum<float>(const int n, const float* x, float* y) {
   CUBLAS_CHECK(cublasSasum(Caffe::cublas_handle(), n, x, 1, y));
 }
 
+//cublasDasum(cublasHandle_t handle, int n, const double *x, int incx, double *result)
 template <>
 void caffe_gpu_asum<double>(const int n, const double* x, double* y) {
   CUBLAS_CHECK(cublasDasum(Caffe::cublas_handle(), n, x, 1, y));
 }
 
-//y[i] = alpha * x[i]
 template <>
 void caffe_gpu_scale<float>(const int n, const float alpha, const float *x,
                             float* y) {
@@ -242,14 +242,6 @@ __global__ void mul_kernel(const int n, const Dtype* a,
   }
 }
 
-template <typename Dtype>
-__global__ void mul_kernel_b(const int n, const Dtype* a,
-    const unsigned int* b, Dtype* y) {
-  CUDA_KERNEL_LOOP(index, n) {
-    y[index] = a[index] * Dtype(b[index]);
-  }
-}
-
 template <>
 void caffe_gpu_mul<float>(const int N, const float* a,
     const float* b, float* y) {
@@ -259,26 +251,10 @@ void caffe_gpu_mul<float>(const int N, const float* a,
 }
 
 template <>
-void caffe_gpu_mul_b<float>(const int N, const float* a,
-    const unsigned int* b, float* y) {
-  // NOLINT_NEXT_LINE(whitespace/operators)
-  mul_kernel_b<float><<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS>>>(
-      N, a, b, y);
-}
-
-template <>
 void caffe_gpu_mul<double>(const int N, const double* a,
     const double* b, double* y) {
   // NOLINT_NEXT_LINE(whitespace/operators)
   mul_kernel<double><<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS>>>(
-      N, a, b, y);
-}
-
-template <>
-void caffe_gpu_mul_b<double>(const int N, const double* a,
-    const unsigned int* b, double* y) {
-  // NOLINT_NEXT_LINE(whitespace/operators)
-  mul_kernel_b<double><<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS>>>(
       N, a, b, y);
 }
 
@@ -347,46 +323,6 @@ void caffe_gpu_exp<double>(const int N, const double* a, double* y) {
   // NOLINT_NEXT_LINE(whitespace/operators)
   exp_kernel<double><<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS>>>(
       N, a, y);
-}
-
-template <typename Dtype>
-__global__ void log_kernel(const int n, const Dtype* a, Dtype* y){
-	CUDA_KERNEL_LOOP(index, n){
-		y[index] = log(a[index]);
-	}
-}
-
-template <>
-void caffe_gpu_log<float>(const int N, const float* a, float* y){
-	//NOLINT_NEXT_LINE(whitespace/operators)
-	log_kernel<float><<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS>>>(
-		N, a, y);
-}
-
-template <>
-void caffe_gpu_log<double>(const int N, const double* a, double* y){
-	//NOLINT_NEXT_LINE(whitespace/operators)
-	log_kernel<double><<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS>>>(
-		N, a, y);
-}
-
-template <typename Dtype>
-__global__ void sqr_kernel(const int n, const Dtype* a, Dtype* y){
-	CUDA_KERNEL_LOOP(index, n){
-		y[index] = a[index] * a[index];
-	}
-}
-
-template <>
-void caffe_gpu_sqr<float>(const int N, const float* a, float* y){
-	sqr_kernel<float><<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS>>>(
-		N, a, y);
-}
-
-template <>
-void caffe_gpu_sqr<double>(const int N, const double* a, double* y){
-	sqr_kernel<double> <<<CAFFE_GET_BLOCKS(N), CAFFE_CUDA_NUM_THREADS>>>(
-		N, a, y);
 }
 
 template <typename Dtype>
@@ -463,7 +399,6 @@ uint32_t caffe_gpu_hamming_distance<double>(const int n, const double* x,
 }
 
 void caffe_gpu_rng_uniform(const int n, unsigned int* r) {
-	//generate n unsigned int random numbers in [0, UINT_MAX] and put into r
   CURAND_CHECK(curandGenerate(Caffe::curand_generator(), r, n));
 }
 
@@ -478,28 +413,6 @@ void caffe_gpu_rng_uniform<float>(const int n, const float a, const float b,
   if (a != static_cast<float>(0)) {
     caffe_gpu_add_scalar(n, a, r);
   }
-}
-
-template <typename Dtype>
-__global__ void thred_kernel(const int n, const Dtype* p, unsigned int* r){
-	CUDA_KERNEL_LOOP(index, n){
-		r[index] = r[index] < static_cast<unsigned int>(p[index] * UINT_MAX);
-	}
-}
-
-//p[i] = P(r[i]=1)
-template <>
-void caffe_gpu_rng_bernoulli<float>(const int n, const float* p, unsigned int* r){
-	//generate n unsigned int random numbers in [0, UINT_MAX] and put into r
-	CURAND_CHECK(curandGenerate(Caffe::curand_generator(), r, n));
-	thred_kernel<float><<<CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS >>>(n, p, r);
-}
-
-template <>
-void caffe_gpu_rng_bernoulli<double>(const int n, const double* p, unsigned int* r){
-	//generate n unsigned int random numbers in [0, UINT_MAX] and put into r
-	CURAND_CHECK(curandGenerate(Caffe::curand_generator(), r, n));
-	thred_kernel<double><<<CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS >>>(n, p, r);
 }
 
 template <>
@@ -535,7 +448,7 @@ __global__ void setup_normal_kernel(curandState* state, const int n, unsigned lo
 	}
 }
 
-__global__ void generate_normal_kernel(curandState* state, const int n, const float* mu,
+__global__ void generate_normal_kernel(curandState* state, const int n, const float* mu, 
 	const float* sigma, float* r){
 	CUDA_KERNEL_LOOP(index, n){
 		curandState localState = state[index];
@@ -543,7 +456,7 @@ __global__ void generate_normal_kernel(curandState* state, const int n, const fl
 	}
 }
 
-__global__ void generate_normal_kernel(curandState* state, const int n, const double* mu,
+__global__ void generate_normal_kernel(curandState* state, const int n, const double* mu, 
 	const double* sigma, double* r){
 	CUDA_KERNEL_LOOP(index, n){
 		curandState localState = state[index];
@@ -556,12 +469,12 @@ void caffe_gpu_rng_gaussian(const int n, const float* mu, const float* sigma,
 	float* r){
 	curandState* devStates;
 	cudaMalloc(&devStates, n * sizeof(curandState));
-
+	
 	//set up seeds
-	setup_normal_kernel<<<CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS>>>(devStates, n, time(NULL));
-
+	setup_normal_kernel << <CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS >> >(devStates, time(NULL));
+	
 	//generate random numbers
-	generate_normal_kernel<<<CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS>>>(devStates, n, mu, sigma, r);
+	generate_normal_kernel<<<CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS >> >(devStates, n, mu, sigma, r);
 	//free GPU memory
 	cudaFree(devStates);
 }
@@ -571,12 +484,12 @@ void caffe_gpu_rng_gaussian(const int n, const double* mu, const double* sigma,
 	double* r){
 	curandState* devStates;
 	cudaMalloc(&devStates, n * sizeof(curandState));
-
+	
 	//set up seeds
-	setup_normal_kernel<<<CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS>>>(devStates, n, time(NULL));
-
+	setup_normal_kernel << <CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS >> >(devStates, time(NULL));
+	
 	//generate random numbers
-	generate_normal_kernel<<<CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS>>>(devStates, n, mu, sigma, r);
+	generate_normal_kernel<<<CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS >> >(devStates, n, mu, sigma, r);
 	//free GPU memory
 	cudaFree(devStates);
 }
