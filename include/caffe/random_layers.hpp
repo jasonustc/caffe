@@ -92,6 +92,10 @@ namespace caffe{
 
 		virtual inline int ExactNumBottomBlobs(){ return 2; }
 		virtual inline int ExactNumTopBlobs(){ return 1; }
+
+		//the sampling value of standard gaussian distribution
+		//needed in backpropagation
+		Blob<Dtype> gaussian_value_;
 	};
 }
 
