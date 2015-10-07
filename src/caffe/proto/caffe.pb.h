@@ -7312,6 +7312,24 @@ class RecurrentParameter : public ::google::protobuf::Message {
   inline ::caffe::FillerParameter* release_bias_filler();
   inline void set_allocated_bias_filler(::caffe::FillerParameter* bias_filler);
 
+  // optional .caffe.FillerParameter latent_weight_filler = 7;
+  inline bool has_latent_weight_filler() const;
+  inline void clear_latent_weight_filler();
+  static const int kLatentWeightFillerFieldNumber = 7;
+  inline const ::caffe::FillerParameter& latent_weight_filler() const;
+  inline ::caffe::FillerParameter* mutable_latent_weight_filler();
+  inline ::caffe::FillerParameter* release_latent_weight_filler();
+  inline void set_allocated_latent_weight_filler(::caffe::FillerParameter* latent_weight_filler);
+
+  // optional .caffe.FillerParameter latent_bias_filler = 8;
+  inline bool has_latent_bias_filler() const;
+  inline void clear_latent_bias_filler();
+  static const int kLatentBiasFillerFieldNumber = 8;
+  inline const ::caffe::FillerParameter& latent_bias_filler() const;
+  inline ::caffe::FillerParameter* mutable_latent_bias_filler();
+  inline ::caffe::FillerParameter* release_latent_bias_filler();
+  inline void set_allocated_latent_bias_filler(::caffe::FillerParameter* latent_bias_filler);
+
   // optional bool debug_info = 4 [default = false];
   inline bool has_debug_info() const;
   inline void clear_debug_info();
@@ -7326,12 +7344,19 @@ class RecurrentParameter : public ::google::protobuf::Message {
   inline bool no_memory_cell() const;
   inline void set_no_memory_cell(bool value);
 
-  // optional bool transpose = 6 [default = false];
-  inline bool has_transpose() const;
-  inline void clear_transpose();
-  static const int kTransposeFieldNumber = 6;
-  inline bool transpose() const;
-  inline void set_transpose(bool value);
+  // optional uint32 num_z = 6;
+  inline bool has_num_z() const;
+  inline void clear_num_z();
+  static const int kNumZFieldNumber = 6;
+  inline ::google::protobuf::uint32 num_z() const;
+  inline void set_num_z(::google::protobuf::uint32 value);
+
+  // optional uint32 num_rec = 9;
+  inline bool has_num_rec() const;
+  inline void clear_num_rec();
+  static const int kNumRecFieldNumber = 9;
+  inline ::google::protobuf::uint32 num_rec() const;
+  inline void set_num_rec(::google::protobuf::uint32 value);
 
   // @@protoc_insertion_point(class_scope:caffe.RecurrentParameter)
  private:
@@ -7341,12 +7366,18 @@ class RecurrentParameter : public ::google::protobuf::Message {
   inline void clear_has_weight_filler();
   inline void set_has_bias_filler();
   inline void clear_has_bias_filler();
+  inline void set_has_latent_weight_filler();
+  inline void clear_has_latent_weight_filler();
+  inline void set_has_latent_bias_filler();
+  inline void clear_has_latent_bias_filler();
   inline void set_has_debug_info();
   inline void clear_has_debug_info();
   inline void set_has_no_memory_cell();
   inline void clear_has_no_memory_cell();
-  inline void set_has_transpose();
-  inline void clear_has_transpose();
+  inline void set_has_num_z();
+  inline void clear_has_num_z();
+  inline void set_has_num_rec();
+  inline void clear_has_num_rec();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -7354,10 +7385,13 @@ class RecurrentParameter : public ::google::protobuf::Message {
   mutable int _cached_size_;
   ::caffe::FillerParameter* weight_filler_;
   ::caffe::FillerParameter* bias_filler_;
+  ::caffe::FillerParameter* latent_weight_filler_;
   ::google::protobuf::uint32 num_output_;
   bool debug_info_;
   bool no_memory_cell_;
-  bool transpose_;
+  ::caffe::FillerParameter* latent_bias_filler_;
+  ::google::protobuf::uint32 num_z_;
+  ::google::protobuf::uint32 num_rec_;
   friend void  protobuf_AddDesc_caffe_2eproto();
   friend void protobuf_AssignDesc_caffe_2eproto();
   friend void protobuf_ShutdownFile_caffe_2eproto();
@@ -19399,15 +19433,97 @@ inline void RecurrentParameter::set_allocated_bias_filler(::caffe::FillerParamet
   // @@protoc_insertion_point(field_set_allocated:caffe.RecurrentParameter.bias_filler)
 }
 
-// optional bool debug_info = 4 [default = false];
-inline bool RecurrentParameter::has_debug_info() const {
+// optional .caffe.FillerParameter latent_weight_filler = 7;
+inline bool RecurrentParameter::has_latent_weight_filler() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void RecurrentParameter::set_has_debug_info() {
+inline void RecurrentParameter::set_has_latent_weight_filler() {
   _has_bits_[0] |= 0x00000008u;
 }
-inline void RecurrentParameter::clear_has_debug_info() {
+inline void RecurrentParameter::clear_has_latent_weight_filler() {
   _has_bits_[0] &= ~0x00000008u;
+}
+inline void RecurrentParameter::clear_latent_weight_filler() {
+  if (latent_weight_filler_ != NULL) latent_weight_filler_->::caffe::FillerParameter::Clear();
+  clear_has_latent_weight_filler();
+}
+inline const ::caffe::FillerParameter& RecurrentParameter::latent_weight_filler() const {
+  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.latent_weight_filler)
+  return latent_weight_filler_ != NULL ? *latent_weight_filler_ : *default_instance_->latent_weight_filler_;
+}
+inline ::caffe::FillerParameter* RecurrentParameter::mutable_latent_weight_filler() {
+  set_has_latent_weight_filler();
+  if (latent_weight_filler_ == NULL) latent_weight_filler_ = new ::caffe::FillerParameter;
+  // @@protoc_insertion_point(field_mutable:caffe.RecurrentParameter.latent_weight_filler)
+  return latent_weight_filler_;
+}
+inline ::caffe::FillerParameter* RecurrentParameter::release_latent_weight_filler() {
+  clear_has_latent_weight_filler();
+  ::caffe::FillerParameter* temp = latent_weight_filler_;
+  latent_weight_filler_ = NULL;
+  return temp;
+}
+inline void RecurrentParameter::set_allocated_latent_weight_filler(::caffe::FillerParameter* latent_weight_filler) {
+  delete latent_weight_filler_;
+  latent_weight_filler_ = latent_weight_filler;
+  if (latent_weight_filler) {
+    set_has_latent_weight_filler();
+  } else {
+    clear_has_latent_weight_filler();
+  }
+  // @@protoc_insertion_point(field_set_allocated:caffe.RecurrentParameter.latent_weight_filler)
+}
+
+// optional .caffe.FillerParameter latent_bias_filler = 8;
+inline bool RecurrentParameter::has_latent_bias_filler() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void RecurrentParameter::set_has_latent_bias_filler() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void RecurrentParameter::clear_has_latent_bias_filler() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void RecurrentParameter::clear_latent_bias_filler() {
+  if (latent_bias_filler_ != NULL) latent_bias_filler_->::caffe::FillerParameter::Clear();
+  clear_has_latent_bias_filler();
+}
+inline const ::caffe::FillerParameter& RecurrentParameter::latent_bias_filler() const {
+  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.latent_bias_filler)
+  return latent_bias_filler_ != NULL ? *latent_bias_filler_ : *default_instance_->latent_bias_filler_;
+}
+inline ::caffe::FillerParameter* RecurrentParameter::mutable_latent_bias_filler() {
+  set_has_latent_bias_filler();
+  if (latent_bias_filler_ == NULL) latent_bias_filler_ = new ::caffe::FillerParameter;
+  // @@protoc_insertion_point(field_mutable:caffe.RecurrentParameter.latent_bias_filler)
+  return latent_bias_filler_;
+}
+inline ::caffe::FillerParameter* RecurrentParameter::release_latent_bias_filler() {
+  clear_has_latent_bias_filler();
+  ::caffe::FillerParameter* temp = latent_bias_filler_;
+  latent_bias_filler_ = NULL;
+  return temp;
+}
+inline void RecurrentParameter::set_allocated_latent_bias_filler(::caffe::FillerParameter* latent_bias_filler) {
+  delete latent_bias_filler_;
+  latent_bias_filler_ = latent_bias_filler;
+  if (latent_bias_filler) {
+    set_has_latent_bias_filler();
+  } else {
+    clear_has_latent_bias_filler();
+  }
+  // @@protoc_insertion_point(field_set_allocated:caffe.RecurrentParameter.latent_bias_filler)
+}
+
+// optional bool debug_info = 4 [default = false];
+inline bool RecurrentParameter::has_debug_info() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void RecurrentParameter::set_has_debug_info() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void RecurrentParameter::clear_has_debug_info() {
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline void RecurrentParameter::clear_debug_info() {
   debug_info_ = false;
@@ -19425,13 +19541,13 @@ inline void RecurrentParameter::set_debug_info(bool value) {
 
 // optional bool no_memory_cell = 5 [default = false];
 inline bool RecurrentParameter::has_no_memory_cell() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
+  return (_has_bits_[0] & 0x00000040u) != 0;
 }
 inline void RecurrentParameter::set_has_no_memory_cell() {
-  _has_bits_[0] |= 0x00000010u;
+  _has_bits_[0] |= 0x00000040u;
 }
 inline void RecurrentParameter::clear_has_no_memory_cell() {
-  _has_bits_[0] &= ~0x00000010u;
+  _has_bits_[0] &= ~0x00000040u;
 }
 inline void RecurrentParameter::clear_no_memory_cell() {
   no_memory_cell_ = false;
@@ -19447,28 +19563,52 @@ inline void RecurrentParameter::set_no_memory_cell(bool value) {
   // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.no_memory_cell)
 }
 
-// optional bool transpose = 6 [default = false];
-inline bool RecurrentParameter::has_transpose() const {
-  return (_has_bits_[0] & 0x00000020u) != 0;
+// optional uint32 num_z = 6;
+inline bool RecurrentParameter::has_num_z() const {
+  return (_has_bits_[0] & 0x00000080u) != 0;
 }
-inline void RecurrentParameter::set_has_transpose() {
-  _has_bits_[0] |= 0x00000020u;
+inline void RecurrentParameter::set_has_num_z() {
+  _has_bits_[0] |= 0x00000080u;
 }
-inline void RecurrentParameter::clear_has_transpose() {
-  _has_bits_[0] &= ~0x00000020u;
+inline void RecurrentParameter::clear_has_num_z() {
+  _has_bits_[0] &= ~0x00000080u;
 }
-inline void RecurrentParameter::clear_transpose() {
-  transpose_ = false;
-  clear_has_transpose();
+inline void RecurrentParameter::clear_num_z() {
+  num_z_ = 0u;
+  clear_has_num_z();
 }
-inline bool RecurrentParameter::transpose() const {
-  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.transpose)
-  return transpose_;
+inline ::google::protobuf::uint32 RecurrentParameter::num_z() const {
+  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.num_z)
+  return num_z_;
 }
-inline void RecurrentParameter::set_transpose(bool value) {
-  set_has_transpose();
-  transpose_ = value;
-  // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.transpose)
+inline void RecurrentParameter::set_num_z(::google::protobuf::uint32 value) {
+  set_has_num_z();
+  num_z_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.num_z)
+}
+
+// optional uint32 num_rec = 9;
+inline bool RecurrentParameter::has_num_rec() const {
+  return (_has_bits_[0] & 0x00000100u) != 0;
+}
+inline void RecurrentParameter::set_has_num_rec() {
+  _has_bits_[0] |= 0x00000100u;
+}
+inline void RecurrentParameter::clear_has_num_rec() {
+  _has_bits_[0] &= ~0x00000100u;
+}
+inline void RecurrentParameter::clear_num_rec() {
+  num_rec_ = 0u;
+  clear_has_num_rec();
+}
+inline ::google::protobuf::uint32 RecurrentParameter::num_rec() const {
+  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.num_rec)
+  return num_rec_;
+}
+inline void RecurrentParameter::set_num_rec(::google::protobuf::uint32 value) {
+  set_has_num_rec();
+  num_rec_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.num_rec)
 }
 
 // -------------------------------------------------------------------
