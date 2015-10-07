@@ -37,7 +37,7 @@ class RecurrentLayer : public Layer<Dtype> {
   virtual inline int MaxBottomBlobs() const { return 3; }
   //here added by xu shen
 //  virtual inline int ExactNumTopBlobs() const { return 1; }
-  virtual inline int MinTopBlobs(){ return 2; }
+  virtual inline int MinTopBlobs(){ return 1; }
 
   virtual inline bool AllowForceBackward(const int bottom_index) const {
     // Can't propagate to sequence continuation indicators.
@@ -286,7 +286,8 @@ class PredRecurrentLayer : public Layer<Dtype> {
   vector<Blob<Dtype>* > recur_output_blobs_;
   //this is all the features catencated: (h_1, h_2,..., h_T)
   vector<Blob<Dtype>* > output_blobs_;
-  Blob<Dtype>* x_input_blob_;
+  Blob<Dtype>* h_input_blob_;
+  Blob<Dtype>* c_input_blob_;
   Blob<Dtype>* x_static_input_blob_;
   Blob<Dtype>* cont_input_blob_;
 };
@@ -370,7 +371,7 @@ class DLSTMLayer : public RecurrentLayer<Dtype> {
   explicit DLSTMLayer(const LayerParameter& param)
       : RecurrentLayer<Dtype>(param) {}
 
-  virtual inline const char* type() const { return "LSTM"; }
+  virtual inline const char* type() const { return "DLSTM"; }
 
  protected:
   virtual void FillUnrolledNet(NetParameter* net_param) const;
@@ -385,7 +386,7 @@ class TwoPathLSTMLayer : public RecurrentLayer<Dtype> {
   explicit TwoPathLSTMLayer(const LayerParameter& param)
       : RecurrentLayer<Dtype>(param) {}
 
-  virtual inline const char* type() const { return "LSTM"; }
+  virtual inline const char* type() const { return "TwoPathLSTM"; }
 
  protected:
   virtual void FillUnrolledNet(NetParameter* net_param) const;
@@ -394,13 +395,18 @@ class TwoPathLSTMLayer : public RecurrentLayer<Dtype> {
   virtual void OutputBlobNames(vector<string>* names) const;
 };
 
+/*
+ * @brief in Prediction LSTM layer, we don't need input x, the input of 
+ * t_th LSTMUnit is h_{t-1}
+ */
+
 template <typename Dtype>
-class PredLSTMLayer : public PredRecurrentLayer<Dtype> {
+class PredLSTMLayer : public RecurrentLayer<Dtype> {
  public:
   explicit PredLSTMLayer(const LayerParameter& param)
-      : PredRecurrentLayer<Dtype>(param) {}
+      : RecurrentLayer<Dtype>(param) {}
 
-  virtual inline const char* type() const { return "LSTM"; }
+  virtual inline const char* type() const { return "PredLSTM"; }
 
  protected:
   virtual void FillUnrolledNet(NetParameter* net_param) const;

@@ -20,6 +20,8 @@ string RecurrentLayer<Dtype>::int_to_str(const int t) const {
 template <typename Dtype>
 void RecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
+	//if this is a prediction RNN or modeling RNN
+  const bool pred = this->layer_param_.recurrent_param().pred();
   CHECK_GE(bottom[0]->num_axes(), 2)
       << "bottom[0] must have at least 2 axes -- (#timesteps, #streams, ...)";
   //timesteps
@@ -47,6 +49,8 @@ void RecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   NetParameter net_param;
   net_param.set_force_backward(true);
 
+  //connect the input this recurrent layer to the 
+  //input of LSTM Net
   net_param.add_input("x");
   BlobShape input_shape;
   for (int i = 0; i < bottom[0]->num_axes(); ++i) {

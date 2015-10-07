@@ -60,6 +60,11 @@ namespace caffe{
 		hidden_param.mutable_inner_product_param()->set_axis(2);
 		hidden_param.mutable_inner_product_param()->mutable_weight_filler()->CopyFrom(weight_filler);
 
+		//bias
+		LayerParameter biased_hidden_param(hidden_param);
+		biased_hidden_param.mutable_inner_product_param()->set_bias_term(true);
+		biased_hidden_param.mutable_inner_product_param()->mutable_bias_filler()->CopyFrom(bias_filler);
+
 		//weight and bias from encode hidden units to \mu and \sigma
 		LayerParameter enc_to_mu_param;
 		enc_to_mu_param.set_type("InnerProduct");
@@ -76,12 +81,21 @@ namespace caffe{
 		enc_to_sigma_param.mutable_inner_product_param()->mutable_weight_filler()->CopyFrom(latent_bias_filler);
 
 		//weight and bias parameter from decode hidden units to \mu and \sigma
+		LayerParameter dec_to_mu_param;
+		dec_to_mu_param.set_type("InnerProduct");
+		dec_to_mu_param.mutable_inner_product_param()->set_num_output(num_z);
+		dec_to_mu_param.mutable_inner_product_param()->set_bias_term(true);
+		dec_to_mu_param.mutable_inner_product_param()->set_axis(2);
+		dec_to_mu_param.mutable_inner_product_param()->mutable_weight_filler()->CopyFrom(latent_weight_filler);
+
+		LayerParameter dec_to_sigma_param;
+		dec_to_sigma_param.set_type("InnerProduct");
+		dec_to_sigma_param.mutable_inner_product_param()->set_num_output(num_z);
+		dec_to_sigma_param.mutable_inner_product_param()->set_bias_term(true);
+		dec_to_sigma_param.mutable_inner_product_param()->set_axis(2);
+		dec_to_sigma_param.mutable_inner_product_param()->mutable_weight_filler()->CopyFrom(latent_bias_filler);
 
 
-		//bias
-		LayerParameter biased_hidden_param(hidden_param);
-		biased_hidden_param.mutable_inner_product_param()->set_bias_term(true);
-		biased_hidden_param.mutable_inner_product_param()->mutable_bias_filler()->CopyFrom(bias_filler);
 
 		//parameter for reconstruction layer
 		//TODO: make this more adaptive from layer parameters
