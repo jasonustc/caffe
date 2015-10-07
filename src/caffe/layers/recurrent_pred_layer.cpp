@@ -185,6 +185,7 @@ namespace caffe {
 	void PredRecurrentLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 		const vector<Blob<Dtype>*>& top) {
 		//  CHECK_EQ(top.size(), output_blobs_.size());
+		//set top blob data source
 		CHECK_GE(top.size(), output_blobs_.size());
 		for (int i = 0; i < top.size(); ++i) {
 			top[i]->ReshapeLike(*output_blobs_[i]);
@@ -204,6 +205,7 @@ namespace caffe {
 			}
 		}
 
+		//set input blob source
 		//h
 		h_input_blob_->ShareData(*bottom[0]);
 		h_input_blob_->ShareDiff(*bottom[0]);
@@ -213,6 +215,7 @@ namespace caffe {
 		//cont
 		cont_input_blob_->ShareData(*bottom[2]);
 		if (static_input_) {
+			//x_static_input
 			x_static_input_blob_->ShareData(*bottom[3]);
 			x_static_input_blob_->ShareDiff(*bottom[3]);
 		}

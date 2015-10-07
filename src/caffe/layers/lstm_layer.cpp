@@ -146,6 +146,7 @@ void LSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
     string tm1s = this->int_to_str(t - 1);
     string ts = this->int_to_str(t);
 
+	//slice x and cont to each time step feature
     cont_slice_param->add_top("cont_" + ts);
     x_slice_param->add_top("W_xc_x_" + ts);
 

@@ -25,6 +25,7 @@ void RecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   CHECK_GE(bottom[0]->num_axes(), 2)
       << "bottom[0] must have at least 2 axes -- (#timesteps, #streams, ...)";
   //timesteps
+  LOG(INFO) << "bottom[0] shape: " << bottom[0]->shape_string();
   T_ = bottom[0]->shape(0);
   //streams
   N_ = bottom[0]->shape(1);
@@ -32,6 +33,7 @@ void RecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
             << T_ << " timesteps of " << N_ << " independent streams.";
 
   //the cont indicator
+  LOG(INFO) << "bottom[1] shape: " << bottom[1]->shape_string();
   CHECK_EQ(bottom[1]->num_axes(), 2)
       << "bottom[1] must have exactly 2 axes -- (#timesteps, #streams)";
   CHECK_EQ(T_, bottom[1]->shape(0));

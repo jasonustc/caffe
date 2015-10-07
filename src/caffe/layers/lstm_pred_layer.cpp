@@ -89,6 +89,7 @@ void PredLSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
   cont_slice_param->CopyFrom(slice_param);
   cont_slice_param->set_name("cont_slice");
   cont_slice_param->add_bottom("cont");
+  //default slice step is 1 in axis 1
   cont_slice_param->mutable_slice_param()->set_axis(1);
 
   if (this->static_input_) {

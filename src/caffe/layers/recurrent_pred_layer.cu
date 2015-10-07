@@ -19,14 +19,16 @@ void PredRecurrentLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
   }
 
   DCHECK_EQ(recur_input_blobs_.size(), recur_output_blobs_.size());
-  for (int i = 0; i < recur_input_blobs_.size(); ++i) {
-    const int count = recur_input_blobs_[i]->count();
-    DCHECK_EQ(count, recur_output_blobs_[i]->count());
-	//during training: copy c_T, h_T to c_0, h_0
-    const Dtype* timestep_T_data = recur_output_blobs_[i]->gpu_data();
-    Dtype* timestep_0_data = recur_input_blobs_[i]->mutable_gpu_data();
-    caffe_copy(count, timestep_T_data, timestep_0_data);
-  }
+  //here because the c_0 and h_0 are copied from trained output of other 
+  //LSTMs, so we don't need to update by c_T and h_T in this net
+//  for (int i = 0; i < recur_input_blobs_.size(); ++i) {
+//    const int count = recur_input_blobs_[i]->count();
+//    DCHECK_EQ(count, recur_output_blobs_[i]->count());
+//	//during training: copy c_T, h_T to c_0, h_0
+//    const Dtype* timestep_T_data = recur_output_blobs_[i]->gpu_data();
+//    Dtype* timestep_0_data = recur_input_blobs_[i]->mutable_gpu_data();
+//    caffe_copy(count, timestep_T_data, timestep_0_data);
+//  }
 
   unrolled_net_->ForwardPrefilled();
 }
