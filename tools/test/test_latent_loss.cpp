@@ -57,7 +57,8 @@ namespace caffe{
 			const Dtype* mu_data = blob_bottom_vec_[0]->cpu_data();
 			const Dtype* sigma_data = blob_bottom_vec_[1]->cpu_data();
 			for (int i = 0; i < count; i++){
-				true_loss += mu_data[i] * mu_data[i] + sigma_data[i] * sigma_data[i] + log(sigma_data[i] * sigma_data[i]);
+				true_loss += mu_data[i] * mu_data[i] + sigma_data[i] * sigma_data[i] - 
+					log(sigma_data[i] * sigma_data[i]) - Dtype(1);
 			}
 			true_loss = true_loss / blob_bottom_mu_->num() / Dtype(2.);
 			EXPECT_NEAR(true_loss, blob_top_vec_[0]->cpu_data()[0], 1e-4);
@@ -86,7 +87,8 @@ namespace caffe{
 			const Dtype* mu_data = blob_bottom_vec_[0]->cpu_data();
 			const Dtype* sigma_data = blob_bottom_vec_[1]->cpu_data();
 			for (int i = 0; i < count; i++){
-				true_loss += mu_data[i] * mu_data[i] + sigma_data[i] * sigma_data[i] + log(sigma_data[i] * sigma_data[i]);
+				true_loss += mu_data[i] * mu_data[i] + sigma_data[i] * sigma_data[i] - 
+					log(sigma_data[i] * sigma_data[i]) - Dtype(1);
 			}
 			true_loss = true_loss / blob_bottom_mu_->num() / Dtype(2.);
 			EXPECT_NEAR(true_loss, blob_top_vec_[0]->cpu_data()[0], 1e-4);

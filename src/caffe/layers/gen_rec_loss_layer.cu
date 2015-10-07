@@ -41,7 +41,7 @@ namespace caffe{
 	__global__ void genrec_loss_mu_backward_kernel(const int n, const Dtype coeff,
 		const Dtype* mu_data, const Dtype* sigma_data, const Dtype* x_data, Dtype* mu_diff){
 		CUDA_KERNEL_LOOP(index, n){
-			mu_diff[index] = 2 * (x_data[index] - mu_data[index])/
+			mu_diff[index] = coeff * Dtype(-2) * (x_data[index] - mu_data[index])/
 				(sigma_data[index] * sigma_data[index]);
 		}
 	}
@@ -50,9 +50,9 @@ namespace caffe{
 	__global__ void genrec_loss_sigma_backward_kernel(const int n, const Dtype coeff,
 		const Dtype* mu_data, const Dtype* sigma_data, const Dtype* x_data, Dtype* sigma_diff){
 		CUDA_KERNEL_LOOP(index, n){
-			sigma_diff[index] = Dtype(-2) * (x_data[index] - mu_data[index]) *
+			sigma_diff[index] = coeff * Dtype(-2) * (x_data[index] - mu_data[index]) *
 				(x_data[index] - mu_data[index]) / pow(sigma_data[index], Dtype(3)) +
-				1 / sigma_data[index];
+				coeff / sigma_data[index];
 		}
 	}
 

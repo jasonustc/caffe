@@ -20,21 +20,24 @@ namespace caffe{
 		caffe_gpu_dot(count, mu_data, mu_data, &mu_sqr_sum);
 		Dtype sigma_sqr_sum;
 		caffe_gpu_dot(count, sigma_data, sigma_data, &sigma_sqr_sum);
-		caffe_gpu_mul(count, sigma_data, sigma_data, log_sqr_sigma_data);
+		caffe_gpu_sqr(count, sigma_data, log_sqr_sigma_data);
 		caffe_gpu_log(count, log_sqr_sigma_data, log_sqr_sigma_data);
 		Dtype log_sigma_sum;
 		caffe_gpu_dot(count, log_sqr_sigma_data, sum_multiplier_.gpu_data(), &log_sigma_sum);
-		Dtype loss = mu_sqr_sum + log_sigma_sum + sigma_sqr_sum;
+		Dtype loss = (mu_sqr_sum + sigma_sqr_sum - log_sigma_sum ) / bottom[0]->num() / Dtype(2);
+		loss -= bottom[0]->count() / bottom[0]->num() / Dtype(2);
 		top[0]->mutable_cpu_data()[0] = loss;
 	}
 
 	template <typename Dtype>
-	__global__ void LatentLoss_Backward_kernel(const int n, const Dtype* sigma_data,
+	__global__ void LatentLoss_Backward_kernel(const int n, const Dtype coeff, const Dtype* sigma_data,
 		Dtype* sigma_diff_data){
 		CUDA_KERNEL_LOOP(index, n){
 			//TODO: check if data is not zero
-			//sigma_i = std::max(sigma_i, kLOG_THRESHOLD;
-			sigma_diff_data[index] = sigma_data[index] + 1 / sigma_data[index];
+			//first load to local device memory to save some time
+			const Dtype log_threshold = 1e-20;
+			Dtype sig = sigma_data[index] > log_threshold ? sigma_data[index] : log_threshold;
+			sigma_diff_data[index] = coeff *(sig - 1 / sig);
 		}
 	}
 
@@ -53,7 +56,7 @@ namespace caffe{
 		}
 		if (propagate_down[1]){
 			LatentLoss_Backward_kernel<Dtype> << <CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS >> >
-				(count, sigma_data, sigma_diff);
+				(count, alpha, sigma_data, sigma_diff);
 		}
 	}
 

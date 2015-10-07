@@ -37,11 +37,12 @@ namespace caffe{
 		const int count = bottom[0]->count();
 		caffe_sub(count, x_data, mu_data, mu_buffer_data);
 		caffe_sqr(count, mu_buffer_data, mu_buffer_data);
-		caffe_powx(count, sigma_buffer_data, Dtype(-2), sigma_buffer_data);
+		caffe_sqr(count, sigma_data, sigma_buffer_data);
 		//put the result into sum_multiplier_ diff
-		caffe_mul(count, mu_buffer_data, sigma_buffer_data, sum_multiplier_.mutable_cpu_diff());
+		caffe_div(count, mu_buffer_data, sigma_buffer_data, sum_multiplier_.mutable_cpu_diff());
 		//sum
-		Dtype loss1 = caffe_cpu_dot(count, sum_multiplier_.mutable_cpu_diff(), sum_multiplier_.cpu_data());
+		Dtype loss1 = caffe_cpu_dot(count, sum_multiplier_.cpu_diff(), sum_multiplier_.cpu_data());
+		//use this memory again
 		caffe_log(count, sigma_data, sigma_buffer_data);
 		Dtype loss2 = caffe_cpu_dot(count, sigma_buffer_data, sum_multiplier_.cpu_data());
 		//loss related to number of features
@@ -66,16 +67,20 @@ namespace caffe{
 		if (propagate_down[0]){
 			for (int i = 0; i < count; i++){
 				//2(x_i - \mu_i)/\sigma^2
-				mu_diff[i] = 2 * (x_data[i] - mu_data[i]) * coeff / (sigma_data[i] * sigma_data[i]);
+				//avoid zero case in denomiter
+				//because sigma = exp(W * h + b), maybe this will be not an issue
+				Dtype sig = std::max(sigma_data[i], Dtype(kLOG_THRESHOLD));
+				mu_diff[i] = Dtype(-2.) * (x_data[i] - mu_data[i]) * coeff / (sig * sig);
 			}
 		}
 		if (propagate_down[1]){
 			for (int i = 0; i < count; i++){
 				//avoid zero case
+				//because sigma = exp(W * h + b), maybe this will be not an issue
 				Dtype sig = std::max(sigma_data[i], Dtype(kLOG_THRESHOLD));
 				//-2(x_i - \mu_i)^2 / (\sigma_i^3) + 1/ \sigma_i
 				sigma_diff[i] = coeff * Dtype(-2) * (x_data[i] - mu_data[i]) * (x_data[i] - mu_data[i]) /
-					pow(sig, Dtype(3)) + 1 / sig;
+					(sig * sig * sig) + coeff / sig;
 			}
 		}
 	}

@@ -36,9 +36,12 @@ namespace caffe{
 			LayerParameter layer_param;
 			shared_ptr<Layer<Dtype>> layer(new GenRecLossLayer<Dtype>(layer_param));
 			layer->SetUp(bottom_, top_);
+			bottom_[0]->ToTxt("mu_data");
+			bottom_[1]->ToTxt("sigma_data");
+			bottom_[2]->ToTxt("x_data");
 			Caffe::set_mode(Caffe::CPU);
 			layer->Forward(bottom_, top_);
-			EXPECT_NEAR(true_loss_, top_[0]->cpu_data()[0], 1e-4);
+			EXPECT_NEAR(true_loss_, top_[0]->cpu_data()[0], 1e-3);
 		}
 
 		void TestGPUForward(){
@@ -47,23 +50,29 @@ namespace caffe{
 			layer->SetUp(bottom_, top_);
 			Caffe::set_mode(Caffe::GPU);
 			layer->Forward(bottom_, top_);
-			EXPECT_NEAR(true_loss_, top_[0]->cpu_data()[0], 1e-4);
+			EXPECT_NEAR(true_loss_, top_[0]->cpu_data()[0], 1e-3);
 		}
 
 		void TestCPUGradients(){
 			LayerParameter layer_param;
 			GenRecLossLayer<Dtype> layer(layer_param);
 			Caffe::set_mode(Caffe::CPU);
-			GradientChecker<Dtype> checker(1e-2, 1e-3);
-			checker.CheckGradientExhaustive(&layer, bottom_, top_);
+			GradientChecker<Dtype> checker(1e-2, 1e-2);
+			//only check bottom[0] and bottom[1]
+			//bottom[2] is x, do not need to backward
+			checker.CheckGradientExhaustive(&layer, bottom_, top_, 0);
+			checker.CheckGradientExhaustive(&layer, bottom_, top_, 1);
 		}
 
 		void TestGPUGradients(){
 			LayerParameter layer_param;
 			GenRecLossLayer<Dtype> layer(layer_param);
 			Caffe::set_mode(Caffe::GPU);
-			GradientChecker<Dtype> checker(1e-2, 1e-3);
-			checker.CheckGradientExhaustive(&layer, bottom_, top_);
+			GradientChecker<Dtype> checker(1e-2, 1e-2);
+			//only check bottom[0] and bottom[1]
+			//bottom[2] is x, do not need to backward
+			checker.CheckGradientExhaustive(&layer, bottom_, top_, 0);
+			checker.CheckGradientExhaustive(&layer, bottom_, top_, 1);
 		}
 
 	protected:
@@ -77,6 +86,8 @@ namespace caffe{
 			GaussianFiller<Dtype> gaussian_filler(filler_param);
 			gaussian_filler.Fill(mu_);
 			gaussian_filler.Fill(sigma_);
+			//make sure that sigma is larger than zero
+			caffe_abs(sigma_->count(), sigma_->cpu_data(), sigma_->mutable_cpu_data());
 			gaussian_filler.Fill(x_);
 			mu_->mutable_cpu_data()[3] = Dtype(1.);
 			sigma_->mutable_cpu_data()[2] = Dtype(3.);

@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "caffe/common.hpp"
 #include "caffe/proto/caffe.pb.h"
@@ -265,12 +266,16 @@ class Blob {
 
   bool ShapeEquals(const BlobProto& other);
 
+  //added by xu shen
+  public:
+	  void ToTxt(const char* filePath, const bool write_diff = false);
+
  protected:
-  shared_ptr<SyncedMemory> data_;
-  shared_ptr<SyncedMemory> diff_;
-  vector<int> shape_;
-  int count_;
-  int capacity_;
+	 shared_ptr<SyncedMemory> data_;
+	 shared_ptr<SyncedMemory> diff_;
+	 vector<int> shape_;
+	 int count_;
+	 int capacity_;
 
   DISABLE_COPY_AND_ASSIGN(Blob);
 };  // class Blob

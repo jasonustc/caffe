@@ -34,7 +34,9 @@ namespace caffe{
 		Dtype dot_mu = caffe_cpu_dot(count, mu_data, mu_data);
 		//dot with ones blob with same size to get the sum of this blob
 		Dtype sum_log_sqr_sigma = caffe_cpu_dot(count, log_sqr_sigma_data, sum_multiplier_.cpu_data());
-		Dtype loss = (dot_sigma + dot_mu + sum_log_sqr_sigma) / bottom[0]->num() / Dtype(2);
+		//\sum \sigma^2 + \mu^2 + log\sigma^2 - 1
+		Dtype loss = (dot_sigma + dot_mu - sum_log_sqr_sigma) / bottom[0]->num() / Dtype(2);
+		loss -= bottom[0]->count() / bottom[0]->num() /Dtype(2);
 		top[0]->mutable_cpu_data()[0] = loss;
 	}
 
@@ -52,8 +54,8 @@ namespace caffe{
 		if (propagate_down[1]){
 			for (int i = 0; i < bottom[1]->count(); i++){
 				Dtype sig = std::max(sigma_data[i], Dtype(kLOG_THRESHOLD));
-				sig += 1 / sig;
-				sigma_diff[i] = sig;
+				sig -= 1 / sig;
+				sigma_diff[i] = alpha * sig;
 			}
 		}
 	}

@@ -485,6 +485,39 @@ void Blob<Dtype>::ToProto(BlobProto* proto, bool write_diff) const {
     }
   }
 }
+template <typename Dtype>
+void Blob<Dtype>::ToTxt(const char* filePath, const bool write_diff){
+	CHECK(this->cpu_data());
+	std::ofstream out(filePath);
+	CHECK(out.is_open()) << "can not open " << filePath << " for writing data";
+	int num = this->num();
+	int channels = this->channels();
+	int height = this->height();
+	int width = this->width();
+	out <<  num << "\t";
+	out <<  channels << "\t";
+	out <<  height << "\t";
+	out <<  width << "\n";
+	for (int d = 0; d < this->count(); d++){
+		out << this->cpu_data()[d] << "\t";
+	}
+	out.close();
+	if (write_diff){
+		CHECK(this->cpu_diff());
+		string diff_file(filePath);
+		diff_file += "_diff";
+		std::ofstream out_diff(diff_file);
+		CHECK(out_diff.is_open()) << "can not open " << diff_file << " for writing data";
+		out_diff << num << "\t";
+		out_diff << channels << "\t";
+		out_diff << height << "\t";
+		out_diff << width << "\n";
+		for (int d = 0; d < this->count(); d++){
+			out_diff << this->cpu_diff()[d] << "\t";
+		}
+		out_diff.close();
+	}
+}
 
 INSTANTIATE_CLASS(Blob);
 template class Blob<int>;
