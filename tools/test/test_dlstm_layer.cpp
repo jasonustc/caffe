@@ -26,5 +26,7 @@ namespace caffe{
 
 		vector<Blob<Dtype>*> bottom_;
 		vector<Blob<Dtype>*> top_;
+
+		vector<bool> propagate_down;
 	};
 }

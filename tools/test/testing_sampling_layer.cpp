@@ -97,6 +97,8 @@ namespace caffe{
 			mu_->mutable_cpu_data()[5] = 4.;
 			sigma_->mutable_cpu_data()[1] = 1.;
 			sigma_->mutable_cpu_data()[4] = 2.;
+			//make sure sigma is larger than 0.
+			caffe_abs(mu_->count(), sigma_->cpu_data(), sigma_->mutable_cpu_data());
 			bottom_.push_back(mu_);
 			bottom_.push_back(sigma_);
 			top_.push_back(gauss_);
