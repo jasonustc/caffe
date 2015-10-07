@@ -401,10 +401,10 @@ class TwoPathLSTMLayer : public RecurrentLayer<Dtype> {
  */
 
 template <typename Dtype>
-class PredLSTMLayer : public RecurrentLayer<Dtype> {
+class PredLSTMLayer : public PredRecurrentLayer<Dtype> {
  public:
   explicit PredLSTMLayer(const LayerParameter& param)
-      : RecurrentLayer<Dtype>(param) {}
+      : PredRecurrentLayer<Dtype>(param) {}
 
   virtual inline const char* type() const { return "PredLSTM"; }
 

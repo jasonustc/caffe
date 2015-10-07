@@ -30,8 +30,8 @@ namespace caffe {
 		LOG(INFO) << "Initializing recurrent layer: assuming input batch contains "
 			<< T_ << " timesteps of " << N_ << " independent streams.";
 		CHECK(bottom[0]->shape() == bottom[1]->shape()) << "c_0(bottom[0]) and h_0 \
-														   													   							(bottom[1]) should have the same shape.";
-		CHECK_EQ(bottom[2].shape(2), this->layer_param_.recurrent_param().num_output()) <<
+		    (bottom[1]) should have the same shape.";
+		CHECK_EQ(bottom[2]->shape(2), this->layer_param_.recurrent_param().num_output()) <<
 			"c_0 and h_0 should have the same dim with LSTMUnit";
 
 		//the cont indicator
@@ -204,12 +204,17 @@ namespace caffe {
 			}
 		}
 
-		x_input_blob_->ShareData(*bottom[0]);
-		x_input_blob_->ShareDiff(*bottom[0]);
-		cont_input_blob_->ShareData(*bottom[1]);
+		//h
+		h_input_blob_->ShareData(*bottom[0]);
+		h_input_blob_->ShareDiff(*bottom[0]);
+		//c
+		c_input_blob_->ShareData(*bottom[1]);
+		c_input_blob_->ShareDiff(*bottom[1]);
+		//cont
+		cont_input_blob_->ShareData(*bottom[2]);
 		if (static_input_) {
-			x_static_input_blob_->ShareData(*bottom[2]);
-			x_static_input_blob_->ShareDiff(*bottom[2]);
+			x_static_input_blob_->ShareData(*bottom[3]);
+			x_static_input_blob_->ShareDiff(*bottom[3]);
 		}
 	}
 

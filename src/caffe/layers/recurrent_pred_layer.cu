@@ -31,6 +31,6 @@ void PredRecurrentLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
   unrolled_net_->ForwardPrefilled();
 }
 
-INSTANTIATE_LAYER_GPU_FORWARD(RecurrentLayer);
+INSTANTIATE_LAYER_GPU_FORWARD(PredRecurrentLayer);
 
 }  // namespace caffe

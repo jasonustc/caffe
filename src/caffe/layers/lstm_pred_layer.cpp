@@ -131,7 +131,7 @@ void PredLSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
 	//     W_xc_h = W_xc * h + b_c
 	{
 		//missing type
-		LayerParameter* x_transform_param = net_param->add_layer();
+		LayerParameter* h_transform_param = net_param->add_layer();
 		h_transform_param->CopyFrom(biased_hidden_param);
 		h_transform_param->set_name("h_transform" + tm1s);
 		//share parameters through time t
@@ -231,7 +231,7 @@ void PredLSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
   net_param->add_layer()->CopyFrom(output_concat_layer);
 }
 
-INSTANTIATE_CLASS(LSTMLayer);
-REGISTER_LAYER_CLASS(LSTM);
+INSTANTIATE_CLASS(PredLSTMLayer);
+REGISTER_LAYER_CLASS(PredLSTM);
 
 }  // namespace caffe
