@@ -821,13 +821,20 @@ message RecurrentParameter {
 
   optional FillerParameter weight_filler = 2; // The filler for the weight
   optional FillerParameter bias_filler = 3; // The filler for the bias
+  optional FillerParameter latent_weight_filler = 7;//The filler for latent variable
+  optional FillerParameter latent_bias_filler = 8;//The filler for latent bias
 
   // Whether to enable displaying debug_info in the unrolled recurrent net.
   optional bool debug_info = 4 [default = false];
 
   //added by xu shen
   optional bool no_memory_cell = 5 [default = false];
-  optional bool transpose = 6 [default = false];
+
+  //number of latent variables in generative RNN
+  optional uint32 num_z = 6;
+
+  //number of reconstructed dim of input
+  optional uint32 num_rec = 9;
 }
 
 // Message that stores parameters used by ReLULayer

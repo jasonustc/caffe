@@ -44,7 +44,6 @@
     <ClCompile Include="..\src\caffe\layers\data_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\deconv_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\dlstm_layer.cpp" />
-    <ClCompile Include="..\src\caffe\layers\dlstm_unit_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\dropout_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\dummy_data_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\eltwise_layer.cpp" />
@@ -95,6 +94,7 @@
     <ClCompile Include="..\src\caffe\layers\ssd_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\tanh_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\threshold_layer.cpp" />
+    <ClCompile Include="..\src\caffe\layers\two_path_lstm_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\video_label_expand_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\video_sigmoid_label.cpp" />
     <ClCompile Include="..\src\caffe\layers\video_unroll_layer.cpp" />
@@ -129,7 +129,6 @@
     <CudaCompile Include="..\src\caffe\layers\cudnn_softmax_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\cudnn_tanh_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\deconv_layer.cu" />
-    <CudaCompile Include="..\src\caffe\layers\dlstm_unit_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\dropout_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\eltwise_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\embed_layer.cu" />
