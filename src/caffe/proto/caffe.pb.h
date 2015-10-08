@@ -7333,6 +7333,22 @@ class RecurrentParameter : public ::google::protobuf::Message {
   inline bool pred() const;
   inline void set_pred(bool value);
 
+  // optional uint32 num_rec_feature = 7;
+  inline bool has_num_rec_feature() const;
+  inline void clear_num_rec_feature();
+  static const int kNumRecFeatureFieldNumber = 7;
+  inline ::google::protobuf::uint32 num_rec_feature() const;
+  inline void set_num_rec_feature(::google::protobuf::uint32 value);
+
+  // optional .caffe.FillerParameter dec_trans_weight_filler = 8;
+  inline bool has_dec_trans_weight_filler() const;
+  inline void clear_dec_trans_weight_filler();
+  static const int kDecTransWeightFillerFieldNumber = 8;
+  inline const ::caffe::FillerParameter& dec_trans_weight_filler() const;
+  inline ::caffe::FillerParameter* mutable_dec_trans_weight_filler();
+  inline ::caffe::FillerParameter* release_dec_trans_weight_filler();
+  inline void set_allocated_dec_trans_weight_filler(::caffe::FillerParameter* dec_trans_weight_filler);
+
   // @@protoc_insertion_point(class_scope:caffe.RecurrentParameter)
  private:
   inline void set_has_num_output();
@@ -7347,6 +7363,10 @@ class RecurrentParameter : public ::google::protobuf::Message {
   inline void clear_has_no_memory_cell();
   inline void set_has_pred();
   inline void clear_has_pred();
+  inline void set_has_num_rec_feature();
+  inline void clear_has_num_rec_feature();
+  inline void set_has_dec_trans_weight_filler();
+  inline void clear_has_dec_trans_weight_filler();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -7358,6 +7378,8 @@ class RecurrentParameter : public ::google::protobuf::Message {
   bool debug_info_;
   bool no_memory_cell_;
   bool pred_;
+  ::caffe::FillerParameter* dec_trans_weight_filler_;
+  ::google::protobuf::uint32 num_rec_feature_;
   friend void  protobuf_AddDesc_caffe_2eproto();
   friend void protobuf_AssignDesc_caffe_2eproto();
   friend void protobuf_ShutdownFile_caffe_2eproto();
@@ -19469,6 +19491,71 @@ inline void RecurrentParameter::set_pred(bool value) {
   set_has_pred();
   pred_ = value;
   // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.pred)
+}
+
+// optional uint32 num_rec_feature = 7;
+inline bool RecurrentParameter::has_num_rec_feature() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void RecurrentParameter::set_has_num_rec_feature() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void RecurrentParameter::clear_has_num_rec_feature() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void RecurrentParameter::clear_num_rec_feature() {
+  num_rec_feature_ = 0u;
+  clear_has_num_rec_feature();
+}
+inline ::google::protobuf::uint32 RecurrentParameter::num_rec_feature() const {
+  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.num_rec_feature)
+  return num_rec_feature_;
+}
+inline void RecurrentParameter::set_num_rec_feature(::google::protobuf::uint32 value) {
+  set_has_num_rec_feature();
+  num_rec_feature_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.num_rec_feature)
+}
+
+// optional .caffe.FillerParameter dec_trans_weight_filler = 8;
+inline bool RecurrentParameter::has_dec_trans_weight_filler() const {
+  return (_has_bits_[0] & 0x00000080u) != 0;
+}
+inline void RecurrentParameter::set_has_dec_trans_weight_filler() {
+  _has_bits_[0] |= 0x00000080u;
+}
+inline void RecurrentParameter::clear_has_dec_trans_weight_filler() {
+  _has_bits_[0] &= ~0x00000080u;
+}
+inline void RecurrentParameter::clear_dec_trans_weight_filler() {
+  if (dec_trans_weight_filler_ != NULL) dec_trans_weight_filler_->::caffe::FillerParameter::Clear();
+  clear_has_dec_trans_weight_filler();
+}
+inline const ::caffe::FillerParameter& RecurrentParameter::dec_trans_weight_filler() const {
+  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.dec_trans_weight_filler)
+  return dec_trans_weight_filler_ != NULL ? *dec_trans_weight_filler_ : *default_instance_->dec_trans_weight_filler_;
+}
+inline ::caffe::FillerParameter* RecurrentParameter::mutable_dec_trans_weight_filler() {
+  set_has_dec_trans_weight_filler();
+  if (dec_trans_weight_filler_ == NULL) dec_trans_weight_filler_ = new ::caffe::FillerParameter;
+  // @@protoc_insertion_point(field_mutable:caffe.RecurrentParameter.dec_trans_weight_filler)
+  return dec_trans_weight_filler_;
+}
+inline ::caffe::FillerParameter* RecurrentParameter::release_dec_trans_weight_filler() {
+  clear_has_dec_trans_weight_filler();
+  ::caffe::FillerParameter* temp = dec_trans_weight_filler_;
+  dec_trans_weight_filler_ = NULL;
+  return temp;
+}
+inline void RecurrentParameter::set_allocated_dec_trans_weight_filler(::caffe::FillerParameter* dec_trans_weight_filler) {
+  delete dec_trans_weight_filler_;
+  dec_trans_weight_filler_ = dec_trans_weight_filler;
+  if (dec_trans_weight_filler) {
+    set_has_dec_trans_weight_filler();
+  } else {
+    clear_has_dec_trans_weight_filler();
+  }
+  // @@protoc_insertion_point(field_set_allocated:caffe.RecurrentParameter.dec_trans_weight_filler)
 }
 
 // -------------------------------------------------------------------

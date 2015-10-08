@@ -19,7 +19,6 @@ namespace caffe{
 	template <typename Dtype>
 	void SamplingLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 		const vector<Blob<Dtype>*>& top){
-		LOG(INFO) << "mu and sigma shape: " << bottom[0]->shape_string();
 		top[0]->ReshapeLike(*bottom[0]);
 		gaussian_value_.ReshapeLike(*bottom[0]);
 	}

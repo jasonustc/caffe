@@ -24,19 +24,12 @@ namespace caffe{
 		~DLSTMTest(){ delete cont_; delete x_; delete h_enc_; delete h_dec_; delete c_T_; delete h_T_; }
 
 		void TestSetUp(){
-			LayerParameter layer_param;
-			layer_param.mutable_recurrent_param()->set_num_output(3);
-			layer_param.mutable_recurrent_param()->mutable_weight_filler()->set_type("uniform");
-			layer_param.mutable_recurrent_param()->mutable_weight_filler()->set_min(0.);
-			layer_param.mutable_recurrent_param()->mutable_weight_filler()->set_max(1.);
-			layer_param.mutable_recurrent_param()->mutable_bias_filler()->set_type("constant");
-			layer_param.mutable_recurrent_param()->mutable_bias_filler()->set_value(0.);
-			shared_ptr<Layer<Dtype>> layer(new DLSTMLayer<Dtype>(layer_param));
+			shared_ptr<Layer<Dtype>> layer(new DLSTMLayer<Dtype>(layer_param_));
 			layer->SetUp(bottom_, top_);
-			CHECK(top_[0]->shape() == top_[1]->shape());
-			CHECK_EQ(top_[0]->shape(0), 6);
-			CHECK_EQ(top_[0]->shape(1), 1);
-			CHECK_EQ(top_[0]->shape(2), 3);
+			CHECK(top_[0]->shape() == bottom_[0]->shape());
+			CHECK_EQ(top_[1]->shape(0), 6);
+			CHECK_EQ(top_[1]->shape(1), 1);
+			CHECK_EQ(top_[1]->shape(2), 3);
 			CHECK(top_[2]->shape() == top_[3]->shape());
 			CHECK_EQ(top_[2]->shape(0), 1);
 			CHECK_EQ(top_[2]->shape(1), 1);
@@ -44,67 +37,57 @@ namespace caffe{
 		}
 
 		void TestCPUForward(){
-			LayerParameter layer_param;
-			layer_param.mutable_recurrent_param()->set_num_output(3);
-			layer_param.mutable_recurrent_param()->mutable_weight_filler()->set_type("uniform");
-			layer_param.mutable_recurrent_param()->mutable_weight_filler()->set_min(0.);
-			layer_param.mutable_recurrent_param()->mutable_weight_filler()->set_max(1.);
-			layer_param.mutable_recurrent_param()->mutable_bias_filler()->set_type("constant");
-			layer_param.mutable_recurrent_param()->mutable_bias_filler()->set_value(0.);
-			shared_ptr<Layer<Dtype>> layer(new DLSTMLayer<Dtype>(layer_param));
+			shared_ptr<Layer<Dtype>> layer(new DLSTMLayer<Dtype>(layer_param_));
 			layer->SetUp(bottom_, top_);
 			Caffe::set_mode(Caffe::CPU);
 			layer->Forward(bottom_, top_);
-			top_[0]->ToTxt("h_dec_cpu");
+			layer->Backward(top_, propagate_down_, bottom_);
+			top_[0]->ToTxt("x_dec_cpu");
 			top_[1]->ToTxt("h_enc_cpu");
 			top_[2]->ToTxt("h_T_cpu");
 			top_[3]->ToTxt("c_T_cpu");
 		}
 
 		void TestGPUForward(){
-			LayerParameter layer_param;
-			layer_param.mutable_recurrent_param()->set_num_output(3);
-			layer_param.mutable_recurrent_param()->mutable_weight_filler()->set_type("uniform");
-			layer_param.mutable_recurrent_param()->mutable_weight_filler()->set_min(0.);
-			layer_param.mutable_recurrent_param()->mutable_weight_filler()->set_max(1.);
-			layer_param.mutable_recurrent_param()->mutable_bias_filler()->set_type("constant");
-			layer_param.mutable_recurrent_param()->mutable_bias_filler()->set_value(0.);
-			shared_ptr<Layer<Dtype>> layer(new DLSTMLayer<Dtype>(layer_param));
+			shared_ptr<Layer<Dtype>> layer(new DLSTMLayer<Dtype>(layer_param_));
 			layer->SetUp(bottom_, top_);
 			Caffe::set_mode(Caffe::GPU);
 			layer->Forward(bottom_, top_);
-			top_[0]->ToTxt("h_dec_gpu");
+			top_[0]->ToTxt("x_dec_gpu");
 			top_[1]->ToTxt("h_enc_gpu");
 			top_[2]->ToTxt("h_T_gpu");
 			top_[3]->ToTxt("c_T_gpu");
 		}
 
 		void TestCPUGradients(){
-			LayerParameter layer_param;
-			layer_param.mutable_recurrent_param()->set_num_output(3);
-			layer_param.mutable_recurrent_param()->mutable_weight_filler()->set_type("uniform");
-			layer_param.mutable_recurrent_param()->mutable_weight_filler()->set_min(0.);
-			layer_param.mutable_recurrent_param()->mutable_weight_filler()->set_max(1.);
-			layer_param.mutable_recurrent_param()->mutable_bias_filler()->set_type("constant");
-			layer_param.mutable_recurrent_param()->mutable_bias_filler()->set_value(0.);
-			DLSTMLayer<Dtype> layer(layer_param);
+			DLSTMLayer<Dtype> layer(layer_param_);
 			Caffe::set_mode(Caffe::CPU);
 			GradientChecker<Dtype> checker(1e-2, 1e-3);
-			checker.CheckGradientExhaustive(&layer, bottom_, top_, 0);
+			//because decoding parameters is not correlated with h_enc,
+			//so the computed and estimated gradient will be 0
+			//checker.CheckGradientExhaustive(&layer, bottom_, top_);
+			layer.SetUp(bottom_, top_);
+			CHECK_GT(top_.size(), 0) << "Exhaustive mode requires at least one top blob.";
+			for (int i = 0; i < top_[0]->count(); i++){
+				checker.CheckGradientSingle(&layer, bottom_, top_, 0, 0, i);
+			}
+			for (int i = 0; i < top_[2]->count(); i++){
+				checker.CheckGradientSingle(&layer, bottom_, top_, 0, 0, i);
+			}
 		}
 
 		void TestGPUGradients(){
-			LayerParameter layer_param;
-			layer_param.mutable_recurrent_param()->set_num_output(3);
-			layer_param.mutable_recurrent_param()->mutable_weight_filler()->set_type("uniform");
-			layer_param.mutable_recurrent_param()->mutable_weight_filler()->set_min(0.);
-			layer_param.mutable_recurrent_param()->mutable_weight_filler()->set_max(1.);
-			layer_param.mutable_recurrent_param()->mutable_bias_filler()->set_type("constant");
-			layer_param.mutable_recurrent_param()->mutable_bias_filler()->set_value(0.);
-			DLSTMLayer<Dtype> layer(layer_param);
+			DLSTMLayer<Dtype> layer(layer_param_);
 			Caffe::set_mode(Caffe::GPU);
+			layer.SetUp(bottom_, top_);
+			CHECK_GT(top_.size(), 0) << "Exhaustive mode requires at least one top blob.";
 			GradientChecker<Dtype> checker(1e-2, 1e-3);
-			checker.CheckGradientExhaustive(&layer, bottom_, top_, 0);
+			for (int i = 0; i < top_[0]->count(); i++){
+				checker.CheckGradientSingle(&layer, bottom_, top_, 0, 0, i);
+			}
+			for (int i = 0; i < top_[2]->count(); i++){
+				checker.CheckGradientSingle(&layer, bottom_, top_, 0, 0, i);
+			}
 		}
 		
 	protected:
@@ -113,7 +96,11 @@ namespace caffe{
 			cont_shape.push_back(6);
 			cont_shape.push_back(1);
 			cont_->Reshape(cont_shape);
-			x_->Reshape(6, 1, 2, 3);
+			vector<int> x_shape;
+			x_shape.push_back(6);
+			x_shape.push_back(1);
+			x_shape.push_back(2);
+			x_->Reshape(x_shape);
 			FillerParameter filler_param;
 			GaussianFiller<Dtype> filler(filler_param);
 			filler.Fill(x_);
@@ -126,8 +113,20 @@ namespace caffe{
 			top_.push_back(h_dec_);
 			top_.push_back(h_T_);
 			top_.push_back(c_T_);
-			propagate_down.resize(2, true);
-			propagate_down[1] = false;
+			propagate_down_.resize(2, true);
+			propagate_down_[1] = false;
+
+			//set layer param
+			layer_param_.mutable_recurrent_param()->set_num_output(3);
+			layer_param_.mutable_recurrent_param()->mutable_weight_filler()->set_type("uniform");
+			layer_param_.mutable_recurrent_param()->mutable_weight_filler()->set_min(-0.1);
+			layer_param_.mutable_recurrent_param()->mutable_weight_filler()->set_max(0.1);
+			layer_param_.mutable_recurrent_param()->mutable_bias_filler()->set_type("constant");
+			layer_param_.mutable_recurrent_param()->mutable_bias_filler()->set_value(0.);
+			layer_param_.mutable_recurrent_param()->mutable_dec_trans_weight_filler()->set_type("uniform");
+			layer_param_.mutable_recurrent_param()->mutable_dec_trans_weight_filler()->set_min(-0.004);
+			layer_param_.mutable_recurrent_param()->mutable_dec_trans_weight_filler()->set_max(0.004);
+			layer_param_.mutable_recurrent_param()->set_num_rec_feature(2);
 		}
 
 		Blob<Dtype>* cont_;
@@ -142,7 +141,9 @@ namespace caffe{
 		vector<Blob<Dtype>*> bottom_;
 		vector<Blob<Dtype>*> top_;
 
-		vector<bool> propagate_down;
+		vector<bool> propagate_down_;
+
+		LayerParameter layer_param_;
 	};
 }
 

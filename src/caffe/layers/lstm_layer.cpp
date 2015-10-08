@@ -44,7 +44,6 @@ void LSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
   // use to save redundant code.
   LayerParameter hidden_param;
   hidden_param.set_type("InnerProduct");
-  //why 4?
   //gate input has 4 types (i_t, f_t, o_t, g_t): 
   //gate_input_t, gate_forget_t, gate_output_t, input_t
   hidden_param.mutable_inner_product_param()->set_num_output(num_output * 4);

@@ -830,6 +830,12 @@ message RecurrentParameter {
 
   //it's a prediction Recurrent Layer or Modeling Recurrent Layer
   optional bool pred = 6 [default = false];
+
+  //number of features to be predicted
+  optional uint32 num_rec_feature = 7;
+
+  //weight filler of transformation of decoder hidden feature
+  optional FillerParameter dec_trans_weight_filler = 8;
 }
 
 // Message that stores parameters used by ReLULayer

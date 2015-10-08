@@ -294,9 +294,6 @@
     <ClCompile Include="..\src\caffe\layers\dlstm_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\dlstm_unit_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\caffe\layers\sampling_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
@@ -315,7 +312,7 @@
     <ClCompile Include="..\src\caffe\layers\recurrent_pred_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\test\testing_sampling_layer.cpp" />
+    <ClCompile Include="..\tools\test\test_dlstm_layer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
@@ -451,9 +448,6 @@
       <Filter>src\layers</Filter>
     </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\norm_loss_layer.cu">
-      <Filter>src\layers</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\dlstm_unit_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\sampling_layer.cu">
