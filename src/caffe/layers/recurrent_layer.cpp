@@ -129,7 +129,8 @@ void RecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   // Setup pointers to outputs.
   vector<string> output_names;
   OutputBlobNames(&output_names);
-  CHECK_EQ(top.size(), output_names.size())
+  //change here to make sure we can output c_T and h_T indepentently
+  CHECK_GE(top.size(), output_names.size())
       << "OutputBlobNames must provide an output blob name for each top.";
   output_blobs_.resize(output_names.size());
   for (int i = 0; i < output_names.size(); ++i) {
@@ -178,7 +179,8 @@ void RecurrentLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
 //  CHECK_EQ(top.size(), output_blobs_.size());
 	CHECK_GE(top.size(), output_blobs_.size());
-	for (int i = 0; i < top.size(); ++i) {
+//	for (int i = 0; i < top.size(); ++i) {
+	for (int i = 0; i < output_blobs_.size(); ++i) {
 		top[i]->ReshapeLike(*output_blobs_[i]);
 		//!!!!
 		//output_blobs_[i]->ShareData(*top[i]); 

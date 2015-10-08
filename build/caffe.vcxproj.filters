@@ -315,7 +315,7 @@
     <ClCompile Include="..\src\caffe\layers\recurrent_pred_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\test\test_dlstm_layer.cpp" />
+    <ClCompile Include="..\tools\test\testing_sampling_layer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
