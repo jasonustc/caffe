@@ -178,11 +178,9 @@ template <typename Dtype>
 void RecurrentLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
 //  CHECK_EQ(top.size(), output_blobs_.size());
-	CHECK_GE(top.size(), 1);
-	CHECK_GE(output_blobs_.size(), 1);
+	CHECK_GE(top.size(), output_blobs_.size());
 //	for (int i = 0; i < top.size(); ++i) {
-	const int out_size = std::min(top.size(), output_blobs_.size());
-	for (int i = 0; i < out_size; ++i) {
+	for (int i = 0; i < output_blobs_.size(); ++i) {
 		top[i]->ReshapeLike(*output_blobs_[i]);
 		//!!!!
 		//output_blobs_[i]->ShareData(*top[i]); 

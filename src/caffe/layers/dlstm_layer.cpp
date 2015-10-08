@@ -60,14 +60,14 @@ namespace caffe{
 		//Add layer to transform all timesteps of h_rec to the x dimension
 		//in decoding LSTM.
 		//this is useful in testing stage
-		LayerParameter biased_dec_trans_param;
-		biased_dec_trans_param.set_type("InnerProduct");
-		biased_dec_trans_param.mutable_inner_product_param()->set_num_output(num_rec_feature);
-		biased_dec_trans_param.mutable_inner_product_param()->set_bias_term(true);
-		biased_dec_trans_param.mutable_inner_product_param()->set_axis(2);
-		biased_dec_trans_param.mutable_inner_product_param()->mutable_weight_filler()->CopyFrom(dec_trans_weight_filler);
-		//usually bias is not different, so just keep the same with biased_hidden_param is OK.
-		biased_dec_trans_param.mutable_inner_product_param()->mutable_bias_filler()->CopyFrom(bias_filler);
+//		LayerParameter biased_dec_trans_param;
+//		biased_dec_trans_param.set_type("InnerProduct");
+//		biased_dec_trans_param.mutable_inner_product_param()->set_num_output(num_rec_feature);
+//		biased_dec_trans_param.mutable_inner_product_param()->set_bias_term(true);
+//		biased_dec_trans_param.mutable_inner_product_param()->set_axis(2);
+//		biased_dec_trans_param.mutable_inner_product_param()->mutable_weight_filler()->CopyFrom(dec_trans_weight_filler);
+//		//usually bias is not different, so just keep the same with biased_hidden_param is OK.
+//		biased_dec_trans_param.mutable_inner_product_param()->mutable_bias_filler()->CopyFrom(bias_filler);
 
 		//sum
 		LayerParameter sum_param;
@@ -332,19 +332,19 @@ namespace caffe{
 
 			//TODO: Add linear transform layer to transform decoding sequence feature
 			//W_hx_h_(t) = W_hx_d * h_{t-1} + b_h_d
-			{
-				LayerParameter* output_transform_param = net_param->add_layer();
-				output_transform_param->CopyFrom( biased_dec_trans_param );
-				//use same weight for different time t of h to x
-				output_transform_param->add_param()->set_name("W_hx_d");
-				output_transform_param->add_param()->set_name("b_h_d");
-				output_transform_param->set_name("W_hx_h_" + ots);
-				output_transform_param->add_bottom("h_" + dts);
-				output_transform_param->add_top("x_pred_" + dts);
-			}
+//			{
+//				LayerParameter* output_transform_param = net_param->add_layer();
+//				output_transform_param->CopyFrom( biased_dec_trans_param );
+//				//use same weight for different time t of h to x
+//				output_transform_param->add_param()->set_name("W_hx_d");
+//				output_transform_param->add_param()->set_name("b_h_d");
+//				output_transform_param->set_name("W_hx_h_" + ots);
+//				output_transform_param->add_bottom("h_" + dts);
+//				output_transform_param->add_top("x_pred_" + dts);
+//			}
 
 			//output decoding result
-			output_concat_layer_mem.add_bottom("x_pred_" + dts);
+			output_concat_layer_mem.add_bottom("h_" + dts);
 		}// for (int dt = 1; dt <= this->T_; ++dt)
 
 		{

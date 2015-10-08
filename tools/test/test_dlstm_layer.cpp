@@ -26,7 +26,7 @@ namespace caffe{
 		void TestSetUp(){
 			shared_ptr<Layer<Dtype>> layer(new DLSTMLayer<Dtype>(layer_param_));
 			layer->SetUp(bottom_, top_);
-			CHECK(top_[0]->shape() == bottom_[0]->shape());
+			CHECK(top_[0]->shape() == top_[1]->shape());
 			CHECK_EQ(top_[1]->shape(0), 6);
 			CHECK_EQ(top_[1]->shape(1), 1);
 			CHECK_EQ(top_[1]->shape(2), 3);
