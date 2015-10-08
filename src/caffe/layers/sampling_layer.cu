@@ -21,9 +21,9 @@ namespace caffe{
 	}
 
 	template <typename Dtype>
-	void SamplingLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& bottom,
+	void SamplingLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 		const vector<bool>& propagate_down,
-		const vector<Blob<Dtype>*>& top){
+		const vector<Blob<Dtype>*>& bottom){
 		const int count = bottom[0]->count();
 		Dtype* mu_diff = bottom[0]->mutable_gpu_diff();
 		Dtype* sigma_diff = bottom[1]->mutable_gpu_diff();
