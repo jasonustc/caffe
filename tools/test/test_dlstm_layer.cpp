@@ -53,6 +53,7 @@ namespace caffe{
 			layer->SetUp(bottom_, top_);
 			Caffe::set_mode(Caffe::GPU);
 			layer->Forward(bottom_, top_);
+			layer->Backward(top_, propagate_down_, bottom_);
 			top_[0]->ToTxt("x_dec_gpu");
 			top_[1]->ToTxt("h_enc_gpu");
 			top_[2]->ToTxt("h_T_gpu");
