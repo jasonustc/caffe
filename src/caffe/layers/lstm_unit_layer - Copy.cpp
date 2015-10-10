@@ -25,10 +25,6 @@ namespace caffe {
 	template <typename Dtype>
 	void LSTMUnitLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 		const vector<Blob<Dtype>*>& top) {
-		//if it is in the decoding LSTM, set decode info as true
-		if (this->layer_param_.recurrent_param().decode()){
-			this->decode_ = true;
-		}
 		for (int i = 0; i < bottom.size(); ++i) {
 			CHECK_EQ(3, bottom[i]->num_axes());
 			CHECK_EQ(1, bottom[i]->shape(0));
@@ -59,22 +55,14 @@ namespace caffe {
 		for (int n = 0; n < num; ++n) {
 			for (int d = 0; d < hidden_dim_; ++d) {
 				const Dtype i = sigmoid(X[d]);
-				Dtype f;
-				if (decode_){
-					f = (*flush * sigmoid(X[1 * hidden_dim_ + d]));
-				}
-				else{
-					f = (*flush == 0) ? 0 :
-						(*flush * sigmoid(X[1 * hidden_dim_ + d]));
-				}
+				const Dtype f = (*flush == 0) ? 0 :
+					(*flush * sigmoid(X[1 * hidden_dim_ + d]));
 				const Dtype o = sigmoid(X[2 * hidden_dim_ + d]);
 				const Dtype g = tanh(X[3 * hidden_dim_ + d]);
 				const Dtype c_prev = C_prev[d];
-				//optionally reset memory here
 				const Dtype c = f * c_prev + i * g;
 				//identity recursive of memory cell
 				C[d] = c;
-				//h_{t-1} is always kept here
 				const Dtype tanh_c = tanh(c);
 				H[d] = o * tanh_c;
 			}
@@ -107,14 +95,8 @@ namespace caffe {
 		for (int n = 0; n < num; ++n) {
 			for (int d = 0; d < hidden_dim_; ++d) {
 				const Dtype i = sigmoid(X[d]);
-				Dtype f;
-				if (decode_){
-					f = (*flush * sigmoid(X[1 * hidden_dim_ + d]));
-				}
-				else{
-					f = (*flush == 0) ? 0 :
-						(*flush * sigmoid(X[1 * hidden_dim_ + d]));
-				}
+				const Dtype f = (*flush == 0) ? 0 :
+					(*flush * sigmoid(X[1 * hidden_dim_ + d]));
 				const Dtype o = sigmoid(X[2 * hidden_dim_ + d]);
 				const Dtype g = tanh(X[3 * hidden_dim_ + d]);
 				const Dtype c_prev = C_prev[d];

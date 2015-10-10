@@ -7349,6 +7349,43 @@ class RecurrentParameter : public ::google::protobuf::Message {
   inline ::caffe::FillerParameter* release_dec_trans_weight_filler();
   inline void set_allocated_dec_trans_weight_filler(::caffe::FillerParameter* dec_trans_weight_filler);
 
+  // optional .caffe.FillerParameter dec_trans_bias_filler = 11;
+  inline bool has_dec_trans_bias_filler() const;
+  inline void clear_dec_trans_bias_filler();
+  static const int kDecTransBiasFillerFieldNumber = 11;
+  inline const ::caffe::FillerParameter& dec_trans_bias_filler() const;
+  inline ::caffe::FillerParameter* mutable_dec_trans_bias_filler();
+  inline ::caffe::FillerParameter* release_dec_trans_bias_filler();
+  inline void set_allocated_dec_trans_bias_filler(::caffe::FillerParameter* dec_trans_bias_filler);
+
+  // optional uint32 sequence_length = 9;
+  inline bool has_sequence_length() const;
+  inline void clear_sequence_length();
+  static const int kSequenceLengthFieldNumber = 9;
+  inline ::google::protobuf::uint32 sequence_length() const;
+  inline void set_sequence_length(::google::protobuf::uint32 value);
+
+  // optional bool decode = 10 [default = false];
+  inline bool has_decode() const;
+  inline void clear_decode();
+  static const int kDecodeFieldNumber = 10;
+  inline bool decode() const;
+  inline void set_decode(bool value);
+
+  // optional float drop_input_prob = 12 [default = 0];
+  inline bool has_drop_input_prob() const;
+  inline void clear_drop_input_prob();
+  static const int kDropInputProbFieldNumber = 12;
+  inline float drop_input_prob() const;
+  inline void set_drop_input_prob(float value);
+
+  // optional float drop_output_prob = 13 [default = 0];
+  inline bool has_drop_output_prob() const;
+  inline void clear_drop_output_prob();
+  static const int kDropOutputProbFieldNumber = 13;
+  inline float drop_output_prob() const;
+  inline void set_drop_output_prob(float value);
+
   // @@protoc_insertion_point(class_scope:caffe.RecurrentParameter)
  private:
   inline void set_has_num_output();
@@ -7367,6 +7404,16 @@ class RecurrentParameter : public ::google::protobuf::Message {
   inline void clear_has_num_rec_feature();
   inline void set_has_dec_trans_weight_filler();
   inline void clear_has_dec_trans_weight_filler();
+  inline void set_has_dec_trans_bias_filler();
+  inline void clear_has_dec_trans_bias_filler();
+  inline void set_has_sequence_length();
+  inline void clear_has_sequence_length();
+  inline void set_has_decode();
+  inline void clear_has_decode();
+  inline void set_has_drop_input_prob();
+  inline void clear_has_drop_input_prob();
+  inline void set_has_drop_output_prob();
+  inline void clear_has_drop_output_prob();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -7378,8 +7425,13 @@ class RecurrentParameter : public ::google::protobuf::Message {
   bool debug_info_;
   bool no_memory_cell_;
   bool pred_;
+  bool decode_;
   ::caffe::FillerParameter* dec_trans_weight_filler_;
   ::google::protobuf::uint32 num_rec_feature_;
+  ::google::protobuf::uint32 sequence_length_;
+  ::caffe::FillerParameter* dec_trans_bias_filler_;
+  float drop_input_prob_;
+  float drop_output_prob_;
   friend void  protobuf_AddDesc_caffe_2eproto();
   friend void protobuf_AssignDesc_caffe_2eproto();
   friend void protobuf_ShutdownFile_caffe_2eproto();
@@ -19556,6 +19608,143 @@ inline void RecurrentParameter::set_allocated_dec_trans_weight_filler(::caffe::F
     clear_has_dec_trans_weight_filler();
   }
   // @@protoc_insertion_point(field_set_allocated:caffe.RecurrentParameter.dec_trans_weight_filler)
+}
+
+// optional .caffe.FillerParameter dec_trans_bias_filler = 11;
+inline bool RecurrentParameter::has_dec_trans_bias_filler() const {
+  return (_has_bits_[0] & 0x00000100u) != 0;
+}
+inline void RecurrentParameter::set_has_dec_trans_bias_filler() {
+  _has_bits_[0] |= 0x00000100u;
+}
+inline void RecurrentParameter::clear_has_dec_trans_bias_filler() {
+  _has_bits_[0] &= ~0x00000100u;
+}
+inline void RecurrentParameter::clear_dec_trans_bias_filler() {
+  if (dec_trans_bias_filler_ != NULL) dec_trans_bias_filler_->::caffe::FillerParameter::Clear();
+  clear_has_dec_trans_bias_filler();
+}
+inline const ::caffe::FillerParameter& RecurrentParameter::dec_trans_bias_filler() const {
+  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.dec_trans_bias_filler)
+  return dec_trans_bias_filler_ != NULL ? *dec_trans_bias_filler_ : *default_instance_->dec_trans_bias_filler_;
+}
+inline ::caffe::FillerParameter* RecurrentParameter::mutable_dec_trans_bias_filler() {
+  set_has_dec_trans_bias_filler();
+  if (dec_trans_bias_filler_ == NULL) dec_trans_bias_filler_ = new ::caffe::FillerParameter;
+  // @@protoc_insertion_point(field_mutable:caffe.RecurrentParameter.dec_trans_bias_filler)
+  return dec_trans_bias_filler_;
+}
+inline ::caffe::FillerParameter* RecurrentParameter::release_dec_trans_bias_filler() {
+  clear_has_dec_trans_bias_filler();
+  ::caffe::FillerParameter* temp = dec_trans_bias_filler_;
+  dec_trans_bias_filler_ = NULL;
+  return temp;
+}
+inline void RecurrentParameter::set_allocated_dec_trans_bias_filler(::caffe::FillerParameter* dec_trans_bias_filler) {
+  delete dec_trans_bias_filler_;
+  dec_trans_bias_filler_ = dec_trans_bias_filler;
+  if (dec_trans_bias_filler) {
+    set_has_dec_trans_bias_filler();
+  } else {
+    clear_has_dec_trans_bias_filler();
+  }
+  // @@protoc_insertion_point(field_set_allocated:caffe.RecurrentParameter.dec_trans_bias_filler)
+}
+
+// optional uint32 sequence_length = 9;
+inline bool RecurrentParameter::has_sequence_length() const {
+  return (_has_bits_[0] & 0x00000200u) != 0;
+}
+inline void RecurrentParameter::set_has_sequence_length() {
+  _has_bits_[0] |= 0x00000200u;
+}
+inline void RecurrentParameter::clear_has_sequence_length() {
+  _has_bits_[0] &= ~0x00000200u;
+}
+inline void RecurrentParameter::clear_sequence_length() {
+  sequence_length_ = 0u;
+  clear_has_sequence_length();
+}
+inline ::google::protobuf::uint32 RecurrentParameter::sequence_length() const {
+  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.sequence_length)
+  return sequence_length_;
+}
+inline void RecurrentParameter::set_sequence_length(::google::protobuf::uint32 value) {
+  set_has_sequence_length();
+  sequence_length_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.sequence_length)
+}
+
+// optional bool decode = 10 [default = false];
+inline bool RecurrentParameter::has_decode() const {
+  return (_has_bits_[0] & 0x00000400u) != 0;
+}
+inline void RecurrentParameter::set_has_decode() {
+  _has_bits_[0] |= 0x00000400u;
+}
+inline void RecurrentParameter::clear_has_decode() {
+  _has_bits_[0] &= ~0x00000400u;
+}
+inline void RecurrentParameter::clear_decode() {
+  decode_ = false;
+  clear_has_decode();
+}
+inline bool RecurrentParameter::decode() const {
+  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.decode)
+  return decode_;
+}
+inline void RecurrentParameter::set_decode(bool value) {
+  set_has_decode();
+  decode_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.decode)
+}
+
+// optional float drop_input_prob = 12 [default = 0];
+inline bool RecurrentParameter::has_drop_input_prob() const {
+  return (_has_bits_[0] & 0x00000800u) != 0;
+}
+inline void RecurrentParameter::set_has_drop_input_prob() {
+  _has_bits_[0] |= 0x00000800u;
+}
+inline void RecurrentParameter::clear_has_drop_input_prob() {
+  _has_bits_[0] &= ~0x00000800u;
+}
+inline void RecurrentParameter::clear_drop_input_prob() {
+  drop_input_prob_ = 0;
+  clear_has_drop_input_prob();
+}
+inline float RecurrentParameter::drop_input_prob() const {
+  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.drop_input_prob)
+  return drop_input_prob_;
+}
+inline void RecurrentParameter::set_drop_input_prob(float value) {
+  set_has_drop_input_prob();
+  drop_input_prob_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.drop_input_prob)
+}
+
+// optional float drop_output_prob = 13 [default = 0];
+inline bool RecurrentParameter::has_drop_output_prob() const {
+  return (_has_bits_[0] & 0x00001000u) != 0;
+}
+inline void RecurrentParameter::set_has_drop_output_prob() {
+  _has_bits_[0] |= 0x00001000u;
+}
+inline void RecurrentParameter::clear_has_drop_output_prob() {
+  _has_bits_[0] &= ~0x00001000u;
+}
+inline void RecurrentParameter::clear_drop_output_prob() {
+  drop_output_prob_ = 0;
+  clear_has_drop_output_prob();
+}
+inline float RecurrentParameter::drop_output_prob() const {
+  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.drop_output_prob)
+  return drop_output_prob_;
+}
+inline void RecurrentParameter::set_drop_output_prob(float value) {
+  set_has_drop_output_prob();
+  drop_output_prob_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.drop_output_prob)
 }
 
 // -------------------------------------------------------------------

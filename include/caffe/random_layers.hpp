@@ -97,6 +97,16 @@ namespace caffe{
 		//needed in backpropagation
 		Blob<Dtype> gaussian_value_;
 	};
+
+	/*
+	 *@brief this layer is to reverse the data in given dimension
+	 */
+
+	template <typename Dtype>
+	class ChangeOrderLayer : public Layer<Dtype> {
+	public:
+		explicit ChangeOrderLayer(const LayerParameter& param) : Layer<Dtype>(param){}
+	};
 }
 
 #endif

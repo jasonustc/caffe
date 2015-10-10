@@ -228,9 +228,6 @@
     <ClCompile Include="..\src\caffe\layers\lstm_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\lstm_unit_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\caffe\layers\recurrent_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
@@ -306,13 +303,13 @@
     <ClCompile Include="..\src\caffe\layers\gen_rec_loss_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\lstm_pred_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\caffe\layers\recurrent_pred_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\caffe.cpp" />
+    <ClCompile Include="..\src\caffe\layers\lstm_unit_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tools\test\test_dlstm_layer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
@@ -426,9 +423,6 @@
     <CudaCompile Include="..\src\caffe\layers\embed_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\lstm_unit_layer.cu">
-      <Filter>src\layers</Filter>
-    </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\recurrent_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
@@ -463,6 +457,9 @@
       <Filter>src\layers</Filter>
     </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\recurrent_pred_layer.cu">
+      <Filter>src\layers</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\src\caffe\layers\lstm_unit_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
   </ItemGroup>
@@ -554,9 +551,6 @@
     <ClInclude Include="..\include\caffe\sequence_layers.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\caffe\video_layers.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\caffe\random_layers.hpp">
       <Filter>include</Filter>
     </ClInclude>
@@ -571,6 +565,9 @@
     </ClInclude>
     <ClInclude Include="..\include\caffe\util\math_functions.hpp">
       <Filter>include\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\caffe\video_layers.hpp">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -424,7 +424,7 @@ template <typename Dtype>
 class LSTMUnitLayer : public Layer<Dtype> {
  public:
   explicit LSTMUnitLayer(const LayerParameter& param)
-      : Layer<Dtype>(param) {}
+      : decode_(false), Layer<Dtype>(param) {}
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
 
@@ -502,6 +502,11 @@ class LSTMUnitLayer : public Layer<Dtype> {
   /// @brief The hidden and output dimension.
   int hidden_dim_;
   Blob<Dtype> X_acts_;
+
+  //to indicate if this is the LSTM decoder unit, if so, we don't need
+  //to clear start point memory, because the start point memory is loaded
+  //from the last point of encoding sequence
+  bool decode_;
 };
 
 

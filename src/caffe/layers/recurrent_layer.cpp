@@ -225,6 +225,8 @@ void RecurrentLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     unrolled_net_->ShareWeightData();
   }
 
+  //before the forward pass, we copy the last c and last h 
+  //to c_0 and h_0
   DCHECK_EQ(recur_input_blobs_.size(), recur_output_blobs_.size());
   for (int i = 0; i < recur_input_blobs_.size(); ++i) {
     const int count = recur_input_blobs_[i]->count();
