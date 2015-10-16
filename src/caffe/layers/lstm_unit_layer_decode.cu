@@ -34,7 +34,7 @@ __global__ void LSTMActsForward(const int nthreads, const int dim,
 template <typename Dtype>
 __global__ void LSTMUnitForward(const int nthreads, const int dim,
     const Dtype* C_prev, const Dtype* X, const Dtype* flush,
-    Dtype* C, Dtype* H) {
+    Dtype* C, Dtype* H, const bool decode) {
   CUDA_KERNEL_LOOP(index, nthreads) {
     const int n = index / dim;
     const int d = index % dim;
@@ -44,7 +44,9 @@ __global__ void LSTMUnitForward(const int nthreads, const int dim,
     const Dtype o = X_offset[2 * dim + d];
     const Dtype g = X_offset[3 * dim + d];
     const Dtype c_prev = C_prev[index];
-    const Dtype c = flush[n] * f * c_prev + i * g;
+	const Dtype flush_decode = decode ? Dtype(1) : flush[n];
+    const Dtype c = flush_decode * f * c_prev + i * g;
+//    const Dtype c = flush[n] * f * c_prev + i * g;
     C[index] = c;
     const Dtype tanh_c = tanh(c);
     H[index] = o * tanh_c;
@@ -68,7 +70,7 @@ void LSTMUnitLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
   CUDA_POST_KERNEL_CHECK;
   // NOLINT_NEXT_LINE(whitespace/operators)
   LSTMUnitForward<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
-      count, hidden_dim_, C_prev, X_acts, flush, C, H);
+      count, hidden_dim_, C_prev, X_acts, flush, C, H, this->decode_);
   CUDA_POST_KERNEL_CHECK;
 }
 
@@ -76,7 +78,7 @@ template <typename Dtype>
 __global__ void LSTMUnitBackward(const int nthreads, const int dim,
     const Dtype* C_prev, const Dtype* X, const Dtype* C, const Dtype* H,
     const Dtype* flush, const Dtype* C_diff, const Dtype* H_diff,
-    Dtype* C_prev_diff, Dtype* X_diff) {
+    Dtype* C_prev_diff, Dtype* X_diff, const bool decode) {
   CUDA_KERNEL_LOOP(index, nthreads) {
     const int n = index / dim;
     const int d = index % dim;
@@ -96,7 +98,8 @@ __global__ void LSTMUnitBackward(const int nthreads, const int dim,
     Dtype* g_diff = X_diff_offset + 3 * dim + d;
     const Dtype c_term_diff =
         C_diff[index] + H_diff[index] * o * (1 - tanh_c * tanh_c);
-    const Dtype flush_n = flush[n];
+//    const Dtype flush_n = flush[n];
+	const Dtype flush_n = decode ? Dtype(1) : flush[n];
     *c_prev_diff = flush_n * c_term_diff * f;
     *i_diff = c_term_diff * g;
     *f_diff = flush_n * c_term_diff * c_prev;
@@ -139,7 +142,7 @@ void LSTMUnitLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
   Dtype* X_acts_diff = X_acts_.mutable_gpu_diff();
   LSTMUnitBackward<Dtype>  // NOLINT_NEXT_LINE(whitespace/operators)
       <<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(count, hidden_dim_,
-      C_prev, X_acts, C, H, flush, C_diff, H_diff, C_prev_diff, X_acts_diff);
+      C_prev, X_acts, C, H, flush, C_diff, H_diff, C_prev_diff, X_acts_diff, this->decode_);
   CUDA_POST_KERNEL_CHECK;
   const int X_count = bottom[1]->count();
   Dtype* X_diff = bottom[1]->mutable_gpu_diff();

@@ -27,6 +27,7 @@ template <typename Dtype>
 void SplitLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
 	//just make many copies as output?
+	//only share data, don't share diff
   for (int i = 0; i < top.size(); ++i) {
     top[i]->ShareData(*bottom[0]);
   }
@@ -36,6 +37,8 @@ template <typename Dtype>
 void SplitLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
   if (!propagate_down[0]) { return; }
+  //accumulate diff of different top blobs into bottom
+  //not cover
   if (top.size() == 1) {
     caffe_copy(count_, top[0]->cpu_diff(), bottom[0]->mutable_cpu_diff());
     return;

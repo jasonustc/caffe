@@ -10,21 +10,21 @@
 
 namespace caffe{
 	template <typename Dtype>
-	void TwoPathLSTMLayer<Dtype>::RecurrentInputBlobNames(vector<string>* names) const {
+	void DLSTMLayer<Dtype>::RecurrentInputBlobNames(vector<string>* names) const {
 		names->resize(2);
 		(*names)[0] = "h_0";
 		(*names)[1] = "c_0";
 	}
 
 	template <typename Dtype>
-	void TwoPathLSTMLayer<Dtype>::RecurrentOutputBlobNames(vector<string>* names) const {
+	void DLSTMLayer<Dtype>::RecurrentOutputBlobNames(vector<string>* names) const {
 		names->resize(2);
 		(*names)[0] = "h_" + this->int_to_str(this->T_);
 		(*names)[1] = "c_T";
 	}
 
 	template <typename Dtype>
-	void TwoPathLSTMLayer<Dtype>::OutputBlobNames(vector<string>* names) const {
+	void DLSTMLayer<Dtype>::OutputBlobNames(vector<string>* names) const {
 		names->resize(2);
 		(*names)[0] = "h_mem";
 		(*names)[1] = "h_tut";
@@ -32,86 +32,31 @@ namespace caffe{
 
 	//TODO: split the process of encoding and decoding
 	template <typename Dtype>
-	void TwoPathLSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const{
+	void DLSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const{
 		const int num_output = this->layer_param_.recurrent_param().num_output();
-		const int num_z = this->layer_param_.recurrent_param().num_z();
-		const int num_rec = this->layer_param_.recurrent_param().num_rec();
+		const int sequence_len = this->layer_param_.recurrent_param().sequence_length();
+		CHECK_GT(sequence_len, 0) << "sequence length must be positive";
+		CHECK(this->T_ % sequence_len == 0) << "sequence length must be divided by T_";
 		CHECK_GT(num_output, 0) << "num_output must be positive";
 		//must share weights with LSTM layer
 		const FillerParameter& weight_filler =
 			this->layer_param_.recurrent_param().weight_filler();
 		const FillerParameter& bias_filler =
 			this->layer_param_.recurrent_param().bias_filler();
-
-		//latent weight and bias filler
-		const FillerParameter& latent_weight_filler =
-			this->layer_param_.recurrent_param().latent_weight_filler();
-		const FillerParameter& latent_bias_filler =
-			this->layer_param_.recurrent_param().latent_bias_filler();
-
 		//Add generic LayerParameter's (without bottoms/tops) of layer types we'll
 		//use to save redundant code.
 		LayerParameter hidden_param;
 		hidden_param.set_type("InnerProduct");
 		//i_t, f_t, o_t, g_t
-		//num_output: num of features in decoding and encoding hidden layer
 		hidden_param.mutable_inner_product_param()->set_num_output(num_output * 4);
 		hidden_param.mutable_inner_product_param()->set_bias_term(false);
 		hidden_param.mutable_inner_product_param()->set_axis(2);
 		hidden_param.mutable_inner_product_param()->mutable_weight_filler()->CopyFrom(weight_filler);
-
 		//bias
 		LayerParameter biased_hidden_param(hidden_param);
 		biased_hidden_param.mutable_inner_product_param()->set_bias_term(true);
 		biased_hidden_param.mutable_inner_product_param()->mutable_bias_filler()->CopyFrom(bias_filler);
 
-		//weight and bias from encode hidden units to \mu and \sigma
-		LayerParameter enc_to_mu_param;
-		enc_to_mu_param.set_type("InnerProduct");
-		enc_to_mu_param.mutable_inner_product_param()->set_num_output(num_z);
-		enc_to_mu_param.mutable_inner_product_param()->set_bias_term(true);
-		enc_to_mu_param.mutable_inner_product_param()->set_axis(2);
-		enc_to_mu_param.mutable_inner_product_param()->mutable_weight_filler()->CopyFrom(latent_weight_filler);
-
-		LayerParameter enc_to_sigma_param;
-		enc_to_sigma_param.set_type("InnerProduct");
-		enc_to_sigma_param.mutable_inner_product_param()->set_num_output(num_z);
-		enc_to_sigma_param.mutable_inner_product_param()->set_bias_term(true);
-		enc_to_sigma_param.mutable_inner_product_param()->set_axis(2);
-		enc_to_sigma_param.mutable_inner_product_param()->mutable_weight_filler()->CopyFrom(latent_bias_filler);
-
-		//weight and bias parameter from decode hidden units to \mu and \sigma
-		LayerParameter dec_to_mu_param;
-		dec_to_mu_param.set_type("InnerProduct");
-		dec_to_mu_param.mutable_inner_product_param()->set_num_output(num_z);
-		dec_to_mu_param.mutable_inner_product_param()->set_bias_term(true);
-		dec_to_mu_param.mutable_inner_product_param()->set_axis(2);
-		dec_to_mu_param.mutable_inner_product_param()->mutable_weight_filler()->CopyFrom(latent_weight_filler);
-
-		LayerParameter dec_to_sigma_param;
-		dec_to_sigma_param.set_type("InnerProduct");
-		dec_to_sigma_param.mutable_inner_product_param()->set_num_output(num_z);
-		dec_to_sigma_param.mutable_inner_product_param()->set_bias_term(true);
-		dec_to_sigma_param.mutable_inner_product_param()->set_axis(2);
-		dec_to_sigma_param.mutable_inner_product_param()->mutable_weight_filler()->CopyFrom(latent_bias_filler);
-
-
-
-		//parameter for reconstruction layer
-		//TODO: make this more adaptive from layer parameters
-		//here just hack for run the experiment
-//		const int dec_num_output = 4096;
-//		LayerParameter dec_hidden_param;
-//		dec_hidden_param.set_type("InnerProduct");
-//		//i_t, f_t, o_t, g_t
-//		dec_hidden_param.mutable_inner_product_param()->set_num_output(dec_num_output * 4);
-//		dec_hidden_param.mutable_inner_product_param()->set_bias_term(false);
-//		dec_hidden_param.mutable_inner_product_param()->set_axis(2);
-//		dec_hidden_param.mutable_inner_product_param()->mutable_weight_filler()->CopyFrom(weight_filler);
-//		//bias
-//		LayerParameter dec_biased_hidden_param(dec_hidden_param);
-//		dec_biased_hidden_param.mutable_inner_product_param()->set_bias_term(true);
-//		dec_biased_hidden_param.mutable_inner_product_param()->mutable_bias_filler()->CopyFrom(bias_filler);
 
 		//sum
 		LayerParameter sum_param;
@@ -160,6 +105,21 @@ namespace caffe{
 			x_transform_param->add_top("W_xc_x");
 		}
 
+		//Add layer to transform all timesteps of x to the hidden state dimension
+		//in decoder LSTM.
+		//W_xc_x_d = W_xc_d * x + b_c_d
+		{
+			//missing type
+			LayerParameter* x_transform_param = net_param->add_layer();
+			x_transform_param->CopyFrom(biased_hidden_param);
+			x_transform_param->set_name("x_transform_d");
+			//param: share weights and biases
+			x_transform_param->add_param()->set_name("W_xc_d");
+			x_transform_param->add_param()->set_name("b_c_d");
+			x_transform_param->add_bottom("x");
+			x_transform_param->add_top("W_xc_x_d");
+		}
+
 		if (this->static_input_){
 			//Add layer to transform x_static to the gate dimension.
 			//      W_xc_x_static = W_xc_static * x_static
@@ -191,6 +151,14 @@ namespace caffe{
 		x_slice_param->add_bottom("W_xc_x");
 		x_slice_param->set_name("W_xc_x_slice");
 
+
+		//slice input along axis 0(time), to get each time step input
+		//default slice step is 1 along given axis
+		LayerParameter* x_slice_param_d = net_param->add_layer();
+		x_slice_param_d->CopyFrom(slice_param);
+		x_slice_param_d->add_bottom("W_xc_x_d");
+		x_slice_param_d->set_name("W_xc_x_slice_d");
+
 		LayerParameter output_concat_layer_mem;
 		output_concat_layer_mem.set_name("h_concat_mem");
 		output_concat_layer_mem.set_type("Concat");
@@ -204,6 +172,7 @@ namespace caffe{
 		output_concat_layer_tut.add_top("h_tut");
 		//concatenate along axis 0(time)
 		output_concat_layer_tut.mutable_concat_param()->set_axis(0);
+
 
 		//save parameter for every time step
 		for (int t = 1; t <= this->T_; ++t){
@@ -285,52 +254,46 @@ namespace caffe{
 			output_concat_layer_tut.add_bottom("h_" + ts);
 		}//for (int t =1; t <= this->T_; ++t)
 
+		for (int t = 1; t <= this->T_; t++){
+			x_slice_param_d->add_top("W_xc_x_d_" + this->int_to_str(t));
+		}
+
+		vector<string> dec_h_names;
+		vector<string> not_used_h_names;
+		vector<string> not_used_c_names;
 		//set up decoding LSTM
 		for (int dt = 1; dt <= this->T_; ++dt){
 			string dts = this->int_to_str(dt + this->T_);
 			string dtm1s = this->int_to_str(dt + this->T_ - 1);
 			string ots = this->int_to_str(dt);
-			//Add layers to flush the hidden state when beginning a new 
-			//sequence, as indicated by cont_t.
-			//		h_conted_{t-1} := cont_t * h_{t-1}
-			//
-			//    Normally, cont_t is binary (i.e., 0 or 1), so:
-			//      h_conted_{t-1} := h_{t-1} if cont_t == 1
-			//								  0 otherwise
-			{
-				LayerParameter* dconted_h_param = net_param->add_layer();
-				dconted_h_param->CopyFrom(sum_param);
-				dconted_h_param->mutable_eltwise_param()->set_coeff_blob(true);
-				dconted_h_param->set_name("h_conted_" + dtm1s);
-				dconted_h_param->add_bottom("h_" + dtm1s);
-				dconted_h_param->add_bottom("cont_" + ots);
-				dconted_h_param->add_top("h_conted_" + dtm1s);
-			}
+			//the ending time of corresponding encoding sequence
+			int seq_reversed_t = dt % sequence_len == 0 ? dt - sequence_len + 1 :
+				(dt / sequence_len) * sequence_len +
+				(sequence_len - (dt % sequence_len) + 1);
+			int dm1t = dt - 1;
+			int seq_reversed_tm1 = dm1t % sequence_len == 0 ? dm1t - sequence_len + 1 :
+				(dm1t / sequence_len) * sequence_len +
+				(sequence_len - (dm1t % sequence_len) + 1);
+			string seq_reversed_ts = this->int_to_str(seq_reversed_t);
+			string seq_reversed_tm1s = this->int_to_str(seq_reversed_tm1);
+			string dec_h_name = (dt - 1) % sequence_len == 0 ? "h_" + seq_reversed_ts :
+				"h_" + dtm1s;
+			string dec_c_name = (dt - 1) % sequence_len == 0 ? "c_" + seq_reversed_ts :
+				"c_" + dtm1s;
+			dec_h_names.push_back(dec_h_name);
 
-			//LSTM decoder
-			//Add layer to transform the input-state of the last time to the hidden state dimension.
-			//W_xc_x = W_xc * h_{t-1} + b_c
-			{
-				LayerParameter* input_transform_param = net_param->add_layer();
-				input_transform_param->CopyFrom(biased_hidden_param);
-				//use independent weight and bias from encoder
-				input_transform_param->add_param()->set_name("w_xc_d");
-				input_transform_param->add_param()->set_name("b_c_d");
-				input_transform_param->set_name("W_xc_x_" + dts);
-				input_transform_param->add_bottom("h_" + dtm1s);
-				input_transform_param->add_top("W_xc_x_" + dts);
-			}
 
 			//Add layer to compute
 			//   W_hc_h_{t-1} := W_hc * h_conted_{t-1}
 			{
 				LayerParameter* dw_param = net_param->add_layer();
 				dw_param->CopyFrom(hidden_param);
-				dw_param->set_name("transform_" + dtm1s);
+				dw_param->set_name("transform_d_" + dtm1s);
 				//use different decoding weight here, need to train independently
-				dw_param->add_param()->set_name("dW_hc");
-				dw_param->add_bottom("h_conted_" + dtm1s);
-				dw_param->add_top("w_hc_h_" + dtm1s);
+				dw_param->add_param()->set_name("W_hc_d");
+				dw_param->add_bottom("h_" + this->int_to_str(4));
+//				dw_param->add_bottom(dec_h_name);
+				dw_param->add_top("W_hc_h_" + dtm1s);
 				//sum along streams and times
 				dw_param->mutable_inner_product_param()->set_axis(2);
 			}
@@ -340,28 +303,49 @@ namespace caffe{
 			//                    = W_hc_h_{t-1} + W_xc_x_t + b_C
 			{
 				LayerParameter* dinput_sum_layer = net_param->add_layer();
-				dinput_sum_layer->CopyFrom(sum_param);
-				dinput_sum_layer->set_name("gate_input_" + dts);
-				dinput_sum_layer->add_bottom("w_hc_h_" + dtm1s);
-				dinput_sum_layer->add_bottom("W_xc_x_" + dts);
-				dinput_sum_layer->add_top("gate_input_" + dts);
+//				if ((dt - 1) % sequence_len == 0){
+//					dinput_sum_layer->set_name("gate_input_" + dts);
+//					dinput_sum_layer->set_type("Copy");
+//					dinput_sum_layer->add_bottom("W_hc_h_" + dtm1s);
+//					dinput_sum_layer->add_top("gate_input_" + dts);
+//				}
+//				else{
+					dinput_sum_layer->CopyFrom(sum_param);
+					dinput_sum_layer->set_name("gate_input_" + dts);
+					dinput_sum_layer->add_bottom("W_hc_h_" + dtm1s);
+//					dinput_sum_layer->add_bottom("W_xc_x_d_" + seq_reversed_tm1s);
+					dinput_sum_layer->add_bottom("W_xc_x_d_" + ots);
+					dinput_sum_layer->add_top("gate_input_" + dts);
+//				}
 			}
 
 			//Add the LSTM Unit to learn sequence feature
 			{
 				LayerParameter* lstm_unit_param = net_param->add_layer();
 				lstm_unit_param->set_type("LSTMUnit");
-				lstm_unit_param->add_bottom("c_" + dtm1s);
+				lstm_unit_param->add_bottom("c_" + this->int_to_str(4));
+//				lstm_unit_param->add_bottom(dec_c_name);
 				lstm_unit_param->add_bottom("gate_input_" + dts);
 				lstm_unit_param->add_bottom("cont_" + ots);
+				lstm_unit_param->mutable_recurrent_param()->set_decode(true);
 				lstm_unit_param->add_top("c_" + dts);
 				lstm_unit_param->add_top("h_" + dts);
 				lstm_unit_param->set_name("unit_" + dts);
 			}
 
-			//output decoding result
-			output_concat_layer_mem.add_bottom("h_" + dts);
 		}// for (int dt = 1; dt <= this->T_; ++dt)
+
+		//in the reconstruction model, the reconstruction order is reversed
+		{
+			const int n_seqs = this->T_ / sequence_len;
+			DCHECK_EQ(dec_h_names.size(), this->T_);
+			for (int n = 0; n < n_seqs; n++){
+				for (int s = sequence_len; s >= 1; s--){
+					string rec_ts = "h_" + this->int_to_str(this->T_ + n * sequence_len + s);
+					output_concat_layer_mem.add_bottom(rec_ts);
+				}
+			}
+		}
 
 		{
 			LayerParameter* c_T_copy_param = net_param->add_layer();
@@ -374,6 +358,6 @@ namespace caffe{
 		net_param->add_layer()->CopyFrom(output_concat_layer_mem);
 	}
 
-	INSTANTIATE_CLASS(TwoPathLSTMLayer);
-	REGISTER_LAYER_CLASS(TwoPathLSTM);
+	INSTANTIATE_CLASS(DLSTMLayer);
+	REGISTER_LAYER_CLASS(DLSTM);
 }

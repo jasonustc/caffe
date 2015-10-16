@@ -27,7 +27,7 @@ namespace caffe{
 			shared_ptr<Layer<Dtype>> layer(new DLSTMLayer<Dtype>(layer_param_));
 			layer->SetUp(bottom_, top_);
 			CHECK(top_[0]->shape() == top_[1]->shape());
-			CHECK_EQ(top_[1]->shape(0), 4);
+			CHECK_EQ(top_[1]->shape(0), 6);
 			CHECK_EQ(top_[1]->shape(1), 1);
 			CHECK_EQ(top_[1]->shape(2), 3);
 			CHECK(top_[2]->shape() == top_[3]->shape());
@@ -94,11 +94,11 @@ namespace caffe{
 	protected:
 		void SetUp(){
 			vector<int> cont_shape;
-			cont_shape.push_back(4);
+			cont_shape.push_back(6);
 			cont_shape.push_back(1);
 			cont_->Reshape(cont_shape);
 			vector<int> x_shape;
-			x_shape.push_back(4);
+			x_shape.push_back(6);
 			x_shape.push_back(1);
 			x_shape.push_back(2);
 			x_->Reshape(x_shape);
@@ -107,7 +107,7 @@ namespace caffe{
 			filler.Fill(x_);
 			caffe_set(cont_->count(), Dtype(1), cont_->mutable_cpu_data());
 			//start a new sequence in 4th element
-			cont_->mutable_cpu_data()[2] = 0;
+			cont_->mutable_cpu_data()[3] = 0;
 			bottom_.push_back(x_);
 			bottom_.push_back(cont_);
 			top_.push_back(h_enc_);
@@ -125,13 +125,9 @@ namespace caffe{
 			layer_param_.mutable_recurrent_param()->mutable_bias_filler()->set_type("constant");
 			layer_param_.mutable_recurrent_param()->mutable_bias_filler()->set_value(0.);
 			layer_param_.mutable_recurrent_param()->mutable_dec_trans_weight_filler()->set_type("uniform");
-			layer_param_.mutable_recurrent_param()->mutable_dec_trans_weight_filler()->set_min(-0.4);
-			layer_param_.mutable_recurrent_param()->mutable_dec_trans_weight_filler()->set_max(0.4);
-			layer_param_.mutable_recurrent_param()->mutable_dec_trans_bias_filler()->set_type("constant");
-			layer_param_.mutable_recurrent_param()->mutable_dec_trans_bias_filler()->set_value(0);
+			layer_param_.mutable_recurrent_param()->mutable_dec_trans_weight_filler()->set_min(-0.004);
+			layer_param_.mutable_recurrent_param()->mutable_dec_trans_weight_filler()->set_max(0.004);
 			layer_param_.mutable_recurrent_param()->set_num_rec_feature(2);
-			layer_param_.mutable_recurrent_param()->set_sequence_length(2);
-			layer_param_.mutable_recurrent_param()->set_decode(true);
 		}
 
 		Blob<Dtype>* cont_;

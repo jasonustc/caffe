@@ -10,7 +10,7 @@
 namespace caffe {
 
 template <typename Dtype>
-void PredRecurrentLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+void DRecurrentLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
   // Hacky fix for test time... reshare all the shared blobs.
   // TODO: somehow make this work non-hackily.
@@ -18,9 +18,8 @@ void PredRecurrentLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     unrolled_net_->ShareWeightData();
   }
 
-  DCHECK_EQ(recur_input_blobs_.size(), recur_output_blobs_.size());
-  //here because the c_0 and h_0 are copied from trained output of other 
-  //LSTMs, so we don't need to update by c_T and h_T in this net
+  //don't need to do this in decoder LSTM
+//  DCHECK_EQ(recur_input_blobs_.size(), recur_output_blobs_.size());
 //  for (int i = 0; i < recur_input_blobs_.size(); ++i) {
 //    const int count = recur_input_blobs_[i]->count();
 //    DCHECK_EQ(count, recur_output_blobs_[i]->count());
@@ -33,6 +32,6 @@ void PredRecurrentLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
   unrolled_net_->ForwardPrefilled();
 }
 
-INSTANTIATE_LAYER_GPU_FORWARD(PredRecurrentLayer);
+INSTANTIATE_LAYER_GPU_FORWARD(DRecurrentLayer);
 
 }  // namespace caffe

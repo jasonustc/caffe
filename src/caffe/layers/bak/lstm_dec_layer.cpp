@@ -11,28 +11,28 @@
 namespace caffe {
 
 template <typename Dtype>
-void PredLSTMLayer<Dtype>::RecurrentInputBlobNames(vector<string>* names) const {
+void LSTMLayer<Dtype>::RecurrentInputBlobNames(vector<string>* names) const {
   names->resize(2);
   (*names)[0] = "h_0";
   (*names)[1] = "c_0";
 }
 
 template <typename Dtype>
-void PredLSTMLayer<Dtype>::RecurrentOutputBlobNames(vector<string>* names) const {
+void LSTMLayer<Dtype>::RecurrentOutputBlobNames(vector<string>* names) const {
   names->resize(2);
   (*names)[0] = "h_" + this->int_to_str(this->T_);
   (*names)[1] = "c_T";
 }
 
 template <typename Dtype>
-void PredLSTMLayer<Dtype>::OutputBlobNames(vector<string>* names) const {
+void LSTMLayer<Dtype>::OutputBlobNames(vector<string>* names) const {
   names->resize(1);
   //output h: all hidden units of time steps
   (*names)[0] = "h";
 }
 
 template <typename Dtype>
-void PredLSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
+void LSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
   const int num_output = this->layer_param_.recurrent_param().num_output();
   CHECK_GT(num_output, 0) << "num_output must be positive";
   const FillerParameter& weight_filler =
@@ -44,7 +44,6 @@ void PredLSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
   // use to save redundant code.
   LayerParameter hidden_param;
   hidden_param.set_type("InnerProduct");
-  //why 4?
   //gate input has 4 types (i_t, f_t, o_t, g_t): 
   //gate_input_t, gate_forget_t, gate_output_t, input_t
   hidden_param.mutable_inner_product_param()->set_num_output(num_output * 4);
@@ -89,8 +88,20 @@ void PredLSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
   cont_slice_param->CopyFrom(slice_param);
   cont_slice_param->set_name("cont_slice");
   cont_slice_param->add_bottom("cont");
-  //default slice step is 1 in axis 1
   cont_slice_param->mutable_slice_param()->set_axis(1);
+
+  // Add layer to transform all timesteps of x to the hidden state dimension.
+  //     W_xc_x = W_xc * x + b_c
+  {
+	//missing type
+    LayerParameter* x_transform_param = net_param->add_layer();
+    x_transform_param->CopyFrom(biased_hidden_param);
+    x_transform_param->set_name("x_transform");
+    x_transform_param->add_param()->set_name("W_xc");
+    x_transform_param->add_param()->set_name("b_c");
+    x_transform_param->add_bottom("x");
+    x_transform_param->add_top("W_xc_x");
+  }
 
   if (this->static_input_) {
     // Add layer to transform x_static to the gate dimension.
@@ -116,6 +127,12 @@ void PredLSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
     reshape_param->add_top("W_xc_x_static");
   }
 
+  LayerParameter* x_slice_param = net_param->add_layer();
+  x_slice_param->CopyFrom(slice_param);
+  //no top here
+  x_slice_param->add_bottom("W_xc_x");
+  x_slice_param->set_name("W_xc_x_slice");
+
   LayerParameter output_concat_layer;
   output_concat_layer.set_name("h_concat");
   output_concat_layer.set_type("Concat");
@@ -128,21 +145,9 @@ void PredLSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
     string tm1s = this->int_to_str(t - 1);
     string ts = this->int_to_str(t);
 
-	// Add layer to transform the last timesteps of h to the hidden state dimension.
-	//     W_xc_h = W_xc * h + b_c
-	{
-		//missing type
-		LayerParameter* h_transform_param = net_param->add_layer();
-		h_transform_param->CopyFrom(biased_hidden_param);
-		h_transform_param->set_name("h_transform" + tm1s);
-		//share parameters through time t
-		h_transform_param->add_param()->set_name("W_xc");
-		h_transform_param->add_param()->set_name("b_c");
-		h_transform_param->add_bottom("h_" + tm1s);
-		h_transform_param->add_top("W_xc_h_" + ts);
-	}
-
+	//slice x and cont to each time step feature
     cont_slice_param->add_top("cont_" + ts);
+    x_slice_param->add_top("W_xc_x_" + ts);
 
     // Add layers to flush the hidden state when beginning a new
     // sequence, as indicated by cont_t.
@@ -187,7 +192,7 @@ void PredLSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
       input_sum_layer->CopyFrom(sum_param);
       input_sum_layer->set_name("gate_input_" + ts);
       input_sum_layer->add_bottom("W_hc_h_" + tm1s);
-      input_sum_layer->add_bottom("W_xc_h_" + ts);
+      input_sum_layer->add_bottom("W_xc_x_" + ts);
       if (this->static_input_) {
         input_sum_layer->add_bottom("W_xc_x_static");
       }
@@ -232,7 +237,7 @@ void PredLSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
   net_param->add_layer()->CopyFrom(output_concat_layer);
 }
 
-INSTANTIATE_CLASS(PredLSTMLayer);
-REGISTER_LAYER_CLASS(PredLSTM);
+INSTANTIATE_CLASS(LSTMLayer);
+REGISTER_LAYER_CLASS(LSTM);
 
 }  // namespace caffe

@@ -25,6 +25,19 @@ void LSTMLayer<Dtype>::RecurrentOutputBlobNames(vector<string>* names) const {
 }
 
 template <typename Dtype>
+void LSTMLayer<Dtype>::RecurrentInputShapes(vector<BlobShape>* shapes) const {
+  const int num_output = this->layer_param_.recurrent_param().num_output();
+  const int num_blobs = 2;
+  shapes->resize(num_blobs);
+  for (int i = 0; i < num_blobs; ++i) {
+    (*shapes)[i].Clear();
+    (*shapes)[i].add_dim(1);  // a single timestep
+    (*shapes)[i].add_dim(this->N_);
+    (*shapes)[i].add_dim(num_output);
+  }
+}
+
+template <typename Dtype>
 void LSTMLayer<Dtype>::OutputBlobNames(vector<string>* names) const {
   names->resize(1);
   (*names)[0] = "h";
@@ -59,6 +72,10 @@ void LSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
   sum_param.mutable_eltwise_param()->set_operation(
       EltwiseParameter_EltwiseOp_SUM);
 
+  LayerParameter scalar_param;
+  scalar_param.set_type("Scalar");
+  scalar_param.mutable_scalar_param()->set_axis(0);
+
   LayerParameter slice_param;
   slice_param.set_type("Slice");
   slice_param.mutable_slice_param()->set_axis(0);
@@ -66,22 +83,21 @@ void LSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
   LayerParameter split_param;
   split_param.set_type("Split");
 
-  BlobShape input_shape;
-  input_shape.add_dim(1);  // c_0 and h_0 are a single timestep
-  input_shape.add_dim(this->N_);
-  input_shape.add_dim(num_output);
+  vector<BlobShape> input_shapes;
+  RecurrentInputShapes(&input_shapes);
+  CHECK_EQ(2, input_shapes.size());
 
   net_param->add_input("c_0");
-  net_param->add_input_shape()->CopyFrom(input_shape);
+  net_param->add_input_shape()->CopyFrom(input_shapes[0]);
 
   net_param->add_input("h_0");
-  net_param->add_input_shape()->CopyFrom(input_shape);
+  net_param->add_input_shape()->CopyFrom(input_shapes[1]);
 
   LayerParameter* cont_slice_param = net_param->add_layer();
   cont_slice_param->CopyFrom(slice_param);
   cont_slice_param->set_name("cont_slice");
   cont_slice_param->add_bottom("cont");
-  cont_slice_param->mutable_slice_param()->set_axis(1);
+  cont_slice_param->mutable_slice_param()->set_axis(0);
 
   // Add layer to transform all timesteps of x to the hidden state dimension.
   //     W_xc_x = W_xc * x + b_c
@@ -104,17 +120,18 @@ void LSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
     x_static_transform_param->set_name("W_xc_x_static");
     x_static_transform_param->add_param()->set_name("W_xc_static");
     x_static_transform_param->add_bottom("x_static");
-    x_static_transform_param->add_top("W_xc_x_static");
+    x_static_transform_param->add_top("W_xc_x_static_preshape");
 
     LayerParameter* reshape_param = net_param->add_layer();
     reshape_param->set_type("Reshape");
     BlobShape* new_shape =
          reshape_param->mutable_reshape_param()->mutable_shape();
     new_shape->add_dim(1);  // One timestep.
-    new_shape->add_dim(this->N_);
+    // Should infer this->N as the dimension so we can reshape on batch size.
+    new_shape->add_dim(-1);
     new_shape->add_dim(
         x_static_transform_param->inner_product_param().num_output());
-    reshape_param->add_bottom("W_xc_x_static");
+    reshape_param->add_bottom("W_xc_x_static_preshape");
     reshape_param->add_top("W_xc_x_static");
   }
 
@@ -145,8 +162,7 @@ void LSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
     //                       0   otherwise
     {
       LayerParameter* cont_h_param = net_param->add_layer();
-      cont_h_param->CopyFrom(sum_param);
-      cont_h_param->mutable_eltwise_param()->set_coeff_blob(true);
+      cont_h_param->CopyFrom(scalar_param);
       cont_h_param->set_name("h_conted_" + tm1s);
       cont_h_param->add_bottom("h_" + tm1s);
       cont_h_param->add_bottom("cont_" + ts);

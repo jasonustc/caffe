@@ -842,10 +842,6 @@ message RecurrentParameter {
   //the sequence length
   optional uint32 sequence_length = 9;
 
-  //if this recurrent layer includes decoding part
-  //only used when building decoding LSTM Unit
-  optional bool decode = 10[default = false];
-
   //if dropout on input
   optional float drop_input_prob = 12[default = 0];
   //if dropout on output

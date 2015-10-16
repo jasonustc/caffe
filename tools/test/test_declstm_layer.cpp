@@ -11,29 +11,31 @@
 
 #include "caffe/sequence_layers.hpp"
 
+float sigmoid_test(float input){
+	return 1. / (1. + exp(-input));
+}
+
+float tanh_test(float input){
+	return 2. * sigmoid_test(2. * input) - 1.;
+}
+
 namespace caffe{
 	template <typename Dtype>
 	class DLSTMTest{
 	public:
-		DLSTMTest() : cont_(new Blob<Dtype>()), x_(new Blob<Dtype>()),
-			h_enc_(new Blob<Dtype>()), h_dec_(new Blob<Dtype>()), c_T_(new Blob<Dtype>()),
+		DLSTMTest() : x_(new Blob<Dtype>()), h_dec_(new Blob<Dtype>()), c_T_(new Blob<Dtype>()),
 			h_T_(new Blob<Dtype>()){
 			this->SetUp();
 		}
 
-		~DLSTMTest(){ delete cont_; delete x_; delete h_enc_; delete h_dec_; delete c_T_; delete h_T_; }
+		~DLSTMTest(){  delete x_; delete h_dec_; delete c_T_; delete h_T_; }
 
 		void TestSetUp(){
 			shared_ptr<Layer<Dtype>> layer(new DLSTMLayer<Dtype>(layer_param_));
 			layer->SetUp(bottom_, top_);
-			CHECK(top_[0]->shape() == top_[1]->shape());
-			CHECK_EQ(top_[1]->shape(0), 4);
-			CHECK_EQ(top_[1]->shape(1), 1);
-			CHECK_EQ(top_[1]->shape(2), 3);
-			CHECK(top_[2]->shape() == top_[3]->shape());
-			CHECK_EQ(top_[2]->shape(0), 1);
-			CHECK_EQ(top_[2]->shape(1), 1);
-			CHECK_EQ(top_[2]->shape(2), 3);
+			CHECK_EQ(top_[0]->shape(0), 4);
+			CHECK_EQ(top_[0]->shape(1), 1);
+			CHECK_EQ(top_[0]->shape(2), 2);
 		}
 
 		void TestCPUForward(){
@@ -41,11 +43,27 @@ namespace caffe{
 			layer->SetUp(bottom_, top_);
 			Caffe::set_mode(Caffe::CPU);
 			layer->Forward(bottom_, top_);
-			layer->Backward(top_, propagate_down_, bottom_);
-			top_[0]->ToTxt("x_dec_cpu");
-			top_[1]->ToTxt("h_enc_cpu");
-			top_[2]->ToTxt("h_T_cpu");
-			top_[3]->ToTxt("c_T_cpu");
+			top_[0]->ToTxt("h_dec_cpu");
+			const Dtype* x_data = x_->cpu_data();
+			const Dtype* h_T_data = h_T_->cpu_data();
+			const Dtype* c_T_data = c_T_->cpu_data();
+			Dtype g_1_i = tanh_test(h_T_data[0] * 0.1 + 0.1 * h_T_data[1] + 0.1 * x_data[3] + 0.l * x_data[2]);
+			Dtype i_1_i = sigmoid_test(0.1 * x_data[2] + 0.1 * x_data[3] + 0.1 * h_T_data[0] + 0.1 * h_T_data[1]);
+			Dtype f_1_i = sigmoid_test(0.1 * x_data[2] + 0.1 * x_data[3] + 0.l * h_T_data[0] + 0.1 * h_T_data[1]);
+			Dtype o_1_i = sigmoid_test(0.1 * x_data[2] + 0.1 * x_data[3] + 0.1 * h_T_data[0] + 0.1 * h_T_data[1]);
+			Dtype c_0_i = c_T_data[0];
+			Dtype c_1_i = g_1_i * i_1_i + f_1_i * c_0_i;
+			Dtype h_1_i = o_1_i * tanh_test(c_1_i);
+			EXPECT_NEAR(h_1_i, top_[0]->cpu_data()[2], 1e-3);
+
+
+			Dtype g_2_i = tanh_test(h_1_i * 0.1 + 0.1 * x_data[1] + h_1_i * 0.1 +  0.1 * x_data[0]);
+			Dtype i_2_i = sigmoid_test(0.1 * x_data[1] + 0.1 * x_data[0] + 0.1 * h_1_i + 0.1 * h_1_i);
+			Dtype f_2_i = sigmoid_test(0.1 * x_data[1] + 0.1 * x_data[0] + 0.l * h_1_i + 0.1 * h_1_i);
+			Dtype o_2_i = sigmoid_test(0.1 * x_data[1] + 0.1 * x_data[0] + 0.1 * h_1_i + 0.1 * h_1_i);
+			Dtype c_2_i = g_2_i * i_2_i + f_2_i * c_1_i;
+			Dtype h_2_i = o_2_i * tanh_test(c_2_i);
+			EXPECT_NEAR(h_2_i, top_[0]->cpu_data()[0], 1e-3);
 		}
 
 		void TestGPUForward(){
@@ -53,11 +71,7 @@ namespace caffe{
 			layer->SetUp(bottom_, top_);
 			Caffe::set_mode(Caffe::GPU);
 			layer->Forward(bottom_, top_);
-			layer->Backward(top_, propagate_down_, bottom_);
-			top_[0]->ToTxt("x_dec_gpu");
-			top_[1]->ToTxt("h_enc_gpu");
-			top_[2]->ToTxt("h_T_gpu");
-			top_[3]->ToTxt("c_T_gpu");
+			top_[0]->ToTxt("h_dec_gpu");
 		}
 
 		void TestCPUGradients(){
@@ -69,11 +83,11 @@ namespace caffe{
 			//checker.CheckGradientExhaustive(&layer, bottom_, top_);
 			layer.SetUp(bottom_, top_);
 			CHECK_GT(top_.size(), 0) << "Exhaustive mode requires at least one top blob.";
+			LOG(INFO) << top_[0]->count();
 			for (int i = 0; i < top_[0]->count(); i++){
 				checker.CheckGradientSingle(&layer, bottom_, top_, 0, 0, i);
-			}
-			for (int i = 0; i < top_[2]->count(); i++){
-				checker.CheckGradientSingle(&layer, bottom_, top_, 0, 0, i);
+				checker.CheckGradientSingle(&layer, bottom_, top_, 1, 0, i);
+				checker.CheckGradientSingle(&layer, bottom_, top_, 2, 0, i);
 			}
 		}
 
@@ -85,59 +99,51 @@ namespace caffe{
 			GradientChecker<Dtype> checker(1e-2, 1e-3);
 			for (int i = 0; i < top_[0]->count(); i++){
 				checker.CheckGradientSingle(&layer, bottom_, top_, 0, 0, i);
-			}
-			for (int i = 0; i < top_[2]->count(); i++){
-				checker.CheckGradientSingle(&layer, bottom_, top_, 0, 0, i);
+				checker.CheckGradientSingle(&layer, bottom_, top_, 1, 0, i);
+				checker.CheckGradientSingle(&layer, bottom_, top_, 2, 0, i);
 			}
 		}
 		
 	protected:
 		void SetUp(){
-			vector<int> cont_shape;
-			cont_shape.push_back(4);
-			cont_shape.push_back(1);
-			cont_->Reshape(cont_shape);
+			vector<int> h_shape;
+			h_shape.push_back(2);
+			h_shape.push_back(1);
+			h_shape.push_back(2);
+			h_T_->Reshape(h_shape);
+			c_T_->Reshape(h_shape);
 			vector<int> x_shape;
 			x_shape.push_back(4);
 			x_shape.push_back(1);
 			x_shape.push_back(2);
 			x_->Reshape(x_shape);
 			FillerParameter filler_param;
-			GaussianFiller<Dtype> filler(filler_param);
+			filler_param.set_value(0.1);
+			ConstantFiller<Dtype> filler(filler_param);
 			filler.Fill(x_);
-			caffe_set(cont_->count(), Dtype(1), cont_->mutable_cpu_data());
-			//start a new sequence in 4th element
-			cont_->mutable_cpu_data()[2] = 0;
+			filler.Fill(h_T_);
+			filler.Fill(c_T_);
+//			h_T_->mutable_cpu_data()[1] = 0.5;
+//			h_T_->mutable_cpu_data()[3] = 1;
+//			c_T_->mutable_cpu_data()[0] = 1.5;
+//			c_T_->mutable_cpu_data()[2] = 1;
 			bottom_.push_back(x_);
-			bottom_.push_back(cont_);
-			top_.push_back(h_enc_);
+			bottom_.push_back(h_T_);
+			bottom_.push_back(c_T_);
 			top_.push_back(h_dec_);
-			top_.push_back(h_T_);
-			top_.push_back(c_T_);
-			propagate_down_.resize(2, true);
-			propagate_down_[1] = false;
+			propagate_down_.resize(3, true);
 
 			//set layer param
-			layer_param_.mutable_recurrent_param()->set_num_output(3);
-			layer_param_.mutable_recurrent_param()->mutable_weight_filler()->set_type("uniform");
-			layer_param_.mutable_recurrent_param()->mutable_weight_filler()->set_min(-0.1);
-			layer_param_.mutable_recurrent_param()->mutable_weight_filler()->set_max(0.1);
+			layer_param_.mutable_recurrent_param()->set_num_output(2);
+			layer_param_.mutable_recurrent_param()->mutable_weight_filler()->set_type("constant");
+			layer_param_.mutable_recurrent_param()->mutable_weight_filler()->set_value(0.1);
 			layer_param_.mutable_recurrent_param()->mutable_bias_filler()->set_type("constant");
 			layer_param_.mutable_recurrent_param()->mutable_bias_filler()->set_value(0.);
-			layer_param_.mutable_recurrent_param()->mutable_dec_trans_weight_filler()->set_type("uniform");
-			layer_param_.mutable_recurrent_param()->mutable_dec_trans_weight_filler()->set_min(-0.4);
-			layer_param_.mutable_recurrent_param()->mutable_dec_trans_weight_filler()->set_max(0.4);
-			layer_param_.mutable_recurrent_param()->mutable_dec_trans_bias_filler()->set_type("constant");
-			layer_param_.mutable_recurrent_param()->mutable_dec_trans_bias_filler()->set_value(0);
-			layer_param_.mutable_recurrent_param()->set_num_rec_feature(2);
 			layer_param_.mutable_recurrent_param()->set_sequence_length(2);
-			layer_param_.mutable_recurrent_param()->set_decode(true);
 		}
 
-		Blob<Dtype>* cont_;
 		Blob<Dtype>* x_;
 
-		Blob<Dtype>* h_enc_;
 		Blob<Dtype>* h_dec_;
 
 		Blob<Dtype>* h_T_;

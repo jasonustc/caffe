@@ -31,9 +31,23 @@ void LSTMLayer<Dtype>::OutputBlobNames(vector<string>* names) const {
 }
 
 template <typename Dtype>
+void LSTMLayer<Dtype>::ConcatSeqEndBlobNames(vector<string>* names) const {
+	names->resize(2);
+	(*names)[0] = "h_T_concat";
+	(*names)[1] = "c_T_concat";
+}
+
+template <typename Dtype>
 void LSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
   const int num_output = this->layer_param_.recurrent_param().num_output();
   CHECK_GT(num_output, 0) << "num_output must be positive";
+  const bool decode_ = this->layer_param_.recurrent_param().decode();
+  int seq_len; 
+  if (decode_){
+	  seq_len = this->layer_param_.recurrent_param().sequence_length();
+	  CHECK_GT(seq_len, 0) << "sequence length must be positive";
+	  CHECK(this->T_ % seq_len == 0) << "T_ must be divided by sequence length";
+  }
   const FillerParameter& weight_filler =
       this->layer_param_.recurrent_param().weight_filler();
   const FillerParameter& bias_filler =
@@ -207,11 +221,33 @@ void LSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const {
   }  // for (int t = 1; t <= this->T_; ++t)
 
   {
-    LayerParameter* c_T_copy_param = net_param->add_layer();
-    c_T_copy_param->CopyFrom(split_param);
-    c_T_copy_param->add_bottom("c_" + this->int_to_str(this->T_));
-    c_T_copy_param->add_top("c_T");
+	  LayerParameter* c_T_copy_param = net_param->add_layer();
+	  c_T_copy_param->CopyFrom(split_param);
+	  c_T_copy_param->add_bottom("c_" + this->int_to_str(this->T_));
+	  c_T_copy_param->add_top("c_T");
   }
+
+  if (decode_){
+	  int num_seq = this->T_ / seq_len;
+
+	  LayerParameter* h_T_param = net_param->add_layer();
+	  h_T_param->add_top("h_T_concat");
+	  h_T_param->set_name("h_T_cont");
+	  h_T_param->set_type("Concat");
+	  h_T_param->mutable_concat_param()->set_axis(0);
+
+	  LayerParameter* c_T_param = net_param->add_layer();
+	  c_T_param->add_top("c_T_concat");
+	  c_T_param->set_name("c_T_cont");
+	  c_T_param->set_type("Concat");
+	  c_T_param->mutable_concat_param()->set_axis(0);
+
+	  for (int n = 0; n < num_seq; n++){
+		  h_T_param->add_bottom("h_" + this->int_to_str(n * seq_len + seq_len));
+		  c_T_param->add_bottom("c_" + this->int_to_str(n * seq_len + seq_len));
+	  }
+  }
+
   net_param->add_layer()->CopyFrom(output_concat_layer);
 }
 

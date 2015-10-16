@@ -25,7 +25,7 @@ template <typename Dtype>
 class RecurrentLayer : public Layer<Dtype> {
  public:
   explicit RecurrentLayer(const LayerParameter& param)
-      : Layer<Dtype>(param) {}
+      : decode_(false), Layer<Dtype>(param) {}
   virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
@@ -72,6 +72,12 @@ class RecurrentLayer : public Layer<Dtype> {
    *        examples.
    */
   virtual void OutputBlobNames(vector<string>* names) const = 0;
+
+  /*
+   * @brief Fills names with the name of the concat result of all the 
+   * (c, h) of the end of sequecnce 
+   */
+  virtual void ConcatSeqEndBlobNames(vector<string>* names) const {};
 
   /**
    * @param bottom input Blob vector (length 2-3)
@@ -151,6 +157,10 @@ class RecurrentLayer : public Layer<Dtype> {
   Blob<Dtype>* x_input_blob_;
   Blob<Dtype>* x_static_input_blob_;
   Blob<Dtype>* cont_input_blob_;
+  vector<Blob<Dtype>*> seq_end_output_blobs_;
+
+  //if this layer need to output all the end feature(c, h) of the sequence
+  bool decode_;
 };
 
 /**
@@ -160,27 +170,23 @@ class RecurrentLayer : public Layer<Dtype> {
  *        architecture, such as RNNLayer or LSTMLayer.
  */
 template <typename Dtype>
-class PredRecurrentLayer : public Layer<Dtype> {
+class DRecurrentLayer : public Layer<Dtype> {
  public:
-  explicit PredRecurrentLayer(const LayerParameter& param)
+  explicit DRecurrentLayer(const LayerParameter& param)
       : Layer<Dtype>(param) {}
   virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
-  virtual void Reset();
 
-  virtual inline const char* type() const { return "PredRecurrent"; }
-  virtual inline int MinBottomBlobs() const { return 2; }
-  virtual inline int MaxBottomBlobs() const { return 3; }
+  virtual inline const char* type() const { return "DecodeRecurrent"; }
+  //h_T, c_T, x need at least 3 inputs
+  virtual inline int MinBottomBlobs() const { return 3; }
+  //reconstructed h feature
+  virtual inline int MaxBottomBlobs() const { return 4; }
   //here added by xu shen
 //  virtual inline int ExactNumTopBlobs() const { return 1; }
-  virtual inline int MinTopBlobs(){ return 2; }
-
-  virtual inline bool AllowForceBackward(const int bottom_index) const {
-    // Can't propagate to sequence continuation indicators.
-    return bottom_index != 1;
-  }
+  virtual inline int MinTopBlobs(){ return 1; }
 
  protected:
   /**
@@ -189,19 +195,6 @@ class PredRecurrentLayer : public Layer<Dtype> {
    */
   virtual void FillUnrolledNet(NetParameter* net_param) const = 0;
 
-  /**
-   * @brief Fills names with the names of the 0th timestep recurrent input
-   *        Blob&s.  Subclasses should define this -- see RNNLayer and LSTMLayer
-   *        for examples.
-   */
-  virtual void RecurrentInputBlobNames(vector<string>* names) const = 0;
-
-  /**
-   * @brief Fills names with the names of the Tth timestep recurrent output
-   *        Blob&s.  Subclasses should define this -- see RNNLayer and LSTMLayer
-   *        for examples.
-   */
-  virtual void RecurrentOutputBlobNames(vector<string>* names) const = 0;
 
   /**
    * @brief Fills names with the names of the output blobs, concatenated across
@@ -210,6 +203,7 @@ class PredRecurrentLayer : public Layer<Dtype> {
    *        examples.
    */
   virtual void OutputBlobNames(vector<string>* names) const = 0;
+
 
   /**
    * @param bottom input Blob vector (length 2-3)
@@ -278,19 +272,24 @@ class PredRecurrentLayer : public Layer<Dtype> {
    */
   int T_;
 
+  /*
+   * @brief The length of sequence
+   */
+  int len_seq_;
+
   /// @brief Whether the layer has a "static" input copied across all timesteps.
   bool static_input_;
 
-  vector<Blob<Dtype>* > recur_input_blobs_;
-  //this is only the C_T and h_T
-  vector<Blob<Dtype>* > recur_output_blobs_;
   //this is all the features catencated: (h_1, h_2,..., h_T)
+  //we don't need cont variables in DRecurrent Layer
   vector<Blob<Dtype>* > output_blobs_;
+  Blob<Dtype>* x_input_blob_;
+  Blob<Dtype>* x_static_input_blob_;
   Blob<Dtype>* h_input_blob_;
   Blob<Dtype>* c_input_blob_;
-  Blob<Dtype>* x_static_input_blob_;
-  Blob<Dtype>* cont_input_blob_;
 };
+
+
 
 /**
  * @brief Processes sequential inputs using a "Long Short-Term Memory" (LSTM)
@@ -325,7 +324,7 @@ template <typename Dtype>
 class LSTMLayer : public RecurrentLayer<Dtype> {
  public:
   explicit LSTMLayer(const LayerParameter& param)
-      : RecurrentLayer<Dtype>(param) {}
+      : decode_(false), RecurrentLayer<Dtype>(param) {}
 
   virtual inline const char* type() const { return "LSTM"; }
 
@@ -334,6 +333,10 @@ class LSTMLayer : public RecurrentLayer<Dtype> {
   virtual void RecurrentInputBlobNames(vector<string>* names) const;
   virtual void RecurrentOutputBlobNames(vector<string>* names) const;
   virtual void OutputBlobNames(vector<string>* names) const;
+  virtual void ConcatSeqEndBlobNames(vector<string>* names) const;
+
+  //if we need to output all the features of the end of the sequence
+  bool decode_;
 };
 
 /**
@@ -366,149 +369,190 @@ class LSTMLayer : public RecurrentLayer<Dtype> {
  *     arXiv preprint arXiv:1308.0850 (2013).
  */
 template <typename Dtype>
-class DLSTMLayer : public RecurrentLayer<Dtype> {
+class DLSTMLayer : public DRecurrentLayer<Dtype> {
  public:
   explicit DLSTMLayer(const LayerParameter& param)
-      : RecurrentLayer<Dtype>(param) {}
+      : DRecurrentLayer<Dtype>(param) {}
 
   virtual inline const char* type() const { return "DLSTM"; }
 
  protected:
   virtual void FillUnrolledNet(NetParameter* net_param) const;
-  virtual void RecurrentInputBlobNames(vector<string>* names) const;
-  virtual void RecurrentOutputBlobNames(vector<string>* names) const;
-  virtual void OutputBlobNames(vector<string>* names) const;
-};
-
-template <typename Dtype>
-class TwoPathLSTMLayer : public RecurrentLayer<Dtype> {
- public:
-  explicit TwoPathLSTMLayer(const LayerParameter& param)
-      : RecurrentLayer<Dtype>(param) {}
-
-  virtual inline const char* type() const { return "TwoPathLSTM"; }
-
- protected:
-  virtual void FillUnrolledNet(NetParameter* net_param) const;
-  virtual void RecurrentInputBlobNames(vector<string>* names) const;
-  virtual void RecurrentOutputBlobNames(vector<string>* names) const;
-  virtual void OutputBlobNames(vector<string>* names) const;
-};
-
-/*
- * @brief in Prediction LSTM layer, we don't need input x, the input of 
- * t_th LSTMUnit is h_{t-1}
- */
-
-template <typename Dtype>
-class PredLSTMLayer : public PredRecurrentLayer<Dtype> {
- public:
-  explicit PredLSTMLayer(const LayerParameter& param)
-      : PredRecurrentLayer<Dtype>(param) {}
-
-  virtual inline const char* type() const { return "PredLSTM"; }
-
- protected:
-  virtual void FillUnrolledNet(NetParameter* net_param) const;
-  virtual void RecurrentInputBlobNames(vector<string>* names) const;
-  virtual void RecurrentOutputBlobNames(vector<string>* names) const;
   virtual void OutputBlobNames(vector<string>* names) const;
 };
 
 /**
- * @brief A helper for LSTMLayer: computes a single timestep of the
- *        non-linearity of the LSTM, producing the updated cell and hidden
- *        states.
- */
+* @brief A helper for LSTMLayer: computes a single timestep of the
+*        non-linearity of the LSTM, producing the updated cell and hidden
+*        states.
+*/
 template <typename Dtype>
 class LSTMUnitLayer : public Layer<Dtype> {
- public:
-  explicit LSTMUnitLayer(const LayerParameter& param)
-      : decode_(false), Layer<Dtype>(param) {}
-  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
+public:
+	explicit LSTMUnitLayer(const LayerParameter& param): Layer<Dtype>(param) {}
+	virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
 
-  virtual inline const char* type() const { return "LSTMUnit"; }
-  virtual inline int ExactNumBottomBlobs() const { return 3; }
-  virtual inline int ExactNumTopBlobs() const { return 2; }
+	virtual inline const char* type() const { return "LSTMUnit"; }
+	virtual inline int ExactNumBottomBlobs() const { return 3; }
+	virtual inline int ExactNumTopBlobs() const { return 2; }
 
-  virtual inline bool AllowForceBackward(const int bottom_index) const {
-    // Can't propagate to sequence continuation indicators.
-    return bottom_index != 2;
-  }
+	virtual inline bool AllowForceBackward(const int bottom_index) const {
+		// Can't propagate to sequence continuation indicators.
+		return bottom_index != 2;
+	}
 
- protected:
-  /**
-   * @param bottom input Blob vector (length 3)
-   *   -# @f$ (1 \times N \times D) @f$
-   *      the previous timestep cell state @f$ c_{t-1} @f$
-   *   -# @f$ (1 \times N \times 4D) @f$
-   *      the "gate inputs" @f$ [i_t', f_t', o_t', g_t'] @f$
-   *   -# @f$ (1 \times 1 \times N) @f$
-   *      the sequence continuation indicators  @f$ \delta_t @f$
-   * @param top output Blob vector (length 2)
-   *   -# @f$ (1 \times N \times D) @f$
-   *      the updated cell state @f$ c_t @f$, computed as:
-   *          i_t := \sigmoid[i_t']
-   *          f_t := \sigmoid[f_t']
-   *          o_t := \sigmoid[o_t']
-   *          g_t := \tanh[g_t']
-   *          c_t := cont_t * (f_t .* c_{t-1}) + (i_t .* g_t)
-   *   -# @f$ (1 \times N \times D) @f$
-   *      the updated hidden state @f$ h_t @f$, computed as:
-   *          h_t := o_t .* \tanh[c_t]
-   */
-  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
-  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
+protected:
+	/**
+	* @param bottom input Blob vector (length 3)
+	*   -# @f$ (1 \times N \times D) @f$
+	*      the previous timestep cell state @f$ c_{t-1} @f$
+	*   -# @f$ (1 \times N \times 4D) @f$
+	*      the "gate inputs" @f$ [i_t', f_t', o_t', g_t'] @f$
+	*   -# @f$ (1 \times 1 \times N) @f$
+	*      the sequence continuation indicators  @f$ \delta_t @f$
+	* @param top output Blob vector (length 2)
+	*   -# @f$ (1 \times N \times D) @f$
+	*      the updated cell state @f$ c_t @f$, computed as:
+	*          i_t := \sigmoid[i_t']
+	*          f_t := \sigmoid[f_t']
+	*          o_t := \sigmoid[o_t']
+	*          g_t := \tanh[g_t']
+	*          c_t := cont_t * (f_t .* c_{t-1}) + (i_t .* g_t)
+	*   -# @f$ (1 \times N \times D) @f$
+	*      the updated hidden state @f$ h_t @f$, computed as:
+	*          h_t := o_t .* \tanh[c_t]
+	*/
+	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+	virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
 
-  /**
-   * @brief Computes the error gradient w.r.t. the LSTMUnit inputs.
-   *
-   * @param top output Blob vector (length 2), providing the error gradient with
-   *        respect to the outputs
-   *   -# @f$ (1 \times N \times D) @f$:
-   *      containing error gradients @f$ \frac{\partial E}{\partial c_t} @f$
-   *      with respect to the updated cell state @f$ c_t @f$
-   *   -# @f$ (1 \times N \times D) @f$:
-   *      containing error gradients @f$ \frac{\partial E}{\partial h_t} @f$
-   *      with respect to the updated cell state @f$ h_t @f$
-   * @param propagate_down see Layer::Backward.
-   * @param bottom input Blob vector (length 3), into which the error gradients
-   *        with respect to the LSTMUnit inputs @f$ c_{t-1} @f$ and the gate
-   *        inputs are computed.  Computatation of the error gradients w.r.t.
-   *        the sequence indicators is not implemented.
-   *   -# @f$ (1 \times N \times D) @f$
-   *      the error gradient w.r.t. the previous timestep cell state
-   *      @f$ c_{t-1} @f$
-   *   -# @f$ (1 \times N \times 4D) @f$
-   *      the error gradient w.r.t. the "gate inputs"
-   *      @f$ [
-   *          \frac{\partial E}{\partial i_t}
-   *          \frac{\partial E}{\partial f_t}
-   *          \frac{\partial E}{\partial o_t}
-   *          \frac{\partial E}{\partial g_t}
-   *          ] @f$
-   *   -# @f$ (1 \times 1 \times N) @f$
-   *      the gradient w.r.t. the sequence continuation indicators
-   *      @f$ \delta_t @f$ is currently not computed.
-   */
-  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
-      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
-  virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
-      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+	/**
+	* @brief Computes the error gradient w.r.t. the LSTMUnit inputs.
+	*
+	* @param top output Blob vector (length 2), providing the error gradient with
+	*        respect to the outputs
+	*   -# @f$ (1 \times N \times D) @f$:
+	*      containing error gradients @f$ \frac{\partial E}{\partial c_t} @f$
+	*      with respect to the updated cell state @f$ c_t @f$
+	*   -# @f$ (1 \times N \times D) @f$:
+	*      containing error gradients @f$ \frac{\partial E}{\partial h_t} @f$
+	*      with respect to the updated cell state @f$ h_t @f$
+	* @param propagate_down see Layer::Backward.
+	* @param bottom input Blob vector (length 3), into which the error gradients
+	*        with respect to the LSTMUnit inputs @f$ c_{t-1} @f$ and the gate
+	*        inputs are computed.  Computatation of the error gradients w.r.t.
+	*        the sequence indicators is not implemented.
+	*   -# @f$ (1 \times N \times D) @f$
+	*      the error gradient w.r.t. the previous timestep cell state
+	*      @f$ c_{t-1} @f$
+	*   -# @f$ (1 \times N \times 4D) @f$
+	*      the error gradient w.r.t. the "gate inputs"
+	*      @f$ [
+	*          \frac{\partial E}{\partial i_t}
+	*          \frac{\partial E}{\partial f_t}
+	*          \frac{\partial E}{\partial o_t}
+	*          \frac{\partial E}{\partial g_t}
+	*          ] @f$
+	*   -# @f$ (1 \times 1 \times N) @f$
+	*      the gradient w.r.t. the sequence continuation indicators
+	*      @f$ \delta_t @f$ is currently not computed.
+	*/
+	virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+		const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+	virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+		const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
 
-  /// @brief The hidden and output dimension.
-  int hidden_dim_;
-  Blob<Dtype> X_acts_;
+	/// @brief The hidden and output dimension.
+	int hidden_dim_;
+	Blob<Dtype> X_acts_;
 
-  //to indicate if this is the LSTM decoder unit, if so, we don't need
-  //to clear start point memory, because the start point memory is loaded
-  //from the last point of encoding sequence
-  bool decode_;
 };
 
+/**
+* @brief A helper for LSTMLayer: computes a single timestep of the
+*        non-linearity of the LSTM, producing the updated cell and hidden
+*        states.
+*/
+template <typename Dtype>
+class DLSTMUnitLayer : public Layer<Dtype> {
+public:
+	explicit DLSTMUnitLayer(const LayerParameter& param) : Layer<Dtype>(param) {}
+	virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+
+	virtual inline const char* type() const { return "DecodeLSTMUnit"; }
+	virtual inline int ExactNumBottomBlobs() const { return 2; }
+	virtual inline int ExactNumTopBlobs() const { return 2; }
+
+protected:
+	/**
+	* @param bottom input Blob vector (length 3)
+	*   -# @f$ (1 \times N \times D) @f$
+	*      the previous timestep cell state @f$ c_{t-1} @f$
+	*   -# @f$ (1 \times N \times 4D) @f$
+	*      the "gate inputs" @f$ [i_t', f_t', o_t', g_t'] @f$
+	*   -# @f$ (1 \times 1 \times N) @f$
+	*      the sequence continuation indicators  @f$ \delta_t @f$
+	* @param top output Blob vector (length 2)
+	*   -# @f$ (1 \times N \times D) @f$
+	*      the updated cell state @f$ c_t @f$, computed as:
+	*          i_t := \sigmoid[i_t']
+	*          f_t := \sigmoid[f_t']
+	*          o_t := \sigmoid[o_t']
+	*          g_t := \tanh[g_t']
+	*          c_t := cont_t * (f_t .* c_{t-1}) + (i_t .* g_t)
+	*   -# @f$ (1 \times N \times D) @f$
+	*      the updated hidden state @f$ h_t @f$, computed as:
+	*          h_t := o_t .* \tanh[c_t]
+	*/
+	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+	virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+
+	/**
+	* @brief Computes the error gradient w.r.t. the LSTMUnit inputs.
+	*
+	* @param top output Blob vector (length 2), providing the error gradient with
+	*        respect to the outputs
+	*   -# @f$ (1 \times N \times D) @f$:
+	*      containing error gradients @f$ \frac{\partial E}{\partial c_t} @f$
+	*      with respect to the updated cell state @f$ c_t @f$
+	*   -# @f$ (1 \times N \times D) @f$:
+	*      containing error gradients @f$ \frac{\partial E}{\partial h_t} @f$
+	*      with respect to the updated cell state @f$ h_t @f$
+	* @param propagate_down see Layer::Backward.
+	* @param bottom input Blob vector (length 3), into which the error gradients
+	*        with respect to the LSTMUnit inputs @f$ c_{t-1} @f$ and the gate
+	*        inputs are computed.  Computatation of the error gradients w.r.t.
+	*        the sequence indicators is not implemented.
+	*   -# @f$ (1 \times N \times D) @f$
+	*      the error gradient w.r.t. the previous timestep cell state
+	*      @f$ c_{t-1} @f$
+	*   -# @f$ (1 \times N \times 4D) @f$
+	*      the error gradient w.r.t. the "gate inputs"
+	*      @f$ [
+	*          \frac{\partial E}{\partial i_t}
+	*          \frac{\partial E}{\partial f_t}
+	*          \frac{\partial E}{\partial o_t}
+	*          \frac{\partial E}{\partial g_t}
+	*          ] @f$
+	*   -# @f$ (1 \times 1 \times N) @f$
+	*      the gradient w.r.t. the sequence continuation indicators
+	*      @f$ \delta_t @f$ is currently not computed.
+	*/
+	virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+		const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+	virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+		const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+
+	/// @brief The hidden and output dimension.
+	int hidden_dim_;
+	Blob<Dtype> X_acts_;
+
+};
 
 /**
  * @brief Processes time-varying inputs using a simple recurrent neural network
