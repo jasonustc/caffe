@@ -841,6 +841,8 @@ namespace caffe {
 		explicit NormLossLayer(const LayerParameter& param) : LossLayer<Dtype>(param){}
 		virtual inline const char* type() const { return "NormLoss"; }
 		virtual inline int ExactNumBottomBlobs() const { return 1; }
+		virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
 
 	protected:
 		virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,

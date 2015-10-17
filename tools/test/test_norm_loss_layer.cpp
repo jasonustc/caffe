@@ -27,7 +27,8 @@ namespace caffe{
 			blob_bottom_->Reshape(2, 1, 2, 2);
 			//fill the values
 			FillerParameter filler_param;
-			filler_param.set_value(1.);
+			filler_param.set_std(1.);
+			filler_param.set_mean(0.);
 			GaussianFiller<Dtype> filler(filler_param);
 			filler.Fill(this->blob_bottom_);
 			blob_bottom_vec_.push_back(blob_bottom_);
@@ -76,6 +77,7 @@ namespace caffe{
 			for (int i = 0; i < this->blob_bottom_vec_[0]->count(); i++){
 				sum_norm += abs(this->blob_bottom_vec_[0]->cpu_data()[i]);
 			}
+			sum_norm /= blob_bottom_vec_[0]->num();
 			EXPECT_NEAR(sum_norm, top_data[0], 1e-4);
 		}
 
@@ -101,6 +103,7 @@ namespace caffe{
 			for (int i = 0; i < this->blob_bottom_->count(); i++){
 				sum_norm += abs(this->blob_bottom_vec_[0]->cpu_data()[i]);
 			}
+			sum_norm /= blob_bottom_vec_[0]->num();
 			EXPECT_NEAR(sum_norm, top_data[0], 1e-4);
 		}
 
@@ -111,6 +114,7 @@ namespace caffe{
 			norm_param->set_norm_type(NormLossParameter_NormType_L1);
 	  		Caffe::set_mode(Caffe::CPU);
 			NormLossLayer<Dtype> checker_layer(layer_param);
+			checker_layer.SetUp(blob_bottom_vec_, blob_top_vec_);
 			GradientChecker<Dtype> checker(1e-2, 1e-3);
 			checker.CheckGradientExhaustive(&checker_layer, this->blob_bottom_vec_, this->blob_top_vec_);
 		}
@@ -122,6 +126,7 @@ namespace caffe{
 			norm_param->set_norm_type(NormLossParameter_NormType_L1);
 			Caffe::set_mode(Caffe::GPU);
 			NormLossLayer<Dtype> layer(layer_param);
+			layer.SetUp(blob_bottom_vec_, blob_top_vec_);
 			GradientChecker<Dtype> checker(1e-2, 1e-3);
 			checker.CheckGradientExhaustive(&layer, this->blob_bottom_vec_, this->blob_top_vec_);
 		}
@@ -131,9 +136,9 @@ namespace caffe{
 int main(int argc, char** argv){
 	caffe::NormLossLayerTest<float> test;
 	test.TestSetup();
-	test.TestCPUGradient();
-	test.TestGPUGradient();
-	test.TestGPUNormLoss();
 	test.TestCPUNormLoss();
+	test.TestCPUGradient();
+	test.TestGPUNormLoss();
+	test.TestGPUGradient();
 	return 0;
 }
