@@ -17,14 +17,17 @@ namespace caffe{
 		const Dtype* bottom_data = bottom[0]->gpu_data();
 		Dtype* top_data = top[0]->mutable_gpu_data();
 		const Dtype scale = 1. / Dtype(num);
+		Dtype asum;
 		switch (this->layer_param_.norm_loss_param().norm_type()){
 		case NormLossParameter_NormType_L1:
-			caffe_gpu_asum(count, bottom_data, top_data);
-			caffe_scal(top[0]->count(), scale, top_data);
+			caffe_gpu_asum(count, bottom_data, &asum);
+			asum *= scale;
+			top[0]->mutable_cpu_data()[0] = asum;
 			break;
 		case NormLossParameter_NormType_L2:
-			caffe_gpu_dot(count, bottom_data, bottom_data, top_data);
-			caffe_scal(top[0]->count(), scale * Dtype(0.5), top_data);
+			caffe_gpu_dot(count, bottom_data, bottom_data, &asum);
+			asum *= scale * Dtype(0.5);
+			top[0]->mutable_cpu_data()[0] = asum;
 			break;
 		default:
 			LOG(FATAL) << "Unkown Norm Type.";
@@ -40,9 +43,9 @@ namespace caffe{
 		const int dim = count / num;
 		Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
 		const Dtype* bottom_data = bottom[0]->gpu_data();
-		const Dtype loss_weight = top[0]->gpu_diff()[0];
+		const Dtype loss_weight = top[0]->cpu_diff()[0];
 		Dtype alpha = loss_weight / num;
-		switch (this->norm_type_)
+		switch (this->layer_param_.norm_loss_param().norm_type())
 		{
 		case NormLossParameter_NormType_L1:
 			caffe_gpu_sign(count, bottom_data, bottom_diff);
