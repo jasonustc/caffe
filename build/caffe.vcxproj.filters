@@ -294,13 +294,13 @@
     <ClCompile Include="..\src\gtest\gtest-all.cpp">
       <Filter>src\test</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\caffe.cpp" />
     <ClCompile Include="..\src\caffe\util\transform.cpp">
       <Filter>src\util</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\caffe\util\random_trans_layer.cpp">
+    <ClCompile Include="..\src\caffe\layers\random_trans_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
+    <ClCompile Include="..\tools\test\test_random_transform_layer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
@@ -444,7 +444,7 @@
     <CudaCompile Include="..\src\caffe\util\transform.cu">
       <Filter>src\util</Filter>
     </CudaCompile>
-    <CudaCompile Include="..\src\caffe\util\random_trans_layer.cu">
+    <CudaCompile Include="..\src\caffe\layers\random_trans_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
   </ItemGroup>
