@@ -34,8 +34,6 @@ namespace caffe{
 		default:
 			LOG(FATAL) << "Unkown Norm Type";
 		}
-		bottom[0]->ToTxt("bottom");
-		top[0]->ToTxt("top");
 	}
 
 	template <typename Dtype>
