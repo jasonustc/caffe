@@ -17,8 +17,12 @@ using namespace caffe;
 using boost::scoped_ptr;
 using std::string;
 
-const int mnist_image_width = 28;
-const int mnist_image_height = 28;
+DEFINE_int32(image_channels, 20, "The channels * sequence length value");
+DEFINE_int32(image_size, 28, "The image size of each frame");
+DEFINE_int32(num_samples, 60000, "Num of samples in the dataset");
+
+const int mnist_image_width = 64;
+const int mnist_image_height = 64;
 //include sequence length into image channels
 //mnist_image_channels = image_channels * sequence_length
 const int mnist_image_channels = 20;
@@ -70,6 +74,7 @@ void create_db(const string& feat_file, const string& db_name, const int image_w
 					image_datum.add_float_data(feat_buf);
 				}
 			}
+		}
 		//sequential 
 		string out;
 		image_datum.SerializeToString(&out);
@@ -84,7 +89,6 @@ void create_db(const string& feat_file, const string& db_name, const int image_w
 			LOG(INFO) << "Processed " << count << " training images in " << diff_time << " s.";
 			LOG(INFO) << "Generated " << num_images << " pairs.";
 		}
-		}
 	}// for (int line_id = 0; line_id < train_end; line_id++)
 	LOG(INFO) << "Processed " << num_images << " images";
 	delete db;
@@ -92,6 +96,7 @@ void create_db(const string& feat_file, const string& db_name, const int image_w
 
 int main(int argc, char** argv){
 	google::InitGoogleLogging(argv[0]);
+	google::LogToStderr();
 	if (argc < 3){
 		gflags::SetUsageMessage("Convert a set of pair images to leveldb\n"
 			"format used as input for caffe.\n"
