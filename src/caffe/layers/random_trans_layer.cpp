@@ -74,6 +74,7 @@ namespace caffe{
 		}
 		if (scale_){
 			caffe_rng_uniform(1, start_scale_, end_scale_, &curr_scale_);
+			curr_scale_ = Dtype(1.);
 			TMatFromParam(1, curr_scale_, curr_scale_, tmat_);
 		}
 		if (shift_){
@@ -90,9 +91,9 @@ namespace caffe{
 		int height_new(0), width_new(0);
 		Blob<float> *original_coord = new Blob<float>();
 		GenCoordMat(tmat_, Height_, Width_, original_coord, height_new, width_new, BORDER_, INTERP_);
-		LOG(INFO) << "Cropping " << height_new << " by " << width_new
-			<< " to input size: "
-			<< Height_ << "x" << Width_;
+//		LOG(INFO) << "Cropping " << height_new << " by " << width_new
+//			<< " to input size: "
+//			<< Height_ << "x" << Width_;
 		//Crop the coordinates at the center to this size.
 		const int orig_width = width_new;
 		const int orig_height = height_new;
@@ -145,7 +146,7 @@ namespace caffe{
 		const Dtype* top_diff = top[0]->cpu_diff();
 		const int count = top[0]->count();
 		Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
-		caffe_gpu_set(count, Dtype(0.), bottom_diff);
+		caffe_set(count, Dtype(0.), bottom_diff);
 		if ((!shift_ && !rotation_ && !scale_)){
 			caffe_copy(count, top_diff, bottom_diff);
 		}
