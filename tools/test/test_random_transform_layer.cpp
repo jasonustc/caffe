@@ -26,8 +26,8 @@ namespace caffe{
 			layer->SetUp(bottom_, top_);
 			CHECK_EQ(top_[0]->shape(0), 4);
 			CHECK_EQ(top_[0]->shape(1), 1);
-			CHECK_EQ(top_[0]->shape(2), 3);
-			CHECK_EQ(top_[0]->shape(3), 3);
+			CHECK_EQ(top_[0]->shape(2), 4);
+			CHECK_EQ(top_[0]->shape(3), 4);
 		}
 
 		void TestCPUForward(){
@@ -38,9 +38,9 @@ namespace caffe{
 			const Dtype* x_data = x_->cpu_data();
 			const Dtype* top_data = top_[0]->cpu_data();
 			//check rotation
-			for (int i = 0; i < 3; i++){
-				for (int j = 0; j < 3; j++){
-					cout << top_data[i * 3 + j] << "\t";
+			for (int i = 0; i < 4; i++){
+				for (int j = 0; j < 4; j++){
+					cout << top_data[i * 4 + j] << "\t";
 				}
 				cout << "\n";
 			}
@@ -112,17 +112,17 @@ namespace caffe{
 			vector<int> x_shape;
 			x_shape.push_back(4);
 			x_shape.push_back(1);
-			x_shape.push_back(3);
-			x_shape.push_back(3);
+			x_shape.push_back(4);
+			x_shape.push_back(4);
 			x_->Reshape(x_shape);
 			FillerParameter filler_param;
 			filler_param.set_value(0.1);
 			ConstantFiller<Dtype> filler(filler_param);
 			filler.Fill(x_);
 			Dtype* x_data = x_->mutable_cpu_data();
-			for (int i = 0; i < 3; i++){
-				for (int j = 0; j < 3; j++){
-					x_data[i * 3 + j] = i * 3 + j;
+			for (int i = 0; i < 4; i++){
+				for (int j = 0; j < 4; j++){
+					x_data[i * 4 + j] = i * 4 + j;
 				}
 			}
 			bottom_.push_back(x_);

@@ -368,6 +368,7 @@ namespace caffe{
 			coord_data = coord->mutable_cpu_data();
 			generate_nn_coord(height, width, height, width, border, coord_data_res,
 				coord_data);
+			break;
 		case BILINEAR:
 			coord->Reshape(1, 1, height * width * 4, 1);
 			coord_data = coord->mutable_cpu_data();
@@ -381,7 +382,6 @@ namespace caffe{
 		//clean up
 		delete[] coord_data_tmp;
 		delete[] coord_data_res;
-		delete[] tmat;
 	}
 
 	void GenCoordMat(float *tmat, const int &height, const int &width,
