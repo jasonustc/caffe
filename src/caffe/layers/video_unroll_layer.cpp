@@ -15,7 +15,7 @@ void VideoUnrollLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 	int frames_per_video = bottom[0]->shape(1) / frame_channels;
 
 	//top[0] unroll the video to frames
-	top[0]->Reshape(bottom[0]->shape(0)*frames_per_video, frame_channels,
+	top[0]->Reshape(bottom[0]->shape(0) * frames_per_video, frame_channels,
 		bottom[0]->shape(2), bottom[0]->shape(3));
 	CHECK_EQ(top[0]->count(), bottom[0]->count())
 		<< "new shape must have the same count as input";
@@ -30,7 +30,7 @@ void VideoUnrollLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 	Dtype* top_data = top[1]->mutable_cpu_data();
 	for (int i = 0; i < top[1]->count(); i++)
 	{
-		if (i%frames_per_video == 0)
+		if (i % frames_per_video == 0)
 			top_data[i] = 0;
 		else
 			top_data[i] = 1;

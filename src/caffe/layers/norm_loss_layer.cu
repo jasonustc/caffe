@@ -18,7 +18,7 @@ namespace caffe{
 		Dtype* top_data = top[0]->mutable_gpu_data();
 		const Dtype scale = 1. / Dtype(num);
 		Dtype asum;
-		switch (this->layer_param_.norm_loss_param().norm_type()){
+		switch (norm_type_){
 		case NormLossParameter_NormType_L1:
 			caffe_gpu_asum(count, bottom_data, &asum);
 			asum *= scale;
@@ -40,16 +40,15 @@ namespace caffe{
 		const vector<Blob<Dtype>*>& bottom){
 		const int count = bottom[0]->count();
 		const int num = bottom[0]->num();
-		const int dim = count / num;
 		Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
 		const Dtype* bottom_data = bottom[0]->gpu_data();
 		const Dtype loss_weight = top[0]->cpu_diff()[0];
 		Dtype alpha = loss_weight / num;
-		switch (this->layer_param_.norm_loss_param().norm_type())
+		switch (norm_type_)
 		{
 		case NormLossParameter_NormType_L1:
 			caffe_gpu_sign(count, bottom_data, bottom_diff);
-			caffe_scal(count, loss_weight / num, bottom_diff);
+			caffe_gpu_scal(count, alpha, bottom_diff);
 			break;
 		case NormLossParameter_NormType_L2:
 			caffe_gpu_axpby(count, alpha, bottom_data, Dtype(0), bottom_diff);

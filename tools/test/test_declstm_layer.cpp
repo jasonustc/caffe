@@ -161,9 +161,9 @@ namespace caffe{
 int main(int argc, char** argv){
 	caffe::DLSTMTest<float> test;
 	test.TestSetUp();
-	test.TestCPUForward();
+//	test.TestCPUForward();
 	test.TestCPUGradients();
-	test.TestGPUForward();
+//	test.TestGPUForward();
 	test.TestGPUGradients();
 	return 0;
 }

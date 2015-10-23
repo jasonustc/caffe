@@ -27,7 +27,7 @@ void VideoSigmoidLabelLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bott
 	for (int i = 0; i < bottom[0]->count(); i++)
 	{
 		int label = bottom_data[i];
-		top_data[i*n_cate_ + label] = Dtype(1);
+		top_data[i * n_cate_ + label] = Dtype(1);
 	}
 }
 
