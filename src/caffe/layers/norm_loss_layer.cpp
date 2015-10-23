@@ -12,6 +12,7 @@ namespace caffe{
 	template<typename Dtype>
 	void NormLossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 		const vector<Blob<Dtype>*>& top){
+		this->norm_type_ = this->layer_param_.norm_loss_param().norm_type();
 		vector<int> top_shape(0);
 		top[0]->Reshape(top_shape);
 	}
@@ -21,10 +22,9 @@ namespace caffe{
 		const vector<Blob<Dtype>*>& top){
 		const int count = bottom[0]->count();
 		const int num = bottom[0]->num();
-		const int dim = count / num;
 		const Dtype* bottom_data = bottom[0]->cpu_data();
 		Dtype* loss = top[0]->mutable_cpu_data();
-		switch (this->layer_param_.norm_loss_param().norm_type()){
+		switch (norm_type_){
 		case NormLossParameter_NormType_L1:
 			loss[0] = caffe_cpu_asum(count, bottom_data) / num;
 			break;
@@ -43,12 +43,11 @@ namespace caffe{
 		if (propagate_down[0]){
 			const int count = bottom[0]->count();
 			const int num = bottom[0]->num();
-			const int dim = count / num;
 			const Dtype loss_weight = top[0]->cpu_diff()[0];
 			Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
 			const Dtype* bottom_data = bottom[0]->cpu_data();
 			Dtype alpha = loss_weight / num;
-			switch (this->layer_param_.norm_loss_param().norm_type()){
+			switch (norm_type_){
 			case NormLossParameter_NormType_L1:
 				caffe_cpu_sign(count, bottom_data, bottom_diff);
 				caffe_scal(count, loss_weight / num, bottom_diff);
