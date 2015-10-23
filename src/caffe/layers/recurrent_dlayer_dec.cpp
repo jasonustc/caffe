@@ -37,8 +37,6 @@ void DRecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 	//the indicator
 	int num_output = this->layer_param_.recurrent_param().num_output();
 	LOG(INFO) << "bottom[1] shape: " << bottom[1]->shape_string();
-	CHECK_EQ(bottom[1]->num_axes(), 3)
-		<< "bottom[1] must have exactly 2 axes -- (#timesteps, #streams)";
 	CHECK_EQ(T_ / len_seq_, bottom[1]->shape(0));
 	CHECK_EQ(N_, bottom[1]->shape(1));
 	CHECK_EQ(num_output, bottom[1]->shape(2));
@@ -72,11 +70,11 @@ void DRecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 		input_shape.add_dim(bottom[1]->shape(i));
 	}
 	//input is the required domain of a net?
-	//h: T x N x hidden_dim
+	//h: num_sequences x N x hidden_dim
 	net_param.add_input("h");
 	net_param.add_input_shape()->CopyFrom(input_shape);
 
-	//c: T x N x hidden_dim
+	//c: num_sequences x N x hidden_dim
 	net_param.add_input("c");
 	net_param.add_input_shape()->CopyFrom(input_shape);
 

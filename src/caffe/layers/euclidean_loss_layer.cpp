@@ -11,6 +11,7 @@ template <typename Dtype>
 void EuclideanLossLayer<Dtype>::Reshape(
   const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
   LossLayer<Dtype>::Reshape(bottom, top);
+  //only require to be the same shape except number
   CHECK_EQ(bottom[0]->count(1), bottom[1]->count(1))
       << "Inputs must have the same dimension.";
   diff_.ReshapeLike(*bottom[0]);
