@@ -16,6 +16,7 @@ using namespace std;
 using namespace caffe;
 using boost::scoped_ptr;
 using std::string;
+using std::vector;
 
 DEFINE_int32(image_channels, 28, "The channels * sequence length value");
 DEFINE_int32(image_height, 28, "The image height of each frame");
@@ -95,6 +96,7 @@ void create_db(const string& feat_file, const string& label_file, const string& 
 int main(int argc, char** argv){
 	google::InitGoogleLogging(argv[0]);
 	google::LogToStderr();
+	vector<string> flags_files{ "convert_sequence_mnist_data_binary.cpp" };
 	if (argc < 4){
 		gflags::SetUsageMessage("Convert a set of pair images to leveldb\n"
 			"format used as input for caffe.\n"

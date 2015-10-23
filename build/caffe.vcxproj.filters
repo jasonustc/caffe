@@ -318,7 +318,7 @@
     <ClCompile Include="..\src\caffe\test\test_lstm_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\caffe.cpp" />
+    <ClCompile Include="..\tools\convert_sequence_mnist_data_binary.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
