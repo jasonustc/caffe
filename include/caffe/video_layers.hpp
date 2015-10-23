@@ -437,6 +437,7 @@ namespace caffe {
 
 	};
 
+
 	///**
 	//* @brief normalize the sample to [0,1]
 	//*/

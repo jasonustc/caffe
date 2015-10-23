@@ -23,144 +23,144 @@ template <typename Dtype> class RecurrentLayer;
  */
 template <typename Dtype>
 class RecurrentLayer : public Layer<Dtype> {
- public:
-  explicit RecurrentLayer(const LayerParameter& param)
-      : decode_(false), Layer<Dtype>(param) {}
-  virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
-  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
-  virtual void Reset();
+public:
+	explicit RecurrentLayer(const LayerParameter& param)
+		: decode_(false), Layer<Dtype>(param) {}
+	virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+	virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+	virtual void Reset();
 
-  virtual inline const char* type() const { return "Recurrent"; }
-  virtual inline int MinBottomBlobs() const { return 2; }
-  virtual inline int MaxBottomBlobs() const { return 3; }
-  //here added by xu shen
-//  virtual inline int ExactNumTopBlobs() const { return 1; }
-  virtual inline int MinTopBlobs(){ return 1; }
+	virtual inline const char* type() const { return "Recurrent"; }
+	virtual inline int MinBottomBlobs() const { return 2; }
+	virtual inline int MaxBottomBlobs() const { return 3; }
+	//here added by xu shen
+	//  virtual inline int ExactNumTopBlobs() const { return 1; }
+	virtual inline int MinTopBlobs(){ return 1; }
 
-  virtual inline bool AllowForceBackward(const int bottom_index) const {
-    // Can't propagate to sequence continuation indicators.
-    return bottom_index != 1;
-  }
+	virtual inline bool AllowForceBackward(const int bottom_index) const {
+		// Can't propagate to sequence continuation indicators.
+		return bottom_index != 1;
+	}
 
- protected:
-  /**
-   * @brief Fills net_param with the recurrent network arcthiecture.  Subclasses
-   *        should define this -- see RNNLayer and LSTMLayer for examples.
-   */
-  virtual void FillUnrolledNet(NetParameter* net_param) const = 0;
+protected:
+	/**
+	 * @brief Fills net_param with the recurrent network arcthiecture.  Subclasses
+	 *        should define this -- see RNNLayer and LSTMLayer for examples.
+	 */
+	virtual void FillUnrolledNet(NetParameter* net_param) const = 0;
 
-  /**
-   * @brief Fills names with the names of the 0th timestep recurrent input
-   *        Blob&s.  Subclasses should define this -- see RNNLayer and LSTMLayer
-   *        for examples.
-   */
-  virtual void RecurrentInputBlobNames(vector<string>* names) const = 0;
+	/**
+	 * @brief Fills names with the names of the 0th timestep recurrent input
+	 *        Blob&s.  Subclasses should define this -- see RNNLayer and LSTMLayer
+	 *        for examples.
+	 */
+	virtual void RecurrentInputBlobNames(vector<string>* names) const = 0;
 
-  /**
-   * @brief Fills names with the names of the Tth timestep recurrent output
-   *        Blob&s.  Subclasses should define this -- see RNNLayer and LSTMLayer
-   *        for examples.
-   */
-  virtual void RecurrentOutputBlobNames(vector<string>* names) const = 0;
+	/**
+	 * @brief Fills names with the names of the Tth timestep recurrent output
+	 *        Blob&s.  Subclasses should define this -- see RNNLayer and LSTMLayer
+	 *        for examples.
+	 */
+	virtual void RecurrentOutputBlobNames(vector<string>* names) const = 0;
 
-  /**
-   * @brief Fills names with the names of the output blobs, concatenated across
-   *        all timesteps.  Should return a name for each top Blob.
-   *        Subclasses should define this -- see RNNLayer and LSTMLayer for
-   *        examples.
-   */
-  virtual void OutputBlobNames(vector<string>* names) const = 0;
+	/**
+	 * @brief Fills names with the names of the output blobs, concatenated across
+	 *        all timesteps.  Should return a name for each top Blob.
+	 *        Subclasses should define this -- see RNNLayer and LSTMLayer for
+	 *        examples.
+	 */
+	virtual void OutputBlobNames(vector<string>* names) const = 0;
 
-  /*
-   * @brief Fills names with the name of the concat result of all the 
-   * (c, h) of the end of sequecnce 
-   */
-  virtual void ConcatSeqEndBlobNames(vector<string>* names) const {};
+	/*
+	 * @brief Fills names with the name of the concat result of all the
+	 * (c, h) of the end of sequecnce
+	 */
+	virtual void ConcatSeqEndBlobNames(vector<string>* names) const {};
 
-  /**
-   * @param bottom input Blob vector (length 2-3)
-   *
-   *   -# @f$ (T \times N \times ...) @f$
-   *      the time-varying input @f$ x @f$.  After the first two axes, whose
-   *      dimensions must correspond to the number of timesteps @f$ T @f$ and
-   *      the number of independent streams @f$ N @f$, respectively, its
-   *      dimensions may be arbitrary.  Note that the ordering of dimensions --
-   *      @f$ (T \times N \times ...) @f$, rather than
-   *      @f$ (N \times T \times ...) @f$ -- means that the @f$ N @f$
-   *      independent input streams must be "interleaved".
-   *
-   *   -# @f$ (T \times N) @f$
-   *      the sequence continuation indicators @f$ \delta @f$.
-   *      These inputs should be binary (0 or 1) indicators, where
-   *      @f$ \delta_{t,n} = 0 @f$ means that timestep @f$ t @f$ of stream
-   *      @f$ n @f$ is the beginning of a new sequence, and hence the previous
-   *      hidden state @f$ h_{t-1} @f$ is multiplied by @f$ \delta_t = 0 @f$
-   *      and has no effect on the cell's output at timestep @f$ t @f$, and
-   *      a value of @f$ \delta_{t,n} = 1 @f$ means that timestep @f$ t @f$ of
-   *      stream @f$ n @f$ is a continuation from the previous timestep
-   *      @f$ t-1 @f$, and the previous hidden state @f$ h_{t-1} @f$ affects the
-   *      updated hidden state and output.
-   *
-   *   -# @f$ (N \times ...) @f$ (optional)
-   *      the static (non-time-varying) input @f$ x_{static} @f$.
-   *      After the first axis, whose dimension must be the number of
-   *      independent streams, its dimensions may be arbitrary.
-   *      This is mathematically equivalent to using a time-varying input of
-   *      @f$ x'_t = [x_t; x_{static}] @f$ -- i.e., tiling the static input
-   *      across the @f$ T @f$ timesteps and concatenating with the time-varying
-   *      input.  Note that if this input is used, all timesteps in a single
-   *      batch within a particular one of the @f$ N @f$ streams must share the
-   *      same static input, even if the sequence continuation indicators
-   *      suggest that difference sequences are ending and beginning within a
-   *      single batch.  This may require padding and/or truncation for uniform
-   *      length.
-   *
-   * @param top output Blob vector (length 1)
-   *   -# @f$ (T \times N \times D) @f$
-   *      the time-varying output @f$ y @f$, where @f$ D @f$ is
-   *      <code>recurrent_param.num_output()</code>.
-   *      Refer to documentation for particular RecurrentLayer implementations
-   *      (such as RNNLayer and LSTMLayer) for the definition of @f$ y @f$.
-   */
-  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
-  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
-  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
-      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+	/**
+	 * @param bottom input Blob vector (length 2-3)
+	 *
+	 *   -# @f$ (T \times N \times ...) @f$
+	 *      the time-varying input @f$ x @f$.  After the first two axes, whose
+	 *      dimensions must correspond to the number of timesteps @f$ T @f$ and
+	 *      the number of independent streams @f$ N @f$, respectively, its
+	 *      dimensions may be arbitrary.  Note that the ordering of dimensions --
+	 *      @f$ (T \times N \times ...) @f$, rather than
+	 *      @f$ (N \times T \times ...) @f$ -- means that the @f$ N @f$
+	 *      independent input streams must be "interleaved".
+	 *
+	 *   -# @f$ (T \times N) @f$
+	 *      the sequence continuation indicators @f$ \delta @f$.
+	 *      These inputs should be binary (0 or 1) indicators, where
+	 *      @f$ \delta_{t,n} = 0 @f$ means that timestep @f$ t @f$ of stream
+	 *      @f$ n @f$ is the beginning of a new sequence, and hence the previous
+	 *      hidden state @f$ h_{t-1} @f$ is multiplied by @f$ \delta_t = 0 @f$
+	 *      and has no effect on the cell's output at timestep @f$ t @f$, and
+	 *      a value of @f$ \delta_{t,n} = 1 @f$ means that timestep @f$ t @f$ of
+	 *      stream @f$ n @f$ is a continuation from the previous timestep
+	 *      @f$ t-1 @f$, and the previous hidden state @f$ h_{t-1} @f$ affects the
+	 *      updated hidden state and output.
+	 *
+	 *   -# @f$ (N \times ...) @f$ (optional)
+	 *      the static (non-time-varying) input @f$ x_{static} @f$.
+	 *      After the first axis, whose dimension must be the number of
+	 *      independent streams, its dimensions may be arbitrary.
+	 *      This is mathematically equivalent to using a time-varying input of
+	 *      @f$ x'_t = [x_t; x_{static}] @f$ -- i.e., tiling the static input
+	 *      across the @f$ T @f$ timesteps and concatenating with the time-varying
+	 *      input.  Note that if this input is used, all timesteps in a single
+	 *      batch within a particular one of the @f$ N @f$ streams must share the
+	 *      same static input, even if the sequence continuation indicators
+	 *      suggest that difference sequences are ending and beginning within a
+	 *      single batch.  This may require padding and/or truncation for uniform
+	 *      length.
+	 *
+	 * @param top output Blob vector (length 1)
+	 *   -# @f$ (T \times N \times D) @f$
+	 *      the time-varying output @f$ y @f$, where @f$ D @f$ is
+	 *      <code>recurrent_param.num_output()</code>.
+	 *      Refer to documentation for particular RecurrentLayer implementations
+	 *      (such as RNNLayer and LSTMLayer) for the definition of @f$ y @f$.
+	 */
+	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+	virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+	virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+		const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
 
-  /// @brief A helper function, useful for stringifying timestep indices.
-  virtual string int_to_str(const int t) const;
+	/// @brief A helper function, useful for stringifying timestep indices.
+	virtual string int_to_str(const int t) const;
 
-  /// @brief A Net to implement the Recurrent functionality.
-  shared_ptr<Net<Dtype> > unrolled_net_;
+	/// @brief A Net to implement the Recurrent functionality.
+	shared_ptr<Net<Dtype> > unrolled_net_;
 
-  /// @brief The number of independent streams to process simultaneously.
-  int N_;
+	/// @brief The number of independent streams to process simultaneously.
+	int N_;
 
-  /**
-   * @brief The number of timesteps in the layer's input, and the number of
-   *        timesteps over which to backpropagate through time.
-   */
-  int T_;
+	/**
+	 * @brief The number of timesteps in the layer's input, and the number of
+	 *        timesteps over which to backpropagate through time.
+	 */
+	int T_;
 
-  /// @brief Whether the layer has a "static" input copied across all timesteps.
-  bool static_input_;
+	/// @brief Whether the layer has a "static" input copied across all timesteps.
+	bool static_input_;
 
-  vector<Blob<Dtype>* > recur_input_blobs_;
-  //this is only the C_T and h_T
-  vector<Blob<Dtype>* > recur_output_blobs_;
-  //this is all the features catencated: (h_1, h_2,..., h_T)
-  vector<Blob<Dtype>* > output_blobs_;
-  Blob<Dtype>* x_input_blob_;
-  Blob<Dtype>* x_static_input_blob_;
-  Blob<Dtype>* cont_input_blob_;
-  vector<Blob<Dtype>*> seq_end_output_blobs_;
+	vector<Blob<Dtype>* > recur_input_blobs_;
+	//this is only the C_T and h_T
+	vector<Blob<Dtype>* > recur_output_blobs_;
+	//this is all the features catencated: (h_1, h_2,..., h_T)
+	vector<Blob<Dtype>* > output_blobs_;
+	Blob<Dtype>* x_input_blob_;
+	Blob<Dtype>* x_static_input_blob_;
+	Blob<Dtype>* cont_input_blob_;
+	vector<Blob<Dtype>*> seq_end_output_blobs_;
 
-  //if this layer need to output all the end feature(c, h) of the sequence
-  bool decode_;
+	//if this layer need to output all the end feature(c, h) of the sequence
+	bool decode_;
 };
 
 /**
@@ -171,122 +171,122 @@ class RecurrentLayer : public Layer<Dtype> {
  */
 template <typename Dtype>
 class DRecurrentLayer : public Layer<Dtype> {
- public:
-  explicit DRecurrentLayer(const LayerParameter& param)
-      : Layer<Dtype>(param) {}
-  virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
-  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
+public:
+	explicit DRecurrentLayer(const LayerParameter& param)
+		: Layer<Dtype>(param) {}
+	virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+	virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
 
-  virtual inline const char* type() const { return "DecodeRecurrent"; }
-  //h_T, c_T, x need at least 3 inputs
-  virtual inline int MinBottomBlobs() const { return 3; }
-  //reconstructed h feature
-  virtual inline int MaxBottomBlobs() const { return 4; }
-  //here added by xu shen
-//  virtual inline int ExactNumTopBlobs() const { return 1; }
-  virtual inline int MinTopBlobs(){ return 1; }
+	virtual inline const char* type() const { return "DecodeRecurrent"; }
+	//h_T, c_T, x need at least 3 inputs
+	virtual inline int MinBottomBlobs() const { return 3; }
+	//reconstructed h feature
+	virtual inline int MaxBottomBlobs() const { return 4; }
+	//here added by xu shen
+	//  virtual inline int ExactNumTopBlobs() const { return 1; }
+	virtual inline int MinTopBlobs(){ return 1; }
 
- protected:
-  /**
-   * @brief Fills net_param with the recurrent network arcthiecture.  Subclasses
-   *        should define this -- see RNNLayer and LSTMLayer for examples.
-   */
-  virtual void FillUnrolledNet(NetParameter* net_param) const = 0;
-
-
-  /**
-   * @brief Fills names with the names of the output blobs, concatenated across
-   *        all timesteps.  Should return a name for each top Blob.
-   *        Subclasses should define this -- see RNNLayer and LSTMLayer for
-   *        examples.
-   */
-  virtual void OutputBlobNames(vector<string>* names) const = 0;
+protected:
+	/**
+	 * @brief Fills net_param with the recurrent network arcthiecture.  Subclasses
+	 *        should define this -- see RNNLayer and LSTMLayer for examples.
+	 */
+	virtual void FillUnrolledNet(NetParameter* net_param) const = 0;
 
 
-  /**
-   * @param bottom input Blob vector (length 2-3)
-   *
-   *   -# @f$ (T \times N \times ...) @f$
-   *      the time-varying input @f$ x @f$.  After the first two axes, whose
-   *      dimensions must correspond to the number of timesteps @f$ T @f$ and
-   *      the number of independent streams @f$ N @f$, respectively, its
-   *      dimensions may be arbitrary.  Note that the ordering of dimensions --
-   *      @f$ (T \times N \times ...) @f$, rather than
-   *      @f$ (N \times T \times ...) @f$ -- means that the @f$ N @f$
-   *      independent input streams must be "interleaved".
-   *
-   *   -# @f$ (T \times N) @f$
-   *      the sequence continuation indicators @f$ \delta @f$.
-   *      These inputs should be binary (0 or 1) indicators, where
-   *      @f$ \delta_{t,n} = 0 @f$ means that timestep @f$ t @f$ of stream
-   *      @f$ n @f$ is the beginning of a new sequence, and hence the previous
-   *      hidden state @f$ h_{t-1} @f$ is multiplied by @f$ \delta_t = 0 @f$
-   *      and has no effect on the cell's output at timestep @f$ t @f$, and
-   *      a value of @f$ \delta_{t,n} = 1 @f$ means that timestep @f$ t @f$ of
-   *      stream @f$ n @f$ is a continuation from the previous timestep
-   *      @f$ t-1 @f$, and the previous hidden state @f$ h_{t-1} @f$ affects the
-   *      updated hidden state and output.
-   *
-   *   -# @f$ (N \times ...) @f$ (optional)
-   *      the static (non-time-varying) input @f$ x_{static} @f$.
-   *      After the first axis, whose dimension must be the number of
-   *      independent streams, its dimensions may be arbitrary.
-   *      This is mathematically equivalent to using a time-varying input of
-   *      @f$ x'_t = [x_t; x_{static}] @f$ -- i.e., tiling the static input
-   *      across the @f$ T @f$ timesteps and concatenating with the time-varying
-   *      input.  Note that if this input is used, all timesteps in a single
-   *      batch within a particular one of the @f$ N @f$ streams must share the
-   *      same static input, even if the sequence continuation indicators
-   *      suggest that difference sequences are ending and beginning within a
-   *      single batch.  This may require padding and/or truncation for uniform
-   *      length.
-   *
-   * @param top output Blob vector (length 1)
-   *   -# @f$ (T \times N \times D) @f$
-   *      the time-varying output @f$ y @f$, where @f$ D @f$ is
-   *      <code>recurrent_param.num_output()</code>.
-   *      Refer to documentation for particular RecurrentLayer implementations
-   *      (such as RNNLayer and LSTMLayer) for the definition of @f$ y @f$.
-   */
-  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
-  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
-  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
-      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+	/**
+	 * @brief Fills names with the names of the output blobs, concatenated across
+	 *        all timesteps.  Should return a name for each top Blob.
+	 *        Subclasses should define this -- see RNNLayer and LSTMLayer for
+	 *        examples.
+	 */
+	virtual void OutputBlobNames(vector<string>* names) const = 0;
 
-  /// @brief A helper function, useful for stringifying timestep indices.
-  virtual string int_to_str(const int t) const;
 
-  /// @brief A Net to implement the Recurrent functionality.
-  shared_ptr<Net<Dtype> > unrolled_net_;
+	/**
+	 * @param bottom input Blob vector (length 2-3)
+	 *
+	 *   -# @f$ (T \times N \times ...) @f$
+	 *      the time-varying input @f$ x @f$.  After the first two axes, whose
+	 *      dimensions must correspond to the number of timesteps @f$ T @f$ and
+	 *      the number of independent streams @f$ N @f$, respectively, its
+	 *      dimensions may be arbitrary.  Note that the ordering of dimensions --
+	 *      @f$ (T \times N \times ...) @f$, rather than
+	 *      @f$ (N \times T \times ...) @f$ -- means that the @f$ N @f$
+	 *      independent input streams must be "interleaved".
+	 *
+	 *   -# @f$ (T \times N) @f$
+	 *      the sequence continuation indicators @f$ \delta @f$.
+	 *      These inputs should be binary (0 or 1) indicators, where
+	 *      @f$ \delta_{t,n} = 0 @f$ means that timestep @f$ t @f$ of stream
+	 *      @f$ n @f$ is the beginning of a new sequence, and hence the previous
+	 *      hidden state @f$ h_{t-1} @f$ is multiplied by @f$ \delta_t = 0 @f$
+	 *      and has no effect on the cell's output at timestep @f$ t @f$, and
+	 *      a value of @f$ \delta_{t,n} = 1 @f$ means that timestep @f$ t @f$ of
+	 *      stream @f$ n @f$ is a continuation from the previous timestep
+	 *      @f$ t-1 @f$, and the previous hidden state @f$ h_{t-1} @f$ affects the
+	 *      updated hidden state and output.
+	 *
+	 *   -# @f$ (N \times ...) @f$ (optional)
+	 *      the static (non-time-varying) input @f$ x_{static} @f$.
+	 *      After the first axis, whose dimension must be the number of
+	 *      independent streams, its dimensions may be arbitrary.
+	 *      This is mathematically equivalent to using a time-varying input of
+	 *      @f$ x'_t = [x_t; x_{static}] @f$ -- i.e., tiling the static input
+	 *      across the @f$ T @f$ timesteps and concatenating with the time-varying
+	 *      input.  Note that if this input is used, all timesteps in a single
+	 *      batch within a particular one of the @f$ N @f$ streams must share the
+	 *      same static input, even if the sequence continuation indicators
+	 *      suggest that difference sequences are ending and beginning within a
+	 *      single batch.  This may require padding and/or truncation for uniform
+	 *      length.
+	 *
+	 * @param top output Blob vector (length 1)
+	 *   -# @f$ (T \times N \times D) @f$
+	 *      the time-varying output @f$ y @f$, where @f$ D @f$ is
+	 *      <code>recurrent_param.num_output()</code>.
+	 *      Refer to documentation for particular RecurrentLayer implementations
+	 *      (such as RNNLayer and LSTMLayer) for the definition of @f$ y @f$.
+	 */
+	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+	virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+	virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+		const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
 
-  /// @brief The number of independent streams to process simultaneously.
-  int N_;
+	/// @brief A helper function, useful for stringifying timestep indices.
+	virtual string int_to_str(const int t) const;
 
-  /**
-   * @brief The number of timesteps in the layer's input, and the number of
-   *        timesteps over which to backpropagate through time.
-   */
-  int T_;
+	/// @brief A Net to implement the Recurrent functionality.
+	shared_ptr<Net<Dtype> > unrolled_net_;
 
-  /*
-   * @brief The length of sequence
-   */
-  int len_seq_;
+	/// @brief The number of independent streams to process simultaneously.
+	int N_;
 
-  /// @brief Whether the layer has a "static" input copied across all timesteps.
-  bool static_input_;
+	/**
+	 * @brief The number of timesteps in the layer's input, and the number of
+	 *        timesteps over which to backpropagate through time.
+	 */
+	int T_;
 
-  //this is all the features catencated: (h_1, h_2,..., h_T)
-  //we don't need cont variables in DRecurrent Layer
-  vector<Blob<Dtype>* > output_blobs_;
-  Blob<Dtype>* x_input_blob_;
-  Blob<Dtype>* x_static_input_blob_;
-  Blob<Dtype>* h_input_blob_;
-  Blob<Dtype>* c_input_blob_;
+	/*
+	 * @brief The length of sequence
+	 */
+	int len_seq_;
+
+	/// @brief Whether the layer has a "static" input copied across all timesteps.
+	bool static_input_;
+
+	//this is all the features catencated: (h_1, h_2,..., h_T)
+	//we don't need cont variables in DRecurrent Layer
+	vector<Blob<Dtype>* > output_blobs_;
+	Blob<Dtype>* x_input_blob_;
+	Blob<Dtype>* x_static_input_blob_;
+	Blob<Dtype>* h_input_blob_;
+	Blob<Dtype>* c_input_blob_;
 };
 
 
@@ -322,21 +322,21 @@ class DRecurrentLayer : public Layer<Dtype> {
  */
 template <typename Dtype>
 class LSTMLayer : public RecurrentLayer<Dtype> {
- public:
-  explicit LSTMLayer(const LayerParameter& param)
-      : decode_(false), RecurrentLayer<Dtype>(param) {}
+public:
+	explicit LSTMLayer(const LayerParameter& param)
+		: decode_(false), RecurrentLayer<Dtype>(param) {}
 
-  virtual inline const char* type() const { return "LSTM"; }
+	virtual inline const char* type() const { return "LSTM"; }
 
- protected:
-  virtual void FillUnrolledNet(NetParameter* net_param) const;
-  virtual void RecurrentInputBlobNames(vector<string>* names) const;
-  virtual void RecurrentOutputBlobNames(vector<string>* names) const;
-  virtual void OutputBlobNames(vector<string>* names) const;
-  virtual void ConcatSeqEndBlobNames(vector<string>* names) const;
+protected:
+	virtual void FillUnrolledNet(NetParameter* net_param) const;
+	virtual void RecurrentInputBlobNames(vector<string>* names) const;
+	virtual void RecurrentOutputBlobNames(vector<string>* names) const;
+	virtual void OutputBlobNames(vector<string>* names) const;
+	virtual void ConcatSeqEndBlobNames(vector<string>* names) const;
 
-  //if we need to output all the features of the end of the sequence
-  bool decode_;
+	//if we need to output all the features of the end of the sequence
+	bool decode_;
 };
 
 /**
@@ -370,15 +370,15 @@ class LSTMLayer : public RecurrentLayer<Dtype> {
  */
 template <typename Dtype>
 class DLSTMLayer : public DRecurrentLayer<Dtype> {
- public:
-  explicit DLSTMLayer(const LayerParameter& param)
-      : DRecurrentLayer<Dtype>(param) {}
+public:
+	explicit DLSTMLayer(const LayerParameter& param)
+		: DRecurrentLayer<Dtype>(param) {}
 
-  virtual inline const char* type() const { return "DLSTM"; }
+	virtual inline const char* type() const { return "DLSTM"; }
 
- protected:
-  virtual void FillUnrolledNet(NetParameter* net_param) const;
-  virtual void OutputBlobNames(vector<string>* names) const;
+protected:
+	virtual void FillUnrolledNet(NetParameter* net_param) const;
+	virtual void OutputBlobNames(vector<string>* names) const;
 };
 
 /**
@@ -389,7 +389,7 @@ class DLSTMLayer : public DRecurrentLayer<Dtype> {
 template <typename Dtype>
 class LSTMUnitLayer : public Layer<Dtype> {
 public:
-	explicit LSTMUnitLayer(const LayerParameter& param): Layer<Dtype>(param) {}
+	explicit LSTMUnitLayer(const LayerParameter& param) : Layer<Dtype>(param) {}
 	virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
 		const vector<Blob<Dtype>*>& top);
 
@@ -566,17 +566,45 @@ protected:
  */
 template <typename Dtype>
 class RNNLayer : public RecurrentLayer<Dtype> {
- public:
-  explicit RNNLayer(const LayerParameter& param)
-      : RecurrentLayer<Dtype>(param) {}
+public:
+	explicit RNNLayer(const LayerParameter& param)
+		: RecurrentLayer<Dtype>(param) {}
 
-  virtual inline const char* type() const { return "RNN"; }
+	virtual inline const char* type() const { return "RNN"; }
 
- protected:
-  virtual void FillUnrolledNet(NetParameter* net_param) const;
-  virtual void RecurrentInputBlobNames(vector<string>* names) const;
-  virtual void RecurrentOutputBlobNames(vector<string>* names) const;
-  virtual void OutputBlobNames(vector<string>* names) const;
+protected:
+	virtual void FillUnrolledNet(NetParameter* net_param) const;
+	virtual void RecurrentInputBlobNames(vector<string>* names) const;
+	virtual void RecurrentOutputBlobNames(vector<string>* names) const;
+	virtual void OutputBlobNames(vector<string>* names) const;
+};
+
+/*
+ * @brief compute the difference between consequent frames
+ * input: n sequence frame
+ * output: n - 1 difference
+ */
+template <typename Dtype>
+class NeighborContrastLayer : public Layer<Dtype>{
+public:
+	explicit NeighborContrastLayer(const LayerParameter& param)
+		: Layer<Dtype>(param){}
+	virtual inline const char* type() const { return "NeighborContrast"; }
+	virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+	virtual void Reshape(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+	virtual inline int ExactNumBottomBlobs() const { return 1; }
+	virtual inline int ExactNumTopBlobs()const { return 1; }
+
+protected:
+	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+	virtual void Backward_cpu(const vector<Blob<Dtype>*>& top, const vector<bool>& propagate_down,
+		const vector<Blob<Dtype>*>& bottom);
+	virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+	virtual void Backward_gpu(const vector<Blob<Dtype>*>& top, const vector<bool>& propagate_down,
+		const vector<Blob<Dtype>*>& bottom);
+
+	//the sequence length of the video
+	int seq_len_;
 };
 
 }  // namespace caffe
