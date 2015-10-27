@@ -46,6 +46,7 @@ class NetState;
 class NetStateRule;
 class ParamSpec;
 class LayerParameter;
+class RBMParameter;
 class NormLossParameter;
 class NoiseParameter;
 class TransformationParameter;
@@ -152,6 +153,25 @@ inline bool ParamSpec_DimCheckMode_Parse(
     const ::std::string& name, ParamSpec_DimCheckMode* value) {
   return ::google::protobuf::internal::ParseNamedEnum<ParamSpec_DimCheckMode>(
     ParamSpec_DimCheckMode_descriptor(), name, value);
+}
+enum RBMParameter_SampleType {
+  RBMParameter_SampleType_BERNOULLI = 1,
+  RBMParameter_SampleType_GAUSSUIAN = 2
+};
+bool RBMParameter_SampleType_IsValid(int value);
+const RBMParameter_SampleType RBMParameter_SampleType_SampleType_MIN = RBMParameter_SampleType_BERNOULLI;
+const RBMParameter_SampleType RBMParameter_SampleType_SampleType_MAX = RBMParameter_SampleType_GAUSSUIAN;
+const int RBMParameter_SampleType_SampleType_ARRAYSIZE = RBMParameter_SampleType_SampleType_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* RBMParameter_SampleType_descriptor();
+inline const ::std::string& RBMParameter_SampleType_Name(RBMParameter_SampleType value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    RBMParameter_SampleType_descriptor(), value);
+}
+inline bool RBMParameter_SampleType_Parse(
+    const ::std::string& name, RBMParameter_SampleType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<RBMParameter_SampleType>(
+    RBMParameter_SampleType_descriptor(), name, value);
 }
 enum NormLossParameter_NormType {
   NormLossParameter_NormType_L1 = 1,
@@ -2968,6 +2988,15 @@ class LayerParameter : public ::google::protobuf::Message {
   inline ::caffe::NormLossParameter* release_norm_loss_param();
   inline void set_allocated_norm_loss_param(::caffe::NormLossParameter* norm_loss_param);
 
+  // optional .caffe.RBMParameter rbm_param = 146;
+  inline bool has_rbm_param() const;
+  inline void clear_rbm_param();
+  static const int kRbmParamFieldNumber = 146;
+  inline const ::caffe::RBMParameter& rbm_param() const;
+  inline ::caffe::RBMParameter* mutable_rbm_param();
+  inline ::caffe::RBMParameter* release_rbm_param();
+  inline void set_allocated_rbm_param(::caffe::RBMParameter* rbm_param);
+
   // @@protoc_insertion_point(class_scope:caffe.LayerParameter)
  private:
   inline void set_has_name();
@@ -3068,6 +3097,8 @@ class LayerParameter : public ::google::protobuf::Message {
   inline void clear_has_noise_param();
   inline void set_has_norm_loss_param();
   inline void clear_has_norm_loss_param();
+  inline void set_has_rbm_param();
+  inline void clear_has_rbm_param();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -3127,6 +3158,7 @@ class LayerParameter : public ::google::protobuf::Message {
   ::caffe::WindowDataParameter* window_data_param_;
   ::caffe::NoiseParameter* noise_param_;
   ::caffe::NormLossParameter* norm_loss_param_;
+  ::caffe::RBMParameter* rbm_param_;
   int phase_;
   mutable int _cached_size_;
   friend void  protobuf_AddDesc_caffe_2eproto();
@@ -3135,6 +3167,163 @@ class LayerParameter : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static LayerParameter* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class RBMParameter : public ::google::protobuf::Message {
+ public:
+  RBMParameter();
+  virtual ~RBMParameter();
+
+  RBMParameter(const RBMParameter& from);
+
+  inline RBMParameter& operator=(const RBMParameter& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const RBMParameter& default_instance();
+
+  void Swap(RBMParameter* other);
+
+  // implements Message ----------------------------------------------
+
+  RBMParameter* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const RBMParameter& from);
+  void MergeFrom(const RBMParameter& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  typedef RBMParameter_SampleType SampleType;
+  static const SampleType BERNOULLI = RBMParameter_SampleType_BERNOULLI;
+  static const SampleType GAUSSUIAN = RBMParameter_SampleType_GAUSSUIAN;
+  static inline bool SampleType_IsValid(int value) {
+    return RBMParameter_SampleType_IsValid(value);
+  }
+  static const SampleType SampleType_MIN =
+    RBMParameter_SampleType_SampleType_MIN;
+  static const SampleType SampleType_MAX =
+    RBMParameter_SampleType_SampleType_MAX;
+  static const int SampleType_ARRAYSIZE =
+    RBMParameter_SampleType_SampleType_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  SampleType_descriptor() {
+    return RBMParameter_SampleType_descriptor();
+  }
+  static inline const ::std::string& SampleType_Name(SampleType value) {
+    return RBMParameter_SampleType_Name(value);
+  }
+  static inline bool SampleType_Parse(const ::std::string& name,
+      SampleType* value) {
+    return RBMParameter_SampleType_Parse(name, value);
+  }
+
+  // accessors -------------------------------------------------------
+
+  // optional int32 num_output = 1;
+  inline bool has_num_output() const;
+  inline void clear_num_output();
+  static const int kNumOutputFieldNumber = 1;
+  inline ::google::protobuf::int32 num_output() const;
+  inline void set_num_output(::google::protobuf::int32 value);
+
+  // optional .caffe.FillerParameter weight_filler = 2;
+  inline bool has_weight_filler() const;
+  inline void clear_weight_filler();
+  static const int kWeightFillerFieldNumber = 2;
+  inline const ::caffe::FillerParameter& weight_filler() const;
+  inline ::caffe::FillerParameter* mutable_weight_filler();
+  inline ::caffe::FillerParameter* release_weight_filler();
+  inline void set_allocated_weight_filler(::caffe::FillerParameter* weight_filler);
+
+  // optional .caffe.FillerParameter bias_filler = 3;
+  inline bool has_bias_filler() const;
+  inline void clear_bias_filler();
+  static const int kBiasFillerFieldNumber = 3;
+  inline const ::caffe::FillerParameter& bias_filler() const;
+  inline ::caffe::FillerParameter* mutable_bias_filler();
+  inline ::caffe::FillerParameter* release_bias_filler();
+  inline void set_allocated_bias_filler(::caffe::FillerParameter* bias_filler);
+
+  // optional .caffe.RBMParameter.SampleType sample_type = 4 [default = BERNOULLI];
+  inline bool has_sample_type() const;
+  inline void clear_sample_type();
+  static const int kSampleTypeFieldNumber = 4;
+  inline ::caffe::RBMParameter_SampleType sample_type() const;
+  inline void set_sample_type(::caffe::RBMParameter_SampleType value);
+
+  // optional int32 axis = 5 [default = 1];
+  inline bool has_axis() const;
+  inline void clear_axis();
+  static const int kAxisFieldNumber = 5;
+  inline ::google::protobuf::int32 axis() const;
+  inline void set_axis(::google::protobuf::int32 value);
+
+  // optional int32 num_iteration = 6 [default = 1];
+  inline bool has_num_iteration() const;
+  inline void clear_num_iteration();
+  static const int kNumIterationFieldNumber = 6;
+  inline ::google::protobuf::int32 num_iteration() const;
+  inline void set_num_iteration(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:caffe.RBMParameter)
+ private:
+  inline void set_has_num_output();
+  inline void clear_has_num_output();
+  inline void set_has_weight_filler();
+  inline void clear_has_weight_filler();
+  inline void set_has_bias_filler();
+  inline void clear_has_bias_filler();
+  inline void set_has_sample_type();
+  inline void clear_has_sample_type();
+  inline void set_has_axis();
+  inline void clear_has_axis();
+  inline void set_has_num_iteration();
+  inline void clear_has_num_iteration();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  ::caffe::FillerParameter* weight_filler_;
+  ::google::protobuf::int32 num_output_;
+  int sample_type_;
+  ::caffe::FillerParameter* bias_filler_;
+  ::google::protobuf::int32 axis_;
+  ::google::protobuf::int32 num_iteration_;
+  friend void  protobuf_AddDesc_caffe_2eproto();
+  friend void protobuf_AssignDesc_caffe_2eproto();
+  friend void protobuf_ShutdownFile_caffe_2eproto();
+
+  void InitAsDefaultInstance();
+  static RBMParameter* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -7365,13 +7554,6 @@ class RecurrentParameter : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 sequence_length() const;
   inline void set_sequence_length(::google::protobuf::uint32 value);
 
-  // optional bool decode = 10 [default = false];
-  inline bool has_decode() const;
-  inline void clear_decode();
-  static const int kDecodeFieldNumber = 10;
-  inline bool decode() const;
-  inline void set_decode(bool value);
-
   // optional float drop_input_prob = 12 [default = 0];
   inline bool has_drop_input_prob() const;
   inline void clear_drop_input_prob();
@@ -7408,8 +7590,6 @@ class RecurrentParameter : public ::google::protobuf::Message {
   inline void clear_has_dec_trans_bias_filler();
   inline void set_has_sequence_length();
   inline void clear_has_sequence_length();
-  inline void set_has_decode();
-  inline void clear_has_decode();
   inline void set_has_drop_input_prob();
   inline void clear_has_drop_input_prob();
   inline void set_has_drop_output_prob();
@@ -7425,7 +7605,6 @@ class RecurrentParameter : public ::google::protobuf::Message {
   bool debug_info_;
   bool no_memory_cell_;
   bool pred_;
-  bool decode_;
   ::caffe::FillerParameter* dec_trans_weight_filler_;
   ::google::protobuf::uint32 num_rec_feature_;
   ::google::protobuf::uint32 sequence_length_;
@@ -15097,6 +15276,230 @@ inline void LayerParameter::set_allocated_norm_loss_param(::caffe::NormLossParam
   // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.norm_loss_param)
 }
 
+// optional .caffe.RBMParameter rbm_param = 146;
+inline bool LayerParameter::has_rbm_param() const {
+  return (_has_bits_[1] & 0x01000000u) != 0;
+}
+inline void LayerParameter::set_has_rbm_param() {
+  _has_bits_[1] |= 0x01000000u;
+}
+inline void LayerParameter::clear_has_rbm_param() {
+  _has_bits_[1] &= ~0x01000000u;
+}
+inline void LayerParameter::clear_rbm_param() {
+  if (rbm_param_ != NULL) rbm_param_->::caffe::RBMParameter::Clear();
+  clear_has_rbm_param();
+}
+inline const ::caffe::RBMParameter& LayerParameter::rbm_param() const {
+  // @@protoc_insertion_point(field_get:caffe.LayerParameter.rbm_param)
+  return rbm_param_ != NULL ? *rbm_param_ : *default_instance_->rbm_param_;
+}
+inline ::caffe::RBMParameter* LayerParameter::mutable_rbm_param() {
+  set_has_rbm_param();
+  if (rbm_param_ == NULL) rbm_param_ = new ::caffe::RBMParameter;
+  // @@protoc_insertion_point(field_mutable:caffe.LayerParameter.rbm_param)
+  return rbm_param_;
+}
+inline ::caffe::RBMParameter* LayerParameter::release_rbm_param() {
+  clear_has_rbm_param();
+  ::caffe::RBMParameter* temp = rbm_param_;
+  rbm_param_ = NULL;
+  return temp;
+}
+inline void LayerParameter::set_allocated_rbm_param(::caffe::RBMParameter* rbm_param) {
+  delete rbm_param_;
+  rbm_param_ = rbm_param;
+  if (rbm_param) {
+    set_has_rbm_param();
+  } else {
+    clear_has_rbm_param();
+  }
+  // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.rbm_param)
+}
+
+// -------------------------------------------------------------------
+
+// RBMParameter
+
+// optional int32 num_output = 1;
+inline bool RBMParameter::has_num_output() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void RBMParameter::set_has_num_output() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void RBMParameter::clear_has_num_output() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void RBMParameter::clear_num_output() {
+  num_output_ = 0;
+  clear_has_num_output();
+}
+inline ::google::protobuf::int32 RBMParameter::num_output() const {
+  // @@protoc_insertion_point(field_get:caffe.RBMParameter.num_output)
+  return num_output_;
+}
+inline void RBMParameter::set_num_output(::google::protobuf::int32 value) {
+  set_has_num_output();
+  num_output_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RBMParameter.num_output)
+}
+
+// optional .caffe.FillerParameter weight_filler = 2;
+inline bool RBMParameter::has_weight_filler() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void RBMParameter::set_has_weight_filler() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void RBMParameter::clear_has_weight_filler() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void RBMParameter::clear_weight_filler() {
+  if (weight_filler_ != NULL) weight_filler_->::caffe::FillerParameter::Clear();
+  clear_has_weight_filler();
+}
+inline const ::caffe::FillerParameter& RBMParameter::weight_filler() const {
+  // @@protoc_insertion_point(field_get:caffe.RBMParameter.weight_filler)
+  return weight_filler_ != NULL ? *weight_filler_ : *default_instance_->weight_filler_;
+}
+inline ::caffe::FillerParameter* RBMParameter::mutable_weight_filler() {
+  set_has_weight_filler();
+  if (weight_filler_ == NULL) weight_filler_ = new ::caffe::FillerParameter;
+  // @@protoc_insertion_point(field_mutable:caffe.RBMParameter.weight_filler)
+  return weight_filler_;
+}
+inline ::caffe::FillerParameter* RBMParameter::release_weight_filler() {
+  clear_has_weight_filler();
+  ::caffe::FillerParameter* temp = weight_filler_;
+  weight_filler_ = NULL;
+  return temp;
+}
+inline void RBMParameter::set_allocated_weight_filler(::caffe::FillerParameter* weight_filler) {
+  delete weight_filler_;
+  weight_filler_ = weight_filler;
+  if (weight_filler) {
+    set_has_weight_filler();
+  } else {
+    clear_has_weight_filler();
+  }
+  // @@protoc_insertion_point(field_set_allocated:caffe.RBMParameter.weight_filler)
+}
+
+// optional .caffe.FillerParameter bias_filler = 3;
+inline bool RBMParameter::has_bias_filler() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void RBMParameter::set_has_bias_filler() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void RBMParameter::clear_has_bias_filler() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void RBMParameter::clear_bias_filler() {
+  if (bias_filler_ != NULL) bias_filler_->::caffe::FillerParameter::Clear();
+  clear_has_bias_filler();
+}
+inline const ::caffe::FillerParameter& RBMParameter::bias_filler() const {
+  // @@protoc_insertion_point(field_get:caffe.RBMParameter.bias_filler)
+  return bias_filler_ != NULL ? *bias_filler_ : *default_instance_->bias_filler_;
+}
+inline ::caffe::FillerParameter* RBMParameter::mutable_bias_filler() {
+  set_has_bias_filler();
+  if (bias_filler_ == NULL) bias_filler_ = new ::caffe::FillerParameter;
+  // @@protoc_insertion_point(field_mutable:caffe.RBMParameter.bias_filler)
+  return bias_filler_;
+}
+inline ::caffe::FillerParameter* RBMParameter::release_bias_filler() {
+  clear_has_bias_filler();
+  ::caffe::FillerParameter* temp = bias_filler_;
+  bias_filler_ = NULL;
+  return temp;
+}
+inline void RBMParameter::set_allocated_bias_filler(::caffe::FillerParameter* bias_filler) {
+  delete bias_filler_;
+  bias_filler_ = bias_filler;
+  if (bias_filler) {
+    set_has_bias_filler();
+  } else {
+    clear_has_bias_filler();
+  }
+  // @@protoc_insertion_point(field_set_allocated:caffe.RBMParameter.bias_filler)
+}
+
+// optional .caffe.RBMParameter.SampleType sample_type = 4 [default = BERNOULLI];
+inline bool RBMParameter::has_sample_type() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void RBMParameter::set_has_sample_type() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void RBMParameter::clear_has_sample_type() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void RBMParameter::clear_sample_type() {
+  sample_type_ = 1;
+  clear_has_sample_type();
+}
+inline ::caffe::RBMParameter_SampleType RBMParameter::sample_type() const {
+  // @@protoc_insertion_point(field_get:caffe.RBMParameter.sample_type)
+  return static_cast< ::caffe::RBMParameter_SampleType >(sample_type_);
+}
+inline void RBMParameter::set_sample_type(::caffe::RBMParameter_SampleType value) {
+  assert(::caffe::RBMParameter_SampleType_IsValid(value));
+  set_has_sample_type();
+  sample_type_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RBMParameter.sample_type)
+}
+
+// optional int32 axis = 5 [default = 1];
+inline bool RBMParameter::has_axis() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void RBMParameter::set_has_axis() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void RBMParameter::clear_has_axis() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void RBMParameter::clear_axis() {
+  axis_ = 1;
+  clear_has_axis();
+}
+inline ::google::protobuf::int32 RBMParameter::axis() const {
+  // @@protoc_insertion_point(field_get:caffe.RBMParameter.axis)
+  return axis_;
+}
+inline void RBMParameter::set_axis(::google::protobuf::int32 value) {
+  set_has_axis();
+  axis_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RBMParameter.axis)
+}
+
+// optional int32 num_iteration = 6 [default = 1];
+inline bool RBMParameter::has_num_iteration() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void RBMParameter::set_has_num_iteration() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void RBMParameter::clear_has_num_iteration() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void RBMParameter::clear_num_iteration() {
+  num_iteration_ = 1;
+  clear_has_num_iteration();
+}
+inline ::google::protobuf::int32 RBMParameter::num_iteration() const {
+  // @@protoc_insertion_point(field_get:caffe.RBMParameter.num_iteration)
+  return num_iteration_;
+}
+inline void RBMParameter::set_num_iteration(::google::protobuf::int32 value) {
+  set_has_num_iteration();
+  num_iteration_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RBMParameter.num_iteration)
+}
+
 // -------------------------------------------------------------------
 
 // NormLossParameter
@@ -19675,39 +20078,15 @@ inline void RecurrentParameter::set_sequence_length(::google::protobuf::uint32 v
   // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.sequence_length)
 }
 
-// optional bool decode = 10 [default = false];
-inline bool RecurrentParameter::has_decode() const {
-  return (_has_bits_[0] & 0x00000400u) != 0;
-}
-inline void RecurrentParameter::set_has_decode() {
-  _has_bits_[0] |= 0x00000400u;
-}
-inline void RecurrentParameter::clear_has_decode() {
-  _has_bits_[0] &= ~0x00000400u;
-}
-inline void RecurrentParameter::clear_decode() {
-  decode_ = false;
-  clear_has_decode();
-}
-inline bool RecurrentParameter::decode() const {
-  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.decode)
-  return decode_;
-}
-inline void RecurrentParameter::set_decode(bool value) {
-  set_has_decode();
-  decode_ = value;
-  // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.decode)
-}
-
 // optional float drop_input_prob = 12 [default = 0];
 inline bool RecurrentParameter::has_drop_input_prob() const {
-  return (_has_bits_[0] & 0x00000800u) != 0;
+  return (_has_bits_[0] & 0x00000400u) != 0;
 }
 inline void RecurrentParameter::set_has_drop_input_prob() {
-  _has_bits_[0] |= 0x00000800u;
+  _has_bits_[0] |= 0x00000400u;
 }
 inline void RecurrentParameter::clear_has_drop_input_prob() {
-  _has_bits_[0] &= ~0x00000800u;
+  _has_bits_[0] &= ~0x00000400u;
 }
 inline void RecurrentParameter::clear_drop_input_prob() {
   drop_input_prob_ = 0;
@@ -19725,13 +20104,13 @@ inline void RecurrentParameter::set_drop_input_prob(float value) {
 
 // optional float drop_output_prob = 13 [default = 0];
 inline bool RecurrentParameter::has_drop_output_prob() const {
-  return (_has_bits_[0] & 0x00001000u) != 0;
+  return (_has_bits_[0] & 0x00000800u) != 0;
 }
 inline void RecurrentParameter::set_has_drop_output_prob() {
-  _has_bits_[0] |= 0x00001000u;
+  _has_bits_[0] |= 0x00000800u;
 }
 inline void RecurrentParameter::clear_has_drop_output_prob() {
-  _has_bits_[0] &= ~0x00001000u;
+  _has_bits_[0] &= ~0x00000800u;
 }
 inline void RecurrentParameter::clear_drop_output_prob() {
   drop_output_prob_ = 0;
@@ -23871,6 +24250,11 @@ template <> struct is_proto_enum< ::caffe::ParamSpec_DimCheckMode> : ::google::p
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::caffe::ParamSpec_DimCheckMode>() {
   return ::caffe::ParamSpec_DimCheckMode_descriptor();
+}
+template <> struct is_proto_enum< ::caffe::RBMParameter_SampleType> : ::google::protobuf::internal::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::caffe::RBMParameter_SampleType>() {
+  return ::caffe::RBMParameter_SampleType_descriptor();
 }
 template <> struct is_proto_enum< ::caffe::NormLossParameter_NormType> : ::google::protobuf::internal::true_type {};
 template <>

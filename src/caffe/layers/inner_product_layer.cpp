@@ -83,6 +83,7 @@ void InnerProductLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   const Dtype* bottom_data = bottom[0]->cpu_data();
   Dtype* top_data = top[0]->mutable_cpu_data();
   const Dtype* weight = this->blobs_[0]->cpu_data();
+  //XW^T
   caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasTrans, M_, N_, K_, (Dtype)1.,
       bottom_data, weight, (Dtype)0., top_data);
   if (bias_term_) {
@@ -91,15 +92,6 @@ void InnerProductLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         this->blobs_[1]->cpu_data(), (Dtype)1., top_data);
   }
 
-	/*for (int i = 0; i < K_; i++)
-	{
-		LOG(INFO) << bottom_data[i];
-	}*/
-
-	/*for (int i = 0; i < 1; i++)
-	{
-		LOG(INFO) << weight[i];
-	}*/
 }
 
 template <typename Dtype>
@@ -112,13 +104,6 @@ void InnerProductLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     // Gradient with respect to weight
     caffe_cpu_gemm<Dtype>(CblasTrans, CblasNoTrans, N_, K_, M_, (Dtype)1.,
         top_diff, bottom_data, (Dtype)1., this->blobs_[0]->mutable_cpu_diff());
-
-
-		/*LOG(INFO) << "testing........";
-		for (int i = 0; i < 2; i++)
-		{
-			LOG(INFO) << this->blobs_[0]->cpu_data()[i];
-		}*/
   }
   if (bias_term_ && this->param_propagate_down_[1]) {
     const Dtype* top_diff = top[0]->cpu_diff();

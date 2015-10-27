@@ -41,10 +41,7 @@ namespace caffe {
 
 		int* mask = NULL;
 
-		/*for (int i = 0; i < 15; i++)
-		{
-			LOG(INFO) << bottom_data[i];
-		}*/
+		//loop at the pool axis
 		switch (this->layer_param_.axis_pooling_param().pool())
 		{
 		case AxisPoolingParameter_PoolMethod_MAX:
@@ -57,8 +54,8 @@ namespace caffe {
 				{
 					for (int j = 0; j < pool_input_size_; j++)
 					{
-						const int bottom_index = n*bottom_pool_axis*pool_input_size_+i*pool_input_size_ + j;
-						const int top_index = n*pool_input_size_+ j;
+						const int bottom_index = n * bottom_pool_axis * pool_input_size_+ i * pool_input_size_ + j;
+						const int top_index = n * pool_input_size_+ j;
 						if (bottom_data[bottom_index]>top_data[top_index])
 						{
 							top_data[top_index] = bottom_data[bottom_index];
@@ -74,10 +71,9 @@ namespace caffe {
 				for (int i = 0; i < bottom_pool_axis; i++)
 				{
 					caffe_add(pool_input_size_,
-						bottom_data + n * bottom_pool_axis * pool_input_size_ + i*pool_input_size_,
-						top_data + n*pool_input_size_,
-						top_data + n*pool_input_size_
-						);
+						bottom_data + n * bottom_pool_axis * pool_input_size_ + i * pool_input_size_,
+						top_data + n * pool_input_size_,
+						top_data + n * pool_input_size_ );
 				}
 			}
 			caffe_scal(top[0]->count(), Dtype(1) / bottom_pool_axis, top_data);

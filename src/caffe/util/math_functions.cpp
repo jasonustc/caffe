@@ -12,6 +12,7 @@
 
 namespace caffe {
 
+//A[M][K] * B[K][N]
 template<>
 void caffe_cpu_gemm<float>(const CBLAS_TRANSPOSE TransA,
     const CBLAS_TRANSPOSE TransB, const int M, const int N, const int K,
@@ -331,6 +332,28 @@ void caffe_rng_bernoulli<double>(const int n, const double p, int* r);
 
 template
 void caffe_rng_bernoulli<float>(const int n, const float p, int* r);
+
+template <typename Dtype>
+void caffe_rng_bernoulli(const int n, const Dtype* p, unsigned int* r) {
+	CHECK_GE(n, 0);
+	CHECK(r);
+	for (int i = 0; i < n; ++i) {
+		CHECK_GE(p[i], 0);
+		CHECK_LE(p[i], 1);
+		Dtype uint_thre = static_cast<Dtype>(UINT_MAX * p[i]);
+		boost::bernoulli_distribution<Dtype> random_distribution(p[i]);
+		boost::variate_generator<caffe::rng_t*, boost::bernoulli_distribution<Dtype> >
+			variate_generator(caffe_rng(), random_distribution);
+		r[i] = static_cast<unsigned int>(variate_generator() > uint_thre);
+	}
+}
+
+
+template
+void caffe_rng_bernoulli<double>(const int n, const double* p, double* r);
+
+template
+void caffe_rng_bernoulli<float>(const int n, const float* p, float* r);
 
 template <typename Dtype>
 void caffe_rng_bernoulli(const int n, const Dtype p, unsigned int* r) {

@@ -349,6 +349,26 @@ message LayerParameter {
   optional WindowDataParameter window_data_param = 129;
   optional NoiseParameter noise_param = 143;
   optional NormLossParameter norm_loss_param = 145;
+  optional RBMParameter rbm_param = 146;
+}
+
+//Message that stores parameters used to calculate rbm loss
+message RBMParameter{
+    optional int32 num_output = 1;
+    optional FillerParameter weight_filler = 2;
+    optional FillerParameter bias_filler = 3;
+    enum SampleType{
+        BERNOULLI = 1;
+        GAUSSUIAN = 2;
+    }
+    optional SampleType sample_type = 4[default = BERNOULLI];
+    // The first axis to be lumped into a single inner product computation;
+    // all preceding axes are retained in the output.
+    // May be negative to index from the end (e.g., -1 for the last axis).
+    // here default to reshape the bottom to be N * (C * H * W)
+    optional int32 axis = 5[default = 1];
+    //number of CD times, CD-k algorithm
+    optional int32 num_iteration = 6[default = 1];
 }
 
 //Message that stores parameters used to calculate l1/l2 loss
