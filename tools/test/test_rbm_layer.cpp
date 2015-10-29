@@ -166,8 +166,8 @@ namespace caffe{
 int main(int argc, char** argv){
 	caffe::RBMTest<float> test;
 	test.TestSetUp();
-	test.TestCPUForward();
-	test.TestCPUGradients();
+//	test.TestCPUForward();
+//	test.TestCPUGradients();
 	test.TestGPUForward();
 	test.TestGPUGradients();
 	return 0;

@@ -42,7 +42,6 @@ namespace caffe{
 			count_h, pos_h_data, pos_h_data);
 		//sampling
 		caffe_gpu_rng_bernoulli<Dtype>(count_h, pos_h_data, positive_state_h_data);
-		positive_state_h_.ToTxt("sample_h_data");
 		//prop down
 		//h: M x N  v: M x K w: N x K
 		//TODO: need to convert the data type of state_h to Dtype
@@ -57,7 +56,6 @@ namespace caffe{
 			count_v, neg_v_data, neg_v_data);
 		//sampling 
 		caffe_gpu_rng_bernoulli<Dtype>(count_v, neg_v_data, negative_state_v_data);
-		negative_state_v_.ToTxt("sample_v_data");
 
 		//prop up again
 		caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasTrans, M_, N_, K_, (Dtype)1.,
@@ -70,7 +68,6 @@ namespace caffe{
 		//sigmoid activation
 		SigmoidForward<Dtype> << <CAFFE_GET_BLOCKS(count_h), CAFFE_CUDA_NUM_THREADS >> >(
 			count_h, neg_h_data, neg_h_data);
-		neg_h_.ToTxt("neg_h_data");
 	}
 
 	template <typename Dtype>
@@ -87,7 +84,7 @@ namespace caffe{
 			caffe_gpu_sub<Dtype>(count, bottom_data, neg_v_data, tmp_data);
 			Dtype loss;
 			caffe_gpu_dot<Dtype>(count, tmp_data, tmp_data, &loss);
-			top[1]->mutable_gpu_data()[0] = loss / bottom[0]->num();
+			top[1]->mutable_cpu_data()[0] = loss / bottom[0]->num();
 		}
 	}
 
@@ -110,10 +107,6 @@ namespace caffe{
 		Dtype scale = Dtype(1.) / bottom[0]->num();
 
 		//Gradient with respect to weight
-		pos_h_.ToTxt("pos_h_data");
-		pos_v_.ToTxt("pos_v_data");
-		neg_h_.ToTxt("neg_h_data");
-		neg_v_.ToTxt("neg_v_data");
 		if (this->param_propagate_down_[0]){
 			caffe_gpu_gemm<Dtype>(CblasTrans, CblasNoTrans, N_, K_, M_, (Dtype)1.,
 				pos_h_data, pos_v_data, (Dtype)0., pos_ass_data);
@@ -124,7 +117,6 @@ namespace caffe{
 			caffe_gpu_axpby<Dtype>(this->blobs_[0]->count(), scale, neg_ass_data, 
 				Dtype(1.), weight_diff);
 		}
-		this->blobs_[0]->ToTxt("weight_data", true);
 
 		//Gradient with respect to h_bias
 		const int count_h = pos_h_.count();
@@ -133,15 +125,12 @@ namespace caffe{
 		if (this->param_propagate_down_[1]){
 			//put buffer data in neg_h_.diff()
 			//pos_h_ is shared with top[0], be carefully to use it in other place
-			caffe_sub<Dtype>(count_h, pos_h_data, neg_h_data, neg_h_.mutable_gpu_diff());
-			neg_v_.ToTxt("cur_v", true);
+			caffe_gpu_sub<Dtype>(count_h, pos_h_data, neg_h_data, neg_h_.mutable_gpu_diff());
 			//put intemediate result into neg_h_ data
 			//average by batch size
 			caffe_gpu_gemv<Dtype>(CblasTrans, M_, N_, scale, neg_h_.gpu_diff(), 
 				bias_multiplier_.gpu_data(),(Dtype)1., h_bias_diff);
 		}
-		bias_multiplier_.ToTxt("bias_multi", true);
-		this->blobs_[1]->ToTxt("h_bias", true);
 
 		//Gradient with respect to v_bias
 		const int count_v = pos_v_.count();
@@ -150,19 +139,17 @@ namespace caffe{
 		if (this->param_propagate_down_[2]){
 			//put buffer data in neg_v_.diff()
 			//pos_v_ is shared with bottom[0], be carefully to use it in other place
-			caffe_sub<Dtype>(count_v, pos_v_data, neg_v_data, neg_v_.mutable_gpu_diff());
+			caffe_gpu_sub<Dtype>(count_v, pos_v_data, neg_v_data, neg_v_.mutable_gpu_diff());
 			//put intemediate result into neg_v_ data
 			//average by batch size
 			caffe_gpu_gemv<Dtype>(CblasTrans, M_, K_, scale, neg_v_.gpu_diff(), 
 				bias_multiplier_.gpu_data(), (Dtype)1., v_bias_diff);
 		}
-		this->blobs_[2]->ToTxt("v_bias", true);
 
 		if (propagate_down[0]){
 			caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, K_, N_, (Dtype)1.,
 				top_diff, weight_data, (Dtype)0., bottom_diff);
 		}
-		bottom[0]->ToTxt("bottom_data", true);
 	}
 
 	INSTANTIATE_LAYER_GPU_FUNCS(RBMLayer);
