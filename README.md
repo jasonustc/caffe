@@ -24,4 +24,4 @@ the definition of rbm is in [common_layers.hpp](./include/caffe/common_layers.hp
 
 [rbm_layer.cu](./src/caffe/layers/rbm_layer.cu)
 
-*Any problem please contact shenxu@mail.ustc.edu.cn*
+*Any problem please contact shenxuATmail.ustc.edu.cn*
