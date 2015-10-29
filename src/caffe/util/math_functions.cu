@@ -505,14 +505,14 @@ void caffe_gpu_rng_bernoulli<float>(const int n, const float* p, unsigned int* r
 
 template <>
 void caffe_gpu_rng_bernoulli<float>(const int n, const float* p, float* r){
-	//generate n unsigned int random numbers in [0, UINT_MAX] and put into r
+	//generate uniformly distributed floating values in [0, 1)
 	CURAND_CHECK(curandGenerateUniform(Caffe::curand_generator(), r, n));
 	thred_kernel<float><<<CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS >>>(n, p, r);
 }
 
 template <>
 void caffe_gpu_rng_bernoulli<double>(const int n, const double* p, double* r){
-	//generate n unsigned int random numbers in [0, UINT_MAX] and put into r
+	//generate uniformly distributed double values in [0, 1)
 	CURAND_CHECK(curandGenerateUniformDouble(Caffe::curand_generator(), r, n));
 	thred_kernel<double><<<CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS >>>(n, p, r);
 }

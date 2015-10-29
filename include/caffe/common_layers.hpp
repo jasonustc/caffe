@@ -408,21 +408,26 @@ protected:
 	//iteration times in contrasitive divergence
 	int num_iteration_;
 
+public:
 	//visible variables
-	Blob<Dtype> pre_v_;
-	Blob<Dtype> cur_v_;
+	Blob<Dtype> pos_v_;
+	Blob<Dtype> neg_v_;
 
 	//hidden variables
-	Blob<Dtype> pre_h_;
-	Blob<Dtype> cur_h_;
+	Blob<Dtype> pos_h_;
+	Blob<Dtype> neg_h_;
 
 	//sampling result of positive hidden states
 	Blob<Dtype> positive_state_h_;
+	Blob<Dtype> negative_state_v_;
 
 	bool bias_term_;
 	Blob<Dtype> bias_multiplier_;
 
 	RBMParameter_SampleType sample_type_;
+	
+	//weight diff buffer
+	Blob<Dtype> weight_diff_buf_;
 };
 
 /**

@@ -858,6 +858,10 @@ message RecurrentParameter {
   optional FillerParameter dec_trans_weight_filler = 8;
   //bias filler of transformation of decoder hidden feature
   optional FillerParameter dec_trans_bias_filler = 11;
+  
+  //if this LSTM used for decode 
+  //will output c_Ts and h_Ts 
+  optional bool decode = 10[default = false];
 
   //the sequence length
   optional uint32 sequence_length = 9;

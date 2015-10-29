@@ -7547,6 +7547,13 @@ class RecurrentParameter : public ::google::protobuf::Message {
   inline ::caffe::FillerParameter* release_dec_trans_bias_filler();
   inline void set_allocated_dec_trans_bias_filler(::caffe::FillerParameter* dec_trans_bias_filler);
 
+  // optional bool decode = 10 [default = false];
+  inline bool has_decode() const;
+  inline void clear_decode();
+  static const int kDecodeFieldNumber = 10;
+  inline bool decode() const;
+  inline void set_decode(bool value);
+
   // optional uint32 sequence_length = 9;
   inline bool has_sequence_length() const;
   inline void clear_sequence_length();
@@ -7588,6 +7595,8 @@ class RecurrentParameter : public ::google::protobuf::Message {
   inline void clear_has_dec_trans_weight_filler();
   inline void set_has_dec_trans_bias_filler();
   inline void clear_has_dec_trans_bias_filler();
+  inline void set_has_decode();
+  inline void clear_has_decode();
   inline void set_has_sequence_length();
   inline void clear_has_sequence_length();
   inline void set_has_drop_input_prob();
@@ -7605,10 +7614,11 @@ class RecurrentParameter : public ::google::protobuf::Message {
   bool debug_info_;
   bool no_memory_cell_;
   bool pred_;
+  bool decode_;
   ::caffe::FillerParameter* dec_trans_weight_filler_;
+  ::caffe::FillerParameter* dec_trans_bias_filler_;
   ::google::protobuf::uint32 num_rec_feature_;
   ::google::protobuf::uint32 sequence_length_;
-  ::caffe::FillerParameter* dec_trans_bias_filler_;
   float drop_input_prob_;
   float drop_output_prob_;
   friend void  protobuf_AddDesc_caffe_2eproto();
@@ -20054,15 +20064,39 @@ inline void RecurrentParameter::set_allocated_dec_trans_bias_filler(::caffe::Fil
   // @@protoc_insertion_point(field_set_allocated:caffe.RecurrentParameter.dec_trans_bias_filler)
 }
 
-// optional uint32 sequence_length = 9;
-inline bool RecurrentParameter::has_sequence_length() const {
+// optional bool decode = 10 [default = false];
+inline bool RecurrentParameter::has_decode() const {
   return (_has_bits_[0] & 0x00000200u) != 0;
 }
-inline void RecurrentParameter::set_has_sequence_length() {
+inline void RecurrentParameter::set_has_decode() {
   _has_bits_[0] |= 0x00000200u;
 }
-inline void RecurrentParameter::clear_has_sequence_length() {
+inline void RecurrentParameter::clear_has_decode() {
   _has_bits_[0] &= ~0x00000200u;
+}
+inline void RecurrentParameter::clear_decode() {
+  decode_ = false;
+  clear_has_decode();
+}
+inline bool RecurrentParameter::decode() const {
+  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.decode)
+  return decode_;
+}
+inline void RecurrentParameter::set_decode(bool value) {
+  set_has_decode();
+  decode_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.decode)
+}
+
+// optional uint32 sequence_length = 9;
+inline bool RecurrentParameter::has_sequence_length() const {
+  return (_has_bits_[0] & 0x00000400u) != 0;
+}
+inline void RecurrentParameter::set_has_sequence_length() {
+  _has_bits_[0] |= 0x00000400u;
+}
+inline void RecurrentParameter::clear_has_sequence_length() {
+  _has_bits_[0] &= ~0x00000400u;
 }
 inline void RecurrentParameter::clear_sequence_length() {
   sequence_length_ = 0u;
@@ -20080,13 +20114,13 @@ inline void RecurrentParameter::set_sequence_length(::google::protobuf::uint32 v
 
 // optional float drop_input_prob = 12 [default = 0];
 inline bool RecurrentParameter::has_drop_input_prob() const {
-  return (_has_bits_[0] & 0x00000400u) != 0;
+  return (_has_bits_[0] & 0x00000800u) != 0;
 }
 inline void RecurrentParameter::set_has_drop_input_prob() {
-  _has_bits_[0] |= 0x00000400u;
+  _has_bits_[0] |= 0x00000800u;
 }
 inline void RecurrentParameter::clear_has_drop_input_prob() {
-  _has_bits_[0] &= ~0x00000400u;
+  _has_bits_[0] &= ~0x00000800u;
 }
 inline void RecurrentParameter::clear_drop_input_prob() {
   drop_input_prob_ = 0;
@@ -20104,13 +20138,13 @@ inline void RecurrentParameter::set_drop_input_prob(float value) {
 
 // optional float drop_output_prob = 13 [default = 0];
 inline bool RecurrentParameter::has_drop_output_prob() const {
-  return (_has_bits_[0] & 0x00000800u) != 0;
+  return (_has_bits_[0] & 0x00001000u) != 0;
 }
 inline void RecurrentParameter::set_has_drop_output_prob() {
-  _has_bits_[0] |= 0x00000800u;
+  _has_bits_[0] |= 0x00001000u;
 }
 inline void RecurrentParameter::clear_has_drop_output_prob() {
-  _has_bits_[0] &= ~0x00000800u;
+  _has_bits_[0] &= ~0x00001000u;
 }
 inline void RecurrentParameter::clear_drop_output_prob() {
   drop_output_prob_ = 0;

@@ -93,6 +93,9 @@ template <typename Dtype>
 void caffe_rng_bernoulli(const int n, const Dtype* p, unsigned int* r);
 
 template <typename Dtype>
+void caffe_rng_bernoulli(const int n, const Dtype* p, Dtype* r);
+
+template <typename Dtype>
 void caffe_gpu_mul_b(const int N, const Dtype* a, const unsigned int* b, Dtype* y);
 
 template <typename Dtype>
