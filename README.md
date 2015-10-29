@@ -19,5 +19,7 @@ More details at https://initialneil.wordpress.com/2015/01/11/build-caffe-in-wind
 
 ### RBM Layer in caffe
 the definition of rbm is in common_layers.hpp .
-[rbm.cpp](https://github.com/jasonustc/caffe/tree/LSTM/src/caffe/layers/rbm.cpp)
-[rbm.cu](./src/caffe/layers/rbm.cu)
+
+[rbm.cpp](https://github.com/jasonustc/caffe/tree/LSTM/src/caffe/layers/rbm_layer.cpp)
+
+[rbm.cu](./src/caffe/layers/rbm_layer.cu)
