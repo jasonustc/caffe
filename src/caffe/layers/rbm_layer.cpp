@@ -116,53 +116,6 @@ namespace caffe{
 		}
 	}
 
-	/*
-	template <typename Dtype>
-	void RBMLayer<Dtype>::Gibbs_hvh_cpu(){
-		const Dtype* weight_data = this->blobs_[0]->cpu_data();
-		const Dtype* h_bias_data = this->blobs_[1]->cpu_data();
-		const Dtype* v_bias_data = this->blobs_[2]->cpu_data();
-		const Dtype* pos_h_data = pos_h_.cpu_data();
-		Dtype* neg_h_data = neg_h_.mutable_cpu_data();
-		Dtype* pos_v_data = pos_v_.cpu_data();
-		const int count_h = pos_h_.count();
-		const int count_v = pos_v_.count();
-		//prop down
-		//h: M x N  v: M x K w: N x K
-		//dimension of matrix is fixed, so we need to use trans to make
-		//the dimension of A and B match
-		caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, K_, N_, (Dtype)1.,
-			pos_h_data, weight_data, (Dtype)0., pos_v_data);
-		if (bias_term_){
-			//h_bias_multiplier: 1 x N h_bias: 1 x N
-			caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, K_, 1, (Dtype)1.,
-				v_bias_multiplier_.cpu_data(), v_bias_data, (Dtype)1., pos_v_data);
-		}
-		//sigmoid activation
-		for (int i = 0; i < count_v; i++){
-			pos_v_data[i] = sigmoid(pos_v_data[i]);
-		}
-
-		//sampling
-		caffe_rng_bernoulli<Dtype>(count_v, pos_v_data, pos_v_data);
-		//prop up
-		//h: M x N  v: M x K w: K x N
-		caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasTrans, M_, N_, K_, (Dtype)1.,
-			pos_v_data, weight_data, (Dtype)0., neg_h_data);
-		if (bias_term){
-			caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, N_, 1, (Dtype)1.,
-				h_bias_multiplier_.cpu_data(), h_bias_data, (Dtype)1., neg_h_data);
-		}
-		//sigmoid activation
-		for (int i = 0; i < count_h; i++){
-			neg_h_data[i] = sigmoid(neg_h_data[i]);
-		}
-
-		//sampling
-		caffe_rng_bernoulli<Dtype>(count_h, neg_h_data, neg_h_data);
-	}
-	*/
-
 	//TODO: currently only one step of CD is implemented,
 	//CD-k is to be updated
 	template <typename Dtype>
