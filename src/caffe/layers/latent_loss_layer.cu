@@ -35,8 +35,7 @@ namespace caffe{
 		CUDA_KERNEL_LOOP(index, n){
 			//TODO: check if data is not zero
 			//first load to local device memory to save some time
-			const Dtype log_threshold = 1e-20;
-			Dtype sig = sigma_data[index] > log_threshold ? sigma_data[index] : log_threshold;
+			Dtype sig = max(sigma_data[index], Dtype(FLT_MIN));
 			sigma_diff_data[index] = coeff *(sig - 1 / sig);
 		}
 	}
