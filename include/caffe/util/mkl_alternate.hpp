@@ -34,6 +34,9 @@ extern "C" {
 DEFINE_VSL_UNARY_FUNC(Sqr, y[i] = a[i] * a[i]);
 DEFINE_VSL_UNARY_FUNC(Exp, y[i] = exp(a[i]));
 DEFINE_VSL_UNARY_FUNC(Abs, y[i] = fabs(a[i]));
+//here because we must avoid log(0) in log, 
+//so it's not safe to use log like this
+//DEFINE_VSL_UNARY_FUNC(Log, y[i] = log(std::max(a[i], 0.0000001)));
 DEFINE_VSL_UNARY_FUNC(Log, y[i] = log(a[i]));
 
 // A simple way to define the vsl unary functions with singular parameter b.

@@ -352,7 +352,9 @@ void caffe_gpu_exp<double>(const int N, const double* a, double* y) {
 template <typename Dtype>
 __global__ void log_kernel(const int n, const Dtype* a, Dtype* y){
 	CUDA_KERNEL_LOOP(index, n){
-		y[index] = log(a[index]);
+		//here we must carefully avoid the instance of log(0)
+		//so we must convert to 
+		y[index] = log(max(a[index], Dtype(FLT_MIN)));
 	}
 }
 

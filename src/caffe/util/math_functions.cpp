@@ -213,6 +213,7 @@ void caffe_exp<double>(const int n, const double* a, double* y) {
 
 template <>
 void caffe_log<float>(const int n, const float* a, float* y){
+	//TODO: add lower threshold before calculating log(a) => log(max(a, FLT_MIN))
 	vsLog(n, a, y);
 }
 
