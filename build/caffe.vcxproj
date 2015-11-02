@@ -74,6 +74,7 @@
     <ClCompile Include="..\src\caffe\layers\pooling_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\power_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\prelu_layer.cpp" />
+    <ClCompile Include="..\src\caffe\layers\random_trans_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\rcs_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\recurrent_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\relu_layer.cpp" />
@@ -105,11 +106,10 @@
     <ClCompile Include="..\src\caffe\util\insert_splits.cpp" />
     <ClCompile Include="..\src\caffe\util\io.cpp" />
     <ClCompile Include="..\src\caffe\util\math_functions.cpp" />
-    <ClCompile Include="..\src\caffe\util\random_trans_layer.cpp" />
     <ClCompile Include="..\src\caffe\util\transform.cpp" />
     <ClCompile Include="..\src\caffe\util\upgrade_proto.cpp" />
     <ClCompile Include="..\src\gtest\gtest-all.cpp" />
-    <ClCompile Include="..\tools\caffe.cpp" />
+    <ClCompile Include="..\tools\test\test_random_transform_layer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu" />
@@ -143,6 +143,7 @@
     <CudaCompile Include="..\src\caffe\layers\pooling_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\power_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\prelu_layer.cu" />
+    <CudaCompile Include="..\src\caffe\layers\random_trans_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\rcs_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\recurrent_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\relu_layer.cu" />
@@ -158,7 +159,6 @@
     <CudaCompile Include="..\src\caffe\layers\threshold_layer.cu" />
     <CudaCompile Include="..\src\caffe\util\im2col.cu" />
     <CudaCompile Include="..\src\caffe\util\math_functions.cu" />
-    <CudaCompile Include="..\src\caffe\util\random_trans_layer.cu" />
     <CudaCompile Include="..\src\caffe\util\transform.cu" />
   </ItemGroup>
   <ItemGroup>

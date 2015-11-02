@@ -9,6 +9,9 @@
 using std::min;
 using std::max;
 
+/*
+ * TODO: transform 
+ */
 namespace caffe{
 
 	/*
@@ -21,11 +24,11 @@ namespace caffe{
 	void TMatFromParam(const int trans_type, const float param1, const float param2, float *tmat, bool invert){
 		//initialize to identity
 		std::fill(tmat, tmat + 9, 0);
-		tmat[0] = tmat[4] = tmat[9] = 1;
+		tmat[0] = tmat[4] = tmat[8] = 1;
 		//rotation
 		if (trans_type == 0){
 			if (invert){
-				AddRotation(-param1, tmat);
+				AddRotation(- param1, tmat);
 			}
 			else{
 				AddRotation(param1, tmat);
@@ -42,6 +45,7 @@ namespace caffe{
 			}
 		}
 		//shift
+		//in current implementation, shift is x <--> y
 		if (trans_type == 2){
 			if (param1 != 0 || param2 != 0){
 				if (invert){
@@ -57,25 +61,21 @@ namespace caffe{
 	void AddScale(const float &scale, float *mat, const Direction dir){
 		float tmp[9] = { scale, 0, 0, 0, scale, 0, 0, 0, 1 };
 		AddTransform(mat, tmp, dir);
-		delete[] tmp;
 	}
 
 
 	void AddRotation(const float &angle, float *mat, const Direction dir){
 		//Angle in degrees
 		float rad = angle * PI_F / 180;
+		//static memory, system will release automatically
 		float tmp[9] = { cos(rad), sin(rad), 0, -sin(rad), cos(rad), 0, 0, 0, 1 };
 		AddTransform(mat, tmp, dir);
-		//clean up
-		delete[] tmp;
 	}
 
 	void AddShift(const float &dx, const float &dy, float *mat, const Direction dir){
 		//dx is width, dy is height
 		float tmp[9] = { 1, 0, 0, 0, 1, 0, dx, dy, 1};
 		AddTransform(mat, tmp, dir);
-		//clean up
-		delete[] tmp;
 	}
 
 	/*
@@ -105,8 +105,6 @@ namespace caffe{
 			A_copy, B, 0.f, A) :
 			caffe_cpu_gemm<float>(CblasNoTrans, CblasNoTrans, 3, 3, 3, 1.f,
 			B, A_copy, 0.f, A);
-		//clean up
-		delete[] A_copy;
 	}
 	
 	//TODO(AJ): this is computing the offset. with affine transformation computing
@@ -142,8 +140,6 @@ namespace caffe{
 		float min_row = min(min(res[0], res[3]), min(res[6], res[9]));
 		height_new = static_cast<int>(max_row - min_row);
 		width_new = static_cast<int>(max_col - min_col);
-		delete[] corners;
-		delete[] res;
 	}
 
 	//Following the inverse rule of 3x3 matrices using determinats
@@ -165,7 +161,7 @@ namespace caffe{
 		float d1 = A[0] * A[4] * A[8] + A[1] * A[5] * A[6] + A[2] * A[3] * A[7];
 		float d2 = A[0] * A[5] * A[7] + A[2] * A[4] * A[6] + A[8] * A[1] * A[3];
 		float det = d1 - d2;
-		printf("det: %.2f - %.2f = %.2f", d1, d2, det);
+//		printf("det: %.2f - %.2f = %.2f", d1, d2, det);
 		CHECK_NE(det, 0);
 		inv[0] = (A[8] * A[4] - A[5] * A[7]) / det;
 		inv[1] = (A[7] * A[2] - A[1] * A[8]) / det;
@@ -177,8 +173,6 @@ namespace caffe{
 		inv[7] = (A[6] * A[1] - A[0] * A[7]) / det;
 		inv[8] = (A[0] * A[4] - A[3] * A[1]) / det;
 		caffe_copy(9, inv, A);
-		//clean up
-		delete[] inv;
 	}
 
 	//get the reflect location in matrix
@@ -374,6 +368,7 @@ namespace caffe{
 			coord_data = coord->mutable_cpu_data();
 			generate_nn_coord(height, width, height, width, border, coord_data_res,
 				coord_data);
+			break;
 		case BILINEAR:
 			coord->Reshape(1, 1, height * width * 4, 1);
 			coord_data = coord->mutable_cpu_data();
@@ -387,7 +382,6 @@ namespace caffe{
 		//clean up
 		delete[] coord_data_tmp;
 		delete[] coord_data_res;
-		delete[] tmat;
 	}
 
 	void GenCoordMat(float *tmat, const int &height, const int &width,
@@ -414,6 +408,7 @@ namespace caffe{
 			coord_data = coord->mutable_cpu_data();
 			generate_bilinear_coord(height, width, height_new, width_new, border,
 				coord_data_res, coord_data);
+			break;
 		default:
 			LOG(ERROR) << "Unknown interpolation mode " << interp;
 			break;
@@ -551,6 +546,7 @@ namespace caffe{
 			break;
 		case BILINEAR:
 			bilinear_interpolation(orig, coord, warped);
+			break;
 		default:
 			LOG(ERROR) << "Unkown interpolation mode" << interp;
 			break;
