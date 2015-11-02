@@ -65,7 +65,7 @@ namespace caffe{
 			LayerParameter layer_param;
 			NormLossParameter* norm_param =
 				layer_param.mutable_norm_loss_param();
-			norm_param->set_norm_type(NormLossParameter_NormType_L1);
+			norm_param->set_norm_type(NormLossParameter_NormType_L2);
 
 			shared_ptr<Layer<Dtype>> layer(new NormLossLayer<Dtype>(layer_param));
 			layer->SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
@@ -75,9 +75,11 @@ namespace caffe{
 			const Dtype* top_data = this->blob_top_->cpu_data();
 			Dtype sum_norm(0);
 			for (int i = 0; i < this->blob_bottom_vec_[0]->count(); i++){
-				sum_norm += abs(this->blob_bottom_vec_[0]->cpu_data()[i]);
+//				sum_norm += abs(this->blob_bottom_vec_[0]->cpu_data()[i]);
+				Dtype data = this->blob_bottom_vec_[0]->cpu_data()[i];
+				sum_norm += data * data;
 			}
-			sum_norm /= blob_bottom_vec_[0]->num();
+			sum_norm = sum_norm / blob_bottom_vec_[0]->num() / 2;
 			EXPECT_NEAR(sum_norm, top_data[0], 1e-4);
 		}
 
@@ -92,7 +94,7 @@ namespace caffe{
 			LayerParameter layer_param;
 			NormLossParameter* norm_param =
 				layer_param.mutable_norm_loss_param();
-			norm_param->set_norm_type(NormLossParameter_NormType_L1);
+			norm_param->set_norm_type(NormLossParameter_NormType_L2);
 			shared_ptr<Layer<Dtype>> layer(new NormLossLayer<Dtype>(layer_param));
 			layer->SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
 			Caffe::set_mode(Caffe::GPU);
@@ -101,9 +103,11 @@ namespace caffe{
 			const Dtype* top_data = this->blob_top_->cpu_data();
 			Dtype sum_norm(0);
 			for (int i = 0; i < this->blob_bottom_->count(); i++){
-				sum_norm += abs(this->blob_bottom_vec_[0]->cpu_data()[i]);
+//				sum_norm += abs(this->blob_bottom_vec_[0]->cpu_data()[i]);
+				Dtype data = this->blob_bottom_vec_[0]->cpu_data()[i];
+				sum_norm += data * data;
 			}
-			sum_norm /= blob_bottom_vec_[0]->num();
+			sum_norm = sum_norm / blob_bottom_vec_[0]->num() / 2;
 			EXPECT_NEAR(sum_norm, top_data[0], 1e-4);
 		}
 
@@ -111,7 +115,7 @@ namespace caffe{
 			LayerParameter layer_param;
 			NormLossParameter* norm_param =
 				layer_param.mutable_norm_loss_param();
-			norm_param->set_norm_type(NormLossParameter_NormType_L1);
+			norm_param->set_norm_type(NormLossParameter_NormType_L2);
 	  		Caffe::set_mode(Caffe::CPU);
 			NormLossLayer<Dtype> checker_layer(layer_param);
 			checker_layer.SetUp(blob_bottom_vec_, blob_top_vec_);
@@ -123,7 +127,7 @@ namespace caffe{
 			LayerParameter layer_param;
 			NormLossParameter* norm_param =
 				layer_param.mutable_norm_loss_param();
-			norm_param->set_norm_type(NormLossParameter_NormType_L1);
+			norm_param->set_norm_type(NormLossParameter_NormType_L2);
 			Caffe::set_mode(Caffe::GPU);
 			NormLossLayer<Dtype> layer(layer_param);
 			layer.SetUp(blob_bottom_vec_, blob_top_vec_);
