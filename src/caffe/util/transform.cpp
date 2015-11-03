@@ -10,7 +10,7 @@ using std::min;
 using std::max;
 
 /*
- * TODO: transform 
+ * TODO: transfer all these transforms into GPU version
  */
 namespace caffe{
 
@@ -106,41 +106,6 @@ namespace caffe{
 			caffe_cpu_gemm<float>(CblasNoTrans, CblasNoTrans, 3, 3, 3, 1.f,
 			B, A_copy, 0.f, A);
 	}
-	
-	//TODO(AJ): this is computing the offset. with affine transformation computing
-	//the offset using the center of the new image is fine but not so for
-	//perspective. What works for both cases is having offset as (min x, min y),
-	//the left top corner of the image is the right offset.
-	void GetNewSize(const int &height, const int &width, const float *mat,
-		int &height_new, int &width_new){
-		CHECK_GT(height, 0) << "height must larger than 0" << height;
-		CHECK_GT(width, 0) << "width must larger than 0" << width;
-		//4 corners
-		// x, y, z
-		// float corners[12] = {0,    0,      1,
-		//                   width,   0,      1,
-		//                     0,   height,   1,
-		//                   width, height,   1};
-		//in row, col, z
-		//what does this mean?
-		float corners[12] = { 0,            0,
-			                  1,            static_cast<float>(height),
-							  0,            1,
-							  0,            static_cast<float>(width),
-							  1,            static_cast<float>(height),
-							  static_cast<float>(width), 1};
-		float res[12];
-		//Apply transformation: RIGHT multiply if using x, y, z corners, LEFT muliply
-		//with y, x, z
-		//res = 1 * corners x mat + 0.f * res
-		caffe_cpu_gemm<float>(CblasNoTrans, CblasNoTrans, 4, 3, 3, 1.f, corners, mat, 0.f, res);
-		float max_col = max(max(res[1], res[4]), max(res[7], res[10]));
-		float min_col = min(min(res[1], res[4]), min(res[7], res[10]));
-		float max_row = max(max(res[0], res[3]), max(res[6], res[9]));
-		float min_row = min(min(res[0], res[3]), min(res[6], res[9]));
-		height_new = static_cast<int>(max_row - min_row);
-		width_new = static_cast<int>(max_col - min_col);
-	}
 
 	//Following the inverse rule of 3x3 matrices using determinats
 	//rewrites tmat into its inverse
@@ -195,37 +160,6 @@ namespace caffe{
 
 	template void Clamp<float>(float &val, const int size);
 
-	void get_transformed_coordinates(const int &height, const int width,
-		float* tmat, int &height_new, int &width_new,
-		float* &coord_data_res){
-		//get new size with this transformation matrix
-		GetNewSize(height, width, tmat, height_new, width_new);
-		//invert the transformation matrix, this rewrites tmat to its inverse
-		Invert3x3(tmat);
-		//get identity indices
-		//use heap b/c o.w. stack overflows with medium sized images.
-		float *coord_data_tmp = new float[height_new * width_new * 3];
-		GenBasicCoordMat(coord_data_tmp, width_new, height_new);
-		//get centers
-		float new_cy = static_cast<float>(height_new - 1) / 2.;
-		float new_cx = static_cast<float>(width_new - 1) / 2.;
-
-		//float old_cy = static_cast<float>(height)/2.;
-		//float old_cx = static_cast<float>(width)/2.;
-
-		//subtract the new center first
-		//*this translation matrix has to be LEFT multied on tmat_inv*.
-		//they have to be subtracted from coord before applying the rest of 
-		//the transformation
-		//note: this has to be swapped bc we're using [row, col, 1]
-		//first move image to the center
-		AddShift(-new_cy, -new_cx, tmat, LEFT);
-		//apply transformation
-		coord_data_res = new float[height_new * width_new * 3];
-		caffe_cpu_gemm<float>(CblasNoTrans, CblasNoTrans, height_new* width_new, 3,
-			3, 1.f, coord_data_tmp, tmat, 0.f, coord_data_res);
-		delete[] coord_data_tmp;
-	}
 
 	void generate_nn_coord(const int &height, const int &width,
 		const int &height_new, const int &width_new,
@@ -243,6 +177,7 @@ namespace caffe{
 			case CROP:
 				if ((row >= height || row < 0) || (col >= width) || (col < 0)){
 					coord_data[ind] = -1;
+					//why continue here?
 					continue;
 				}
 				break;
@@ -273,6 +208,10 @@ namespace caffe{
 	 *         dr_0, dr_1, ...]
 	 * bc so that the first row is the NN-coord
 	 *& compatible with max-pooling range checking later(see MaxTransSetSwitch).
+	 * [(trunc(x),trunc(y)				  (trunc(x+1), trunc(y)) ]
+	 * [                     (row, col)                          ]
+	 * [(trunc(y+1), trunc(x))            (trunc(x+1), trunc(y+1)]
+	 *
 	 */
 	void generate_bilinear_coord(const int &height, const int &width,
 		const int &height_new, const int &width_new,
@@ -287,6 +226,7 @@ namespace caffe{
 		float row, col, row0, col0, row1, col1, dc, dr;
 		int N = height_new * width_new;
 		for (int ind = 0; ind < N; ++ind){
+			//add center
 			row = coord_data_res[3 * ind] + old_cy;
 			col = coord_data_res[3 * ind + 1] + old_cx;
 			//p00=>(r0, c0) p11=>(r1, c1)
@@ -294,6 +234,7 @@ namespace caffe{
 			switch (border)
 			{
 			case CROP:
+				//ignored in bilinear interpolation
 				if ((row >= height - 0.5 || row < -0.5) || 
 					(col >= width - 0.5 || col < -0.5)){
 					coord_data[ind] = -1;
@@ -318,32 +259,38 @@ namespace caffe{
 			col0 = trunc(col);
 			//p11
 			row1 = trunc(row + 1) > (height - 1) ? height - 1 : trunc(row + 1);
-			col1 = trunc(col + 1) > (height - 1) ? height - 1 : trunc(col + 1);
+			col1 = trunc(col + 1) > (width - 1) ? width - 1 : trunc(col + 1);
 
 			//if p00 is outside, don't compute difference
+			//difference of truncation
+			//if no difference or difference is an int, we don't need to do 
+			//bilinear interpolation
 			dc = col0 == col1 ? 0 : col - col0;
 			dr = row0 == row1 ? 0 : row - row0;
-			CHECK(dc >= 0) << "dc has to be pos " << dc;
-			CHECK(dr >= 0) << "dr has to be pos " << dr;
+			DCHECK(dc >= 0) << "dc has to be pos " << dc;
+			DCHECK(dr >= 0) << "dr has to be pos " << dr;
+			//left up point
 			coord_data[ind] = row0 * width + col0;
+			//right down point
 			coord_data[ind + N] = row1 * width + col1;
+			//column difference
 			coord_data[ind + 2 * N] = dc;
+			//row difference
 			coord_data[ind + 3 * N] = dr;
 		}
 	}
 
+	//TODO: transfer these CPU code to GPU versions
 	//This doesn't change the size of the input
-	void GenCoordMatCrop(const float &scale, const float &rotation,
-		const int &height, const int &width, Blob<float> *coord,
-		const Border &border, const Interp &interp){
-		//0. make tmat
-		float tmat[9];
-		std::fill(tmat, tmat + 9, 0);
-		tmat[0] = tmat[4] = tmat[8] = 1;
-		AddScale(scale, tmat);
-		AddRotation(rotation, tmat);
+	void GenCoordMatCrop(float* tmat,
+		const int &height, const int &width, Blob<float>& ori_coord,
+		Blob<float>& coord_idx, const Border &border, const Interp &interp){
 
+		//transform tmat to it's inversed matrix
 		Invert3x3(tmat);
+		LOG(INFO) << tmat[0] << "\t" << tmat[1] << "\t" << tmat[2];
+		LOG(INFO) << tmat[3] << "\t" << tmat[4] << "\t" << tmat[5];
+		LOG(INFO) << tmat[6] << "\t" << tmat[7] << "\t" << tmat[8];
 
 		float cy = static_cast<float>(height - 1) / 2.;
 		float cx = static_cast<float>(width - 1) / 2.;
@@ -351,70 +298,32 @@ namespace caffe{
 		//substract center:
 		AddShift(-cy, -cx, tmat, LEFT);
 
-		float *coord_data_tmp = new float[height * width * 3];
-		//give ind, we can find the col and row index
-		GenBasicCoordMat(coord_data_tmp, width, height);
-		//Apply transformation
-		float *coord_data_res = new float[height * width * 3];
+		//we can use coord data and diff for buffer of coordinate
+		//data, since it is only used after this computation
+		float *coord_data_tmp = ori_coord.mutable_cpu_data();
+		float *coord_data_res = ori_coord.mutable_cpu_diff();
+		//put the final coordinates in coord_idx
+		float *coord_data_final = coord_idx.mutable_cpu_data();
 
-		caffe_gpu_gemm<float>(CblasNoTrans, CblasNoTrans, height * width, 3, 3, 1.f,
+		//Apply transformation
+		caffe_cpu_gemm<float>(CblasNoTrans, CblasNoTrans, height * width, 3, 3, 1.f,
 			coord_data_tmp, tmat, 0.f, coord_data_res);
 
-		float *coord_data;
+		//we can now put the final coordinate data into coord data again
 		switch (interp)
 		{
 		case NN:
-			coord->Reshape(1, 1, height * width, 1);
-			coord_data = coord->mutable_cpu_data();
 			generate_nn_coord(height, width, height, width, border, coord_data_res,
-				coord_data);
+				coord_data_final);
 			break;
 		case BILINEAR:
-			coord->Reshape(1, 1, height * width * 4, 1);
-			coord_data = coord->mutable_cpu_data();
 			generate_bilinear_coord(height, width, height, width, border,
-				coord_data_res, coord_data);
+				coord_data_res, coord_data_final);
 			break;
 		default:
 			LOG(ERROR) << "Unkown interpolation mode " << interp;
 			break;
 		}
-		//clean up
-		delete[] coord_data_tmp;
-		delete[] coord_data_res;
-	}
-
-	void GenCoordMat(float *tmat, const int &height, const int &width,
-		Blob<float>* coord, int &height_new, int &width_new,
-		const Border &border, const Interp &interp){
-		float *coord_data_res = NULL;
-		get_transformed_coordinates(height, width, tmat, height_new, width_new, 
-			coord_data_res);
-		float old_cy = static_cast<float>(height - 1) / 2.;
-		float old_cx = static_cast<float>(width - 1) / 2.;
-
-		float* coord_data;
-		switch (interp)
-		{
-		case NN:
-			//set the size of coord blob
-			coord->Reshape(1, 1, height_new * width_new, 1);
-			coord_data = coord->mutable_cpu_data();
-			generate_nn_coord(height, width, height_new, width_new, border,
-				coord_data_res, coord_data);
-			break;
-		case BILINEAR:
-			coord->Reshape(1, 1, height_new * width_new * 4, 1);
-			coord_data = coord->mutable_cpu_data();
-			generate_bilinear_coord(height, width, height_new, width_new, border,
-				coord_data_res, coord_data);
-			break;
-		default:
-			LOG(ERROR) << "Unknown interpolation mode " << interp;
-			break;
-		}
-		//clean up
-		delete[] coord_data_res;
 	}
 
 	//fills width * height by 3 matrix that holds identity homogeneous coordinates
@@ -443,96 +352,6 @@ namespace caffe{
 			row = ind / width;
 			col = ind % width;
 			coord_data[ind] = row * width + col;
-		}
-	}
-
-	// TODO(AJ): Move this comment elsewhere.
-	// For downpooling, when undoing all the transformation, need to only return the
-	// pixels that correspond to the canonical response. If the output is smaller
-	// than the canonical output size, then the output is padded with 0 to fit the
-	// size. If the output is larger, then the crop of size canonical output is
-	// taken at the center.
-	// For odd canonical output sizes, the extra pixel has to happen to the right of
-	// the center, i.e. Crop an 4x4 into 3x3 at the center can be either (in 1-D)
-	// indices [0, 1, 2] or [1, 2, 3]. The correct indices in SICNN case is [1, 2,
-	// 3] because the first few convolution outputs don't have corresponding centers
-	// as the output of the canonical size.
-	// Assumes that coord_new is length target_w*target_h.
-	// Flow:
-	// up_layer & tied conv: applies T to an image (img*T), then convolve the
-	// transformed image (img*T*W)
-	// downpool_layer: applies T^{-1}, which has a different size than the canonical
-	// size (unless stride==kernel size0
-	// if img*T*W*T^{-1} is smaller than img*W (when image was down-sampled), then
-	// pad the border with 0 (i.e. coordinate points to -1).
-	// else, the corresponding portion is the center of the bigger response, so crop
-	// at the center.
-	void CropCenter(const float *coord, const ImageSize &original,
-		const ImageSize &target, const Interp &interp,
-		float* coord_new){
-		int new_start_r = 0, new_start_c = 0;
-		int old_start_r = 0, old_start_c = 0;
-		int match_width = 0, match_height = 0;
-		//find the start and row of the larger dimension.
-
-		if (original.height < target.height){//pad
-			new_start_r = ceil((target.height - original.height) / 2.);
-			match_height = original.height;
-		}
-		else{//crop center
-			old_start_r = ceil((original.height - target.height) / 2.);
-			match_height = target.height;
-		}
-		if (original.width < target.width){//pad
-			new_start_c = ceil((target.width - original.width) / 2.);
-			match_width = original.width;
-		}
-		else{//crop center
-			new_start_c = ceil((original.width - target.width) / 2.);
-			match_width = target.width;
-		}
-		switch (interp)
-		{
-		case NN:
-		{
-		   //nn_crop_center(coord, original, target, coord_new);
-		   std::fill(coord_new, coord_new + target.height * target.width, -1);
-		   for (int i = 0, row_new = new_start_r, row_old = old_start_r; i < match_height;
-			   ++i, ++row_new, ++row_old){
-			   for (int j = 0, col_new = new_start_c, col_old = old_start_r; j < match_width;
-				   ++j, ++col_new, ++col_old){
-				   const int ind_new = row_new * target.width + col_new;
-				   const int ind_old = row_old * original.width + col_old;
-				   coord_new[ind_new] = coord[ind_old];
-			   }
-		   }
-		}
-		break;
-		case BILINEAR:
-		{
-			//bilnear_crop_center(coord, original, target, coord_new);
-			//maybe pixel value of (i, j) is determined by (i-1, j),(i+1, j),(i, j-1) and (i, j+1)?
-			 int dim_old = original.width * original.height;
-			 int dim_new = target.width * target.height;
-			 //why 4 here?
-			 std::fill(coord_new, coord_new + 4 * dim_new, -1);
-			 for (int i = 0, row_new = new_start_r, row_old = old_start_r; i < match_height;
-				 ++i, ++row_new, ++row_old){
-				 for (int j = 0, col_new = new_start_c, col_old = old_start_c; j < match_width;
-					 ++j, ++col_new, ++col_old){
-					 const int ind_new = row_new * target.width + col_new;
-					 const int ind_old = row_old * original.width + col_old;
-					 coord_new[ind_new] = coord[ind_old];
-					 coord_new[ind_new + dim_new] = coord[ind_old + dim_old];
-					 coord_new[ind_new + 2 * dim_new] = coord[ind_old + 2 * dim_old];
-					 coord_new[ind_new + 3 * dim_new] = coord[ind_old + 3 * dim_old];
-				 }
-			 }
-		}
-		break;
-		default:
-			LOG(ERROR) << "Unkown interpolate mode" << interp;
-			break;
 		}
 	}
 
@@ -619,6 +438,9 @@ namespace caffe{
 				for (int h = 0; h < height; ++h){
 					for (int w = 0; w < width; ++w){
 						ind_warped = h * width + w;//index for coordinate in new image
+						//because we use the inverse tmat to get coord
+						//so we can infer original coord(x_orig, y_orig) by (x,y)
+						//in the new image and coord
 						ind_orig = static_cast<int>(coord[ind_warped]);//p00
 						if (ind_orig > 0){//do only if p00 is valid index
 							r0 = ind_orig / width_orig;
@@ -633,6 +455,7 @@ namespace caffe{
 
 							//bilinear interpolation
 							//f(x,y) \approx f(0,0)(1-x)(1-y) + f(1,0)x(1-y) + f(0,1)(1-x)y + f(1,1)xy
+							//in the little one pixel square, dr and dc just corresponding to y and x
 							w00 = (1 - dc) * (1 - dr);
 							w01 = (1 - dr) * dc;
 							w10 = (1 - dc) * dr;
@@ -658,16 +481,18 @@ namespace caffe{
 	template void bilinear_interpolation(const Blob<float>* &orig, const float* &coord,
 		Blob<float>* &warped);
 
+	//back propagation according to the corresponding indexes
+	//in propatation
 	template <typename Dtype>
-	void PropagateErrorNN_cpu(const Blob<Dtype>* top, const float* coord,
+	void BackPropagateErrorNN_cpu(const Blob<Dtype>* top, const float* coord,
 		Blob<Dtype>* bottom, const Interp &interp){
 		switch (interp)
 		{
 		case NN:
-			nn_propagation(top, coord, bottom);
+			nn_backpropagation(top, coord, bottom);
 			break;
 		case BILINEAR:
-			bilinear_interpolation(top, coord, bottom);
+			bilinear_backpropagation(top, coord, bottom);
 			break;
 		default:
 			LOG(ERROR) << "Unkown interpolation mode " << interp;
@@ -676,13 +501,13 @@ namespace caffe{
 	}
 
 	//Explicit instantiation
-	template void PropagateErrorNN_cpu(const Blob<float>* top, const float* coord,
+	template void BackPropagateErrorNN_cpu(const Blob<float>* top, const float* coord,
 		Blob<float>* bottom, const Interp &interp);
 //	template void PropagateErrorNN_cpu(const Blob<double>* top, const float* coord,
 //		Blob<double>* bottom, const Interp &interp);
 
 	template <typename Dtype>
-	void nn_propagation(const Blob<Dtype>* & top, const float* &coord,
+	void nn_backpropagation(const Blob<Dtype>* & top, const float* &coord,
 		Blob<Dtype>* &bottom){
 		//I will simply take the error at each location in top and add it to the 
 		//corresponding neuron
@@ -723,7 +548,7 @@ namespace caffe{
 	}
 
 	template <typename Dtype>
-	void bilinear_propagation(const Blob<Dtype>* & top, const float* & coord,
+	void bilinear_backpropagation(const Blob<Dtype>* & top, const float* & coord,
 		Blob<Dtype>* &bottom){
 		//AJ: Just like forward image interpolation
 		//IMP: IT IS ASSUMED THAT THE BOTTOM IS PROPERLY PRE_INITIALIZED AND HAS ALL

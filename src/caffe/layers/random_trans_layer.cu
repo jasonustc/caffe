@@ -22,7 +22,7 @@ namespace caffe{
 			//get coordinate map matrix
 			GetTransCoord();
 			//Apply Imterpolation on bottom_data using tmat_[i] into top_data.
-			InterpImageNN_gpu(bottom[0], coord_idx_->gpu_data(), top[0], INTERP_);
+			InterpImageNN_gpu(bottom[0], coord_idx_.gpu_data(), top[0], INTERP_);
 		}
 	}
 
@@ -40,7 +40,7 @@ namespace caffe{
 				caffe_copy(count, top_diff, bottom_diff);
 			}
 			else{
-				PropagateErrorNN_gpu(top[0], coord_idx_->gpu_data(), bottom[0], INTERP_);
+				BackPropagateErrorNN_gpu(top[0], coord_idx_.gpu_data(), bottom[0], INTERP_);
 			}
 		}
 	}

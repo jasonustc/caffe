@@ -122,8 +122,9 @@ namespace caffe{
 
 		//Indices for image transformation
 		//We use blob's data to be fwd and diff to be backward indices
-		shared_ptr<Blob<float>> coord_idx_;
-
+		Blob<float> coord_idx_;
+		//here to store the original coord_
+		Blob<float> original_coord_;
 	};
 
 	template <typename Dtype>
@@ -149,8 +150,7 @@ namespace caffe{
 			const vector<bool>& propagate_down,
 			const vector<Blob<Dtype>*>& top);
 
-		virtual inline bool EqualNumBottomTopBlobs{ return true; }
-
+		virtual inline bool EqualNumBottomTopBlobs() const { return true; }
 		//sampling parameters of gaussian distribution
 		float mu_;
 		float sigma_;

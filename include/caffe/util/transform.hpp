@@ -29,15 +29,11 @@ namespace caffe{
 	void AddRotation(const float &angle, float *mat, const Direction dir = RIGHT);
 	void AddScale(const float &scale, float* mat, const Direction dir = RIGHT);
 	void AddShift(const float &dx, const float& dy, float *mat, const Direction dir = RIGHT);
+
 	//m = m * t
 	void AddTransform(float *mat, const float *tmp, const Direction dir = RIGHT);
-	void GetNewSize(const int &height, const int &width, const float *mat, int &height_new, int &width_new);
 
 	void Invert3x3(float *A);
-	//Generate coordinate matrix for backward mapping.
-	void GenCoordMat(float *tmat, const int &height, const int &width,
-		Blob<float> *coord, int &height_new, int &width_new,
-		const Border &border = CROP, const Interp &interp = NN);
 
 	void generate_nn_coord(const int &height, const int &width,
 		const int &height_new,const int &width_new, const Border &border, 
@@ -49,9 +45,9 @@ namespace caffe{
 		float *&coord_data);
 
 	//This one doesn't change the size. Used in jittering the data with scale/rotation.
-	void GenCoordMatCrop(const float &scale, const float &rotation,
-		const int &height, const int &width, Blob<float> *coord,
-		const Border &border = CROP, const Interp &interp = NN);
+	void GenCoordMatCrop(float* tmat,
+		const int &height, const int &width, Blob<float>& ori_coord,
+		Blob<float>& coord_idx, const Border &border = CROP, const Interp &interp = NN);
 
 	//Generates identity coordinates.
 	void GenBasicCoordMat(float *coord, const int &width, const int &height);
@@ -61,11 +57,6 @@ namespace caffe{
 
 	template <typename Dtype> void Reflect(Dtype &val, const int size);
 	template <typename Dtype> void Clamp(Dtype &val, const int size);
-
-	//Crop the coordinates at center to go back to canonical shape
-	void CropCenter(const float *coord, const ImageSize &original,
-		const ImageSize &target, const Interp &interp,
-		float *coord_new);
 
 	template <typename Dtype>
 	void InterpImageNN_cpu(const Blob<Dtype> *orig, const float *coord,
@@ -80,12 +71,16 @@ namespace caffe{
 		Blob<Dtype> *&warped);
 
 	template <typename Dtype>
-	void PropagateErrorNN_cpu(const Blob<Dtype> *top, const float *coord,
+	void BackPropagateErrorNN_cpu(const Blob<Dtype> *top, const float *coord,
 		Blob<Dtype> *bottom, const Interp &interp = NN);
 
 	template <typename Dtype>
-	void nn_propagation(const Blob<Dtype> *&top, const float *&coord,
-		Blob<Dtype> *&bottom);
+	void nn_backpropagation(const Blob<Dtype> *&top, const float *&coord,
+		Blob<Dtype>* &bottom);
+
+	template <typename Dtype>
+	void bilinear_backpropagation(const Blob<Dtype>* & top, const float* & coord,
+		Blob<Dtype>* &bottom);
 
 	//gpu functions
 	template <typename Dtype>
@@ -93,23 +88,9 @@ namespace caffe{
 		Blob<Dtype> *warped, const Interp &interp = NN);
 
 	template <typename Dtype>
-	void PropagateErrorNN_gpu(const Blob<Dtype> *top, const float *coord,
+	void BackPropagateErrorNN_gpu(const Blob<Dtype> *top, const float *coord,
 		Blob<Dtype> *bottom, const Interp &interp = NN);
 
-	template <typename Dtype>
-	void MaxTransSetSwitch_gpu(const Dtype *A, Dtype *B, int count,
-		const float *coord, int sheet_count, float *switchD,
-		int tIndex);
-
-	template <typename Dtype>
-	void ErrorPropagateDownpoolNN_gpu_single(
-		const Dtype *top, const float *switchD, const float *coord,
-		Dtype *bottom, const int &bottomSheetCount, const int &W,
-		const Interp &interp = NN);
-
-	//a function that uses thrust to count the usage of each transformation.
-	//switch_data is device memory, counter is host memory
-	void CountSwitches(float *switch_data, int n, int num_t, int *counter);
 }//namespace caffe
 
 #endif

@@ -32,8 +32,8 @@ namespace caffe{
 
 		void TestCPUForward(){
 			shared_ptr<Layer<Dtype>> layer(new RandomTransformLayer<Dtype>(layer_param_));
-			layer->SetUp(bottom_, top_);
 			Caffe::set_mode(Caffe::CPU);
+			layer->SetUp(bottom_, top_);
 			layer->Forward(bottom_, top_);
 			const Dtype* x_data = x_->cpu_data();
 			const Dtype* top_data = top_[0]->cpu_data();

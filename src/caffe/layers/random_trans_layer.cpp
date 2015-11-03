@@ -63,6 +63,19 @@ namespace caffe{
 		const vector<Blob<Dtype>*>& top){
 		//TODO: shape the parameter blobs
 		top[0]->ReshapeLike(*bottom[0]);
+		switch (INTERP_){
+		case NN:
+			coord_idx_.Reshape(1, 1, Height_ * Width_, 1);
+			break;
+		case BILINEAR:
+			coord_idx_.Reshape(1, 1, Height_ * Width_ * 4, 1);
+			break;
+		default:
+			LOG(FATAL) << "Unkown pooling method.";
+		}
+		//to store the original row and colum index data of the matrix
+		original_coord_.Reshape(1, 1, Height_ * Width_ * 3, 1);
+		GenBasicCoordMat(original_coord_.mutable_cpu_data(), Width_, Height_);
 	}
 
 	template <typename Dtype>
@@ -76,7 +89,7 @@ namespace caffe{
 		}
 		if (scale_){
 			caffe_rng_uniform(1, start_scale_, end_scale_, &curr_scale_);
-			curr_scale_ = Dtype(2);
+			curr_scale_ = Dtype(1.7);
 			TMatFromParam(1, curr_scale_, curr_scale_, tmat_);
 		}
 		if (shift_){
@@ -91,34 +104,9 @@ namespace caffe{
 		//Canoincal size is set, so after finding the transformation,
 		//crop or pad to that canonical size.
 		//First find the coordinate matrix for this transformation
-		//do not have diff to save memory
-		int height_new(0), width_new(0);
-		Blob<float> *original_coord = new Blob<float>();
-		GenCoordMat(tmat_, Height_, Width_, original_coord, height_new, width_new, BORDER_, INTERP_);
-//		LOG(INFO) << "Cropping " << height_new << " by " << width_new
-//			<< " to input size: "
-//			<< Height_ << "x" << Width_;
-		//Crop the coordinates at the center to this size.
-		const int orig_width = width_new;
-		const int orig_height = height_new;
-		//Need to set coordinates to the size of crop_size.
-		//here allocate memory every time is very expensive
-		switch (INTERP_){
-		case NN:
-			coord_idx_.reset(new Blob<float>(1, 1, Height_ * Width_, 1));
-			break;
-		case BILINEAR:
-			coord_idx_.reset(new Blob<float>(1, 1, Height_ * Width_ * 4, 1));
-			break;
-		default:
-			LOG(FATAL) << "Unkown pooling method.";
-		}
-		ImageSize original(orig_width, orig_height);
-		ImageSize target(Width_, Height_);
-		CropCenter(original_coord->cpu_data(), original, target, INTERP_,
-			coord_idx_->mutable_cpu_data());
-		//clear up.
-		delete original_coord;
+		//here we don't change the shape of the input 2D map
+		//wo we don't need crop operation here
+		GenCoordMatCrop(tmat_, Height_, Width_, original_coord_, coord_idx_, BORDER_, INTERP_);
 	}
 
 	template <typename Dtype>
@@ -137,7 +125,7 @@ namespace caffe{
 			GetTransCoord();
 			//apply Interpolation on bottom_data using tmat_[i] into top_data
 			//the coord_idx_[i] will be of size as the output data
-			InterpImageNN_cpu(bottom[0], coord_idx_->cpu_data(), top[0], INTERP_);
+			InterpImageNN_cpu(bottom[0], coord_idx_.cpu_data(), top[0], INTERP_);
 		}
 	}
 
@@ -151,11 +139,13 @@ namespace caffe{
 		const int count = top[0]->count();
 		Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
 		caffe_set(count, Dtype(0.), bottom_diff);
-		if ((!shift_ && !rotation_ && !scale_)){
-			caffe_copy(count, top_diff, bottom_diff);
-		}
-		else{
-			PropagateErrorNN_cpu(top[0], coord_idx_->cpu_data(), bottom[0], INTERP_);
+		if (propagate_down[0]){
+			if ((!shift_ && !rotation_ && !scale_)){
+				caffe_copy(count, top_diff, bottom_diff);
+			}
+			else{
+				BackPropagateErrorNN_cpu(top[0], coord_idx_.cpu_data(), bottom[0], INTERP_);
+			}
 		}
 	}
 #ifdef CPU_ONLY

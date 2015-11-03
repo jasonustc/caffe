@@ -144,7 +144,7 @@ namespace caffe{
 	}
 
 	template <typename Dtype>
-	__global__ void nn_propagation_kernel(int nThreads, const Dtype* topDataPtr,
+	__global__ void nn_backpropagation_kernel(int nThreads, const Dtype* topDataPtr,
 		int topSheetCount, Dtype* bottomDataPtr,
 		int bottomSheetCount, const float* coord){
 		int index = blockIdx.x * blockDim.x + threadIdx.x;
@@ -164,7 +164,7 @@ namespace caffe{
 	}
 
 	template <typename Dtype>
-	__global__ void bilinear_propagation_kernel(int nThreads, const Dtype* topDataPtr,
+	__global__ void bilinear_backpropagation_kernel(int nThreads, const Dtype* topDataPtr,
 		int topSheetCount, Dtype* bottomDataPtr, int bottomSheetCount,
 		const float* coord, int W){
 		int index = blockIdx.x * blockDim.x + threadIdx.x;
@@ -206,7 +206,7 @@ namespace caffe{
 	}
 
 	template <typename Dtype>
-	void PropagateErrorNN_gpu(const Blob<Dtype>* top, const float* coord,
+	void BackPropagateErrorNN_gpu(const Blob<Dtype>* top, const float* coord,
 		Blob<Dtype>* bottom, const Interp &interp){
 	    //Get the parameters from the original and warped and apply the 
 		//transformation to it.
@@ -219,12 +219,12 @@ namespace caffe{
 		switch (interp)
 		{
 		case NN:
-			nn_propagation_kernel<Dtype> << <CAFFE_GET_BLOCKS(nCount),
+			nn_backpropagation_kernel<Dtype> << <CAFFE_GET_BLOCKS(nCount),
 				CAFFE_CUDA_NUM_THREADS >> >(nCount, topDataPtr,
 				topNPerSheet, bottomDataPtr, bottomNPerSheet, coord);
 			break;
 		case BILINEAR:
-			bilinear_propagation_kernel<Dtype> << <CAFFE_GET_BLOCKS(nCount),
+			bilinear_backpropagation_kernel<Dtype> << <CAFFE_GET_BLOCKS(nCount),
 				CAFFE_CUDA_NUM_THREADS >> >(nCount, topDataPtr,
 				topNPerSheet, bottomDataPtr, bottomNPerSheet, coord, bottom->width());
 			break;
@@ -236,193 +236,9 @@ namespace caffe{
 	}
 
 	//explicit instantiation
-	template void PropagateErrorNN_gpu(const Blob<float>* top, const float* coord,
+	template void BackPropagateErrorNN_gpu(const Blob<float>* top, const float* coord,
 		Blob<float>* bottom, const Interp &interp);
 //	template void PropagateErrorNN_gpu(const Blob<double>* top, const float* coord,
 //		Blob<double>* bottom, const Interp &interp);
 
-	template <typename Dtype>
-	__global__ void MaxTransSetSwitch_kernel(const Dtype* A, Dtype* B, int count,
-		const float* coord, int sheet_count, float* switchPtr, int tIndex){
-		int index = threadIdx.x + blockIdx.x * blockDim.x;
-		if (index < count){
-			//only update max switch if this coord_data is valid
-			if (coord[index % sheet_count] >= 0 && A[index] > B[index]){
-				B[index] = A[index];
-				switchPtr[index] = tIndex;
-			}
-		}
-	}
-
-	template <typename Dtype>
-	void MaxTransSetSwitch_gpu(const Dtype* A, Dtype* B, int count,
-		const float* coord, int sheet_count, float* switchD,
-		int tIndex){
-		MaxTransSetSwitch_kernel<Dtype> << <CAFFE_GET_BLOCKS(count),
-			CAFFE_CUDA_NUM_THREADS >> >(A, B, count, coord, sheet_count,
-			switchD, tIndex);
-	}
-
-	//explicit instantiation
-	template void MaxTransSetSwitch_gpu(const float* A, float* B, int count,
-		const float* coord, int sheet_count, float* switchD, int tIndex);
-
-	template <typename Dtype>
-	__global__ void ErrorPropagateDownpoolNN_kernel(const Dtype* topDiff, const int topCount,
-		const int topSheetCount, const float* switchD, float ** coord, Dtype ** bottomDiff,
-		const int *bottomSheetCount){
-		int index = threadIdx.x + blockIdx.x * blockDim.x;
-		if (index < topCount){
-			//what is switchD here for?
-			int tIndex = static_cast<int>(switchD[index]);
-			if (tIndex == 0){//identity transformation, no need to chang index
-				atomicAdd((&(bottomDiff[tIndex]))[index],
-					static_cast<float>(topDiff[index]));
-			}
-			else{
-				int sheetOffset = index % topSheetCount; //ind of w and h in top
-				int backSheetOffset = static_cast<int>((coord[tIndex][sheetOffset]));
-				if (backSheetOffset >= 0){
-					int numSheet = index / topSheetCount; //chnnel * num
-					int backBlobOffset = (bottomSheetCount[tIndex]) * numSheet + backSheetOffset;
-					//AJ: same issue with lack of double atomicAdd
-					atomicAdd((&(bottomDiff[tIndex]))[backBlobOffset],
-						static_cast<float>(topDiff[index]));
-				}
-			}
-		}
-	}
-
-	template <typename Dtype>
-	void ErrorPropagateDownpoolNN_gpu(const Dtype* topDiff, const int topCount,
-		const int topSheetCount, const float* switchD, float** coord,
-		Dtype** bottomDiff, const int *bottomSheetCount){
-		ErrorPropagateDownpoolNN_kernel<Dtype> << <CAFFE_GET_BLOCKS(topCount),
-			CAFFE_CUDA_NUM_THREADS >> >(topDiff, topCount, topSheetCount, switchD, coord, bottomDiff,
-			bottomSheetCount);
-	}
-
-	//explicit instantiation
-	template void ErrorPropagateDownpoolNN_gpu(const float* topDiff, const int topCount,
-		const int topSheetCount, const float* switchD, float** coord,
-		float** bottomDiff, const int *bottomSheetCount);
-
-	//For downpool layer, uses max switch.
-	template <typename Dtype>
-	__global__ void nn_error_propagation_kernel_single(const Dtype* top, const int t_id,
-		const int topCount, const int topSheetCount, const float* switchD, const float* coord,
-		Dtype* bottom, const int bottomSheetCount){
-		int index = threadIdx.x + blockIdx.x * blockDim.x;
-		if (index < topCount){
-			int tIndex = static_cast<int>(switchD[index]);
-			if (tIndex == t_id){//only do this if tIndex is at t_id
-				if (tIndex == 0){//identity transformation, no need to change anything,
-					//atomic is not necessary in this version only
-					bottom[index] += top[index];
-				}
-				else{
-					int sheetOffset = index % topSheetCount; //ind of w and h in top
-					int backSheetOffset = static_cast<int>((coord[sheetOffset]));
-					if (backSheetOffset >= 0){
-						int numSheet = index / topSheetCount; //channel * num
-						int backBlobOffset = (bottomSheetCount)* numSheet + backSheetOffset;
-						//AJ: same issue with lack of double atomicAdd
-						atomicAdd(&bottom[backBlobOffset], static_cast<float>(top[index]));
-					}
-				}
-			}//if (tIndex == t_id)
-		}
-	}//nn_error_propagation_kernel_single
-
-	//For downpool layer, uses max switch to propagate error.
-	template <typename Dtype>
-	__global__ void bilinear_error_propagation_kernel_single(
-		const Dtype *top, const int t_id, const int topCount,
-		const int topSheetCount, const float* switchD, const float* coord,
-		Dtype* bottom, const int bottomSheetCount, int W){
-		int index = threadIdx.x + blockIdx.x * blockDim.x;
-		if (index < topCount){
-			int tIndex = static_cast<int>(switchD[index]);
-			if (tIndex == t_id){//only do this if tIndex is at t_id
-				if (tIndex == 0){
-					bottom[index] += top[index];
-				}
-				else{
-					int sheetOffset = index % topSheetCount; //ind of w and h in top
-					int backSheetOffset = static_cast<int>((coord[sheetOffset]));
-					if (backSheetOffset >= 0){
-						int c0 = backSheetOffset % W;
-						int ind_p11 = static_cast<int>(coord[sheetOffset + topSheetCount]);
-						int c1 = ind_p11 % W;
-
-						int ind_p01 = backSheetOffset - c0 + c1;//r0 * W + c1
-						int ind_p10 = ind_p11 - c1 + c0; //r1 * W + c0
-
-						float dc = coord[sheetOffset + 2 * topSheetCount];
-						float dr = coord[sheetOffset + 3 * topSheetCount];
-
-						float w00 = (1 - dc)*(1 - dr);
-						float w01 = (1 - dr)*dc;
-						float w10 = (1 - dc)*dr;
-						float w11 = dr * dc;
-
-						int numSheet = index / topSheetCount; //channel * num
-						float top_error = static_cast<float>(top[index]);
-
-						int commonOffset = numSheet * bottomSheetCount;
-
-						atomicAdd(&bottom[commonOffset + backSheetOffset],
-							w00 * top_error); //p00
-						atomicAdd(&bottom[commonOffset + ind_p01], w01 * top_error); //p01
-						atomicAdd(&bottom[commonOffset + ind_p10], w10 * top_error); //p10
-						atomicAdd(&bottom[commonOffset + ind_p11], w11 * top_error); //p11
-					}
-				}
-			}//tIndex == t_id
-		}
-	}// bilinear_error_propagation_kernel_single
-	
-	//AJ ErrorPropagateDownpoolNN_gpu that runs on each transformation seperately
-	//t_id is the one that is being operated now
-
-	template <typename Dtype>
-	void ErrorPropagateDownpoolNN_gpu_single(
-		const Dtype* top, const int &t_id, const int &topCount,
-		const int &topSheetCount, const float* switchD, const float* coord,
-		Dtype* bottom, const int &bottomSheetCount, const int &width,
-		const Interp &interp){
-		switch (interp)
-		{
-		case NN:
-			nn_error_propagation_kernel_single << <CAFFE_GET_BLOCKS(topCount), CAFFE_CUDA_NUM_THREADS >> >
-				(top, t_id, topCount, topSheetCount, switchD, coord, bottom, bottomSheetCount);
-			break;
-		case BILINEAR:
-			bilinear_error_propagation_kernel_single << <CAFFE_GET_BLOCKS(topCount), CAFFE_CUDA_NUM_THREADS >> >(
-				top, t_id, topCount, topSheetCount, switchD, coord, bottom, bottomSheetCount, width);
-			break;
-		default:
-			LOG(ERROR) << "Unknown interpolation mode " << interp;
-			break;
-		}
-		CUDA_POST_KERNEL_CHECK;
-	}
-	//explicit instantiation
-	template void ErrorPropagateDownpoolNN_gpu_single(
-		const float* top, const int &t_id, const int &topCount,
-		const int &topSheetCount, const float* switchD, const float* coord,
-		float* bottom, const int &bottomSheetCount, const int &width,
-		const Interp &interp);
-
-	//Counts the usage of transformation:
-	//- switch_data is a raw pointer to device memory.
-	//- counter_data is a pointer with HOST memory.
-	void CountSwitches(float* switch_data, int n, int num_t, int *counter){
-		//wrap the raw pointer
-		const thrust::device_ptr<float> d_ptr(switch_data);
-		thrust::device_vector<float> vec(d_ptr, d_ptr + n);
-		for (int t = 0; t < num_t; ++t){
-			counter[t] = thrust::count(vec.begin(), vec.end(), t);
-		}
-	}
 }
