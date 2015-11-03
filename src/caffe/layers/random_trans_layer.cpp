@@ -98,7 +98,7 @@ namespace caffe{
 			caffe_rng_uniform(1, -shift_pixels_x, shift_pixels_x, &curr_shift_x_);
 			caffe_rng_uniform(1, -shift_pixels_y, shift_pixels_y, &curr_shift_y_);
 			curr_shift_x_ = 1;
-			curr_shift_y_ = -1;
+			curr_shift_y_ = 1;
 			TMatFromParam(2, curr_shift_x_, curr_shift_y_, tmat_);
 		}
 		//Canoincal size is set, so after finding the transformation,

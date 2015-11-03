@@ -288,14 +288,11 @@ namespace caffe{
 
 		//transform tmat to it's inversed matrix
 		Invert3x3(tmat);
-		LOG(INFO) << tmat[0] << "\t" << tmat[1] << "\t" << tmat[2];
-		LOG(INFO) << tmat[3] << "\t" << tmat[4] << "\t" << tmat[5];
-		LOG(INFO) << tmat[6] << "\t" << tmat[7] << "\t" << tmat[8];
 
 		float cy = static_cast<float>(height - 1) / 2.;
 		float cx = static_cast<float>(width - 1) / 2.;
 
-		//substract center:
+		//substract center
 		AddShift(-cy, -cx, tmat, LEFT);
 
 		//we can use coord data and diff for buffer of coordinate
@@ -317,6 +314,7 @@ namespace caffe{
 				coord_data_final);
 			break;
 		case BILINEAR:
+			ori_coord.ToTxt("ori_coord",true);
 			generate_bilinear_coord(height, width, height, width, border,
 				coord_data_res, coord_data_final);
 			break;
@@ -335,6 +333,7 @@ namespace caffe{
 			row = ind / width;
 			col = ind % width;
 
+			//(y, x, 1)
 			coord[3 * ind] = row;
 			coord[3 * ind + 1] = col;
 			coord[3 * ind + 2] = 1;
@@ -421,7 +420,7 @@ namespace caffe{
 		//Get the parameters from the original and warped and apply the
 		//transformation to it.
 		int ind_warped, ind_orig, r0, c0, r1, c1, ind_p11;
-		int dc, dr, w00, w01, w10, w11;
+		float dc, dr, w00, w01, w10, w11;
 		Dtype p00, p01, p10, p11;
 		int width_orig = orig->width();
 		int height_orig = orig->height();
@@ -442,7 +441,7 @@ namespace caffe{
 						//so we can infer original coord(x_orig, y_orig) by (x,y)
 						//in the new image and coord
 						ind_orig = static_cast<int>(coord[ind_warped]);//p00
-						if (ind_orig > 0){//do only if p00 is valid index
+						if (ind_orig >= 0){//do only if p00 is valid index
 							r0 = ind_orig / width_orig;
 							c0 = ind_orig % width_orig;
 							//Coordinates are stored as 4 x N matrix
@@ -575,7 +574,7 @@ namespace caffe{
 					for (int w = 0; w < width; ++w){
 						ind_top = h * width + w;
 						ind_bottom = static_cast<int>(coord[ind_top]);
-						if (ind_bottom > 0){ //do only if valid index
+						if (ind_bottom >= 0){ //do only if valid index
 							r0 = ind_bottom / width_bottom; //row
 							c0 = ind_bottom % width_bottom; //col
 

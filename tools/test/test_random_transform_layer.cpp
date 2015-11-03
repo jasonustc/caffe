@@ -132,10 +132,10 @@ namespace caffe{
 			//set layer param
 //			layer_param_.mutable_rand_trans_param()->set_start_angle(0);
 //			layer_param_.mutable_rand_trans_param()->set_end_angle(90);
-//			layer_param_.mutable_rand_trans_param()->set_dy_prop(0.8);
-//			layer_param_.mutable_rand_trans_param()->set_dx_prop(0.1);
-			layer_param_.mutable_rand_trans_param()->set_start_scale(0.3);
-			layer_param_.mutable_rand_trans_param()->set_end_scale(0.7);
+			layer_param_.mutable_rand_trans_param()->set_dy_prop(0.8);
+			layer_param_.mutable_rand_trans_param()->set_dx_prop(0.1);
+//			layer_param_.mutable_rand_trans_param()->set_start_scale(0.3);
+//			layer_param_.mutable_rand_trans_param()->set_end_scale(0.7);
 		}
 
 		Blob<Dtype>* x_;
