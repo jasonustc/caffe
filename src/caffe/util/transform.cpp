@@ -293,12 +293,9 @@ namespace caffe{
 			coord_data[ind + 2 * N] = dc;
 			//row difference
 			coord_data[ind + 3 * N] = dr;
-//			LOG(ERROR) << coord_data[ind] << "\t" << coord_data[ind + N] << 
-//				"\t" << dc << "\t" << dr;
 		}
 	}
 
-	//TODO: transfer these CPU code to GPU versions
 	//This doesn't change the size of the input
 	void GenCoordMatCrop_cpu(Blob<float>& tmat,
 		const int &height, const int &width, Blob<float>& ori_coord,
