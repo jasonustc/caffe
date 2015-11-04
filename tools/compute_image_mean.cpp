@@ -36,7 +36,8 @@ int main(int argc, char** argv) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
   if (argc < 2 || argc > 3) {
-    gflags::ShowUsageWithFlagsRestrict(argv[0], "tools/compute_image_mean");
+//    gflags::ShowUsageWithFlagsRestrict(argv[0], "tools/compute_image_mean");
+	  gflags::ShowUsageWithFlags(argv[0]);
     return 1;
   }
 

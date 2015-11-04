@@ -221,12 +221,14 @@ void CVMatToDatum(const cv::Mat& cv_img, Datum* datum) {
   int datum_width = datum->width();
   int datum_size = datum_channels * datum_height * datum_width;
   std::string buffer(datum_size, ' ');
+  //channel first, width second, height third
   for (int h = 0; h < datum_height; ++h) {
     const uchar* ptr = cv_img.ptr<uchar>(h);
     int img_index = 0;
     for (int w = 0; w < datum_width; ++w) {
       for (int c = 0; c < datum_channels; ++c) {
         int datum_index = (c * datum_height + h) * datum_width + w;
+		//image pixel data is stored as char, 8 bit, (0 - 255)
         buffer[datum_index] = static_cast<char>(ptr[img_index++]);
       }
     }
