@@ -195,8 +195,6 @@ namespace caffe{
 	__global__ void bilinear_interpolation_kernel(const int nthreads, const Dtype* oldDPtr,
 		const int oldSheetCount, Dtype* newDPtr, const int newSheetCount, const float* coord,
 		const int W){
-		//need W
-		//what is W here? maybe the width of transformed matrix?
 		int index = blockIdx.x * blockDim.x + threadIdx.x;
 		if (index < nthreads){
 			int offset = index % newSheetCount; //p00: r0 * W + c0
