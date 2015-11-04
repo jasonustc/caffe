@@ -90,12 +90,10 @@ namespace caffe{
 		if (rotation_){
 			//randomly generate rotation angle
 			caffe_rng_uniform(1, start_angle_, end_angle_, &curr_angle_);
-			curr_angle_ = 45;
 			TMatFromParam(ROTATION, curr_angle_, curr_angle_, tmat_data);
 		}
 		if (scale_){
 			caffe_rng_uniform(1, start_scale_, end_scale_, &curr_scale_);
-			curr_scale_ = Dtype(2);
 			TMatFromParam(SCALE, curr_scale_, curr_scale_, tmat_data);
 		}
 		if (shift_){
@@ -103,8 +101,6 @@ namespace caffe{
 			float shift_pixels_y = dy_prop_ * Height_;
 			caffe_rng_uniform(1, -shift_pixels_x, shift_pixels_x, &curr_shift_x_);
 			caffe_rng_uniform(1, -shift_pixels_y, shift_pixels_y, &curr_shift_y_);
-			curr_shift_x_ = 1;
-			curr_shift_y_ = 1;
 			TMatFromParam(SHIFT, curr_shift_x_, curr_shift_y_, tmat_data);
 		}
 		//Canoincal size is set, so after finding the transformation,
