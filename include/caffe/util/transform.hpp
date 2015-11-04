@@ -8,22 +8,16 @@
 
 namespace caffe{
 	const float PI_F = 3.14159265358979f;
+
 	enum Direction {RIGHT, LEFT};
+	enum TransType {ROTATION, SCALE, SHIFT};
 
 	//Crop is zero-padding, CLAMP is border replicate, REFLECT is mirror.
 	enum Border {CROP, CLAMP, REFLECT};
 	enum Interp {NN, BILINEAR};
 
-	struct ImageSize
-	{
-		ImageSize():width(0), height(0){};
-		ImageSize(const int width, const int height) : width(width), height(height){};
-		int width;
-		int height;
-	};
-
 	//compute parameters in transformation matrix by given transform type
-	void TMatFromParam(const int trans_type, const float param1, const float param2, float *tmat, bool invert = false);
+	void TMatFromParam(TransType transType, const float param1, const float param2, float *tmat, bool invert = false);
 
 	//matrix is multiplied to the existing one from the right
 	void AddRotation(const float &angle, float *mat, const Direction dir = RIGHT);
@@ -44,16 +38,17 @@ namespace caffe{
 		const Border &border, const float *coord_data_res,
 		float *&coord_data);
 
-	//This one doesn't change the size. Used in jittering the data with scale/rotation.
-	void GenCoordMatCrop(float* tmat,
+	//This one doesn't change the size.
+	void GenCoordMatCrop_cpu(Blob<float>& tmat,
 		const int &height, const int &width, Blob<float>& ori_coord,
 		Blob<float>& coord_idx, const Border &border = CROP, const Interp &interp = NN);
 
-	//Generates identity coordinates.
+	//This one doesn't change the size.
+	void GenCoordMatCrop_gpu(Blob<float>& tmat, const int height, const int width,
+		Blob<float>& ori_coord, Blob<float>& coord_idx, const Border& border, const Interp& interp);
+
+	//Generates identity coordinates (y, x, 1).
 	void GenBasicCoordMat(float *coord, const int &width, const int &height);
-	//identity coordinates in indices
-	void GenBasicCoordMatInds(const int &width, const int &height,
-		Blob<float> *coord);
 
 	template <typename Dtype> void Reflect(Dtype &val, const int size);
 	template <typename Dtype> void Clamp(Dtype &val, const int size);
@@ -67,8 +62,8 @@ namespace caffe{
 		Blob<Dtype> *&warped);
 
 	template <typename Dtype>
-	void bilinear_interpolation(const Blob<Dtype> *&orig, const float *&coord,
-		Blob<Dtype> *&warped);
+	void bilinear_interpolation(const Blob<Dtype>* orig, const float* coord,
+		Blob<Dtype>* warped);
 
 	template <typename Dtype>
 	void BackPropagateErrorNN_cpu(const Blob<Dtype> *top, const float *coord,

@@ -24,7 +24,7 @@ namespace caffe{
 		void TestSetUp(){
 			shared_ptr<Layer<Dtype>> layer(new RandomTransformLayer<Dtype>(layer_param_));
 			layer->SetUp(bottom_, top_);
-			CHECK_EQ(top_[0]->shape(0), 4);
+			CHECK_EQ(top_[0]->shape(0), 1);
 			CHECK_EQ(top_[0]->shape(1), 1);
 			CHECK_EQ(top_[0]->shape(2), 4);
 			CHECK_EQ(top_[0]->shape(3), 4);
@@ -62,9 +62,9 @@ namespace caffe{
 			layer->Forward(bottom_, top_);
 			const Dtype* x_data = x_->cpu_data();
 			const Dtype* top_data = top_[0]->cpu_data();
-			for (int i = 0; i < 3; i++){
-				for (int j = 0; j < 3; j++){
-					cout << top_data[i * 3 + j] << "\t";
+			for (int i = 0; i < 4; i++){
+				for (int j = 0; j < 4; j++){
+					cout << top_data[i * 4 + j] << "\t";
 				}
 				cout << "\n";
 			}
@@ -110,7 +110,7 @@ namespace caffe{
 	protected:
 		void SetUp(){
 			vector<int> x_shape;
-			x_shape.push_back(4);
+			x_shape.push_back(1);
 			x_shape.push_back(1);
 			x_shape.push_back(4);
 			x_shape.push_back(4);
@@ -130,10 +130,10 @@ namespace caffe{
 			propagate_down_.resize(1, true);
 
 			//set layer param
-//			layer_param_.mutable_rand_trans_param()->set_start_angle(0);
-//			layer_param_.mutable_rand_trans_param()->set_end_angle(90);
-			layer_param_.mutable_rand_trans_param()->set_dy_prop(0.8);
-			layer_param_.mutable_rand_trans_param()->set_dx_prop(0.1);
+			layer_param_.mutable_rand_trans_param()->set_start_angle(0);
+			layer_param_.mutable_rand_trans_param()->set_end_angle(90);
+//			layer_param_.mutable_rand_trans_param()->set_dy_prop(0.8);
+//			layer_param_.mutable_rand_trans_param()->set_dx_prop(0.1);
 //			layer_param_.mutable_rand_trans_param()->set_start_scale(0.3);
 //			layer_param_.mutable_rand_trans_param()->set_end_scale(0.7);
 		}

@@ -11,6 +11,151 @@
 
 namespace caffe{
 	template <typename Dtype>
+	__device__ void Reflect_gpu(Dtype& val, const int size){
+		if (val < Dtype(0)){
+			val = -floor(val);
+			val = static_cast<Dtype>(static_cast<int>(val) % (2 * size - 1));
+		}
+		if (val >= size){
+			val = 2 * size - 2 - val;
+		}
+	}
+
+	template <typename Dtype>
+	__device__ void Clamp_gpu(Dtype& val, const int size){
+		val = max(static_cast<Dtype>(0.), min(val, static_cast<Dtype>(size - 1)));
+	}
+
+	template <typename Dtype>
+	__global__ void generate_nn_coord_kernel(const int N, const int height, const int width,
+		const int height_new, const int width_new, const Border& border,
+		const float* coord_data_res, float* &coord_data){
+		float old_cy = static_cast<float>(height - 1) / 2.;
+		float old_cx = static_cast<float>(width - 1) / 2.;
+		CUDA_KERNEL_LOOP(index, N){
+			//nearest pixel
+			float row = round(coord_data_res[3 * index] + old_cy);
+			float col = round(coord_data_res[3 * index + 1] + old_cx);
+			switch (border)
+			{
+			case CROP:
+				if ((row >= height || row < 0) || (col >= width) || (col < 0)){
+					coord_data[index] = Dtype(-1);
+					continue;
+				}
+				break;
+			case CLAMP:
+				Clamp_gpu(row, height);
+				Clamp_gpu(col, width);
+				break;
+			case REFLECT:
+				Reflect_gpu(row, height);
+				Reflect_gpu(col, width);
+				break;
+			default:
+				break;
+			}
+			coord_data[index] = round(row) * width + round(col);
+		}
+	}
+
+	template <typename Dtype>
+	__global__ void generate_bilinear_coord_kernel(const int N, const int height, const int width,
+		const int height_new, const int width_new, const Border &border,
+		const float* coord_data_res, float* &coord_data){
+		float old_cy = static_cast<float>(height - 1) / 2.;
+		float old_cx = static_cast<float>(width - 1) / 2.;
+		CUDA_KERNEL_LOOP(index, N){
+			float row = coord_data_res[3 * index] + old_cy;
+			float col = coord_data_res[3 * index + 1] + old_cx;
+			//p00 => (r0, c0) p11 => (r1,c1)
+			switch (border)
+			{
+			case CROP:
+				//skip interpolation
+				if ((row >= height - 0.5 || row < -0.5) || (col >= width - 0.5) || 
+					(col < -0.5)){
+					coord_data[index] = Dtype(-1);
+					continue;
+				}
+				break;
+			case CLAMP:
+				Clamp_gpu(row, height);
+				Clamp_gpu(col, width);
+				break;
+			case REFLECT:
+				Reflect_gpu(row, height);
+				Reflect_gpu(col, width);
+				break;
+			default:
+				break;
+			}
+			//p00, trunc(x), trunc(y)
+			float row0 = trunc(row);
+			float col0 = trunc(col);
+			//p11
+			float row1 = trunc(row + 1) > (height - 1) ? height - 1 : trunc(row + 1);
+			float col1 = trunc(col + 1) > (width - 1) ? width - 1 : trunc(col + 1);
+
+			//if p00 is outside, don't compute difference
+			float dc = col0 == col1 ? 0 : col - col0;
+			float dr = row0 == row1 ? 0 : row - row0;
+
+			//left up point
+			coord_data[index] = row0 * width + col0;
+			//right down point
+			coord_data[index + N] = row1 * width + col1;
+			//column difference
+			coord_data[index + 2 * N] = dc;
+			//row difference
+			coord_data[index + 3 * N] = dr;
+		}
+	}
+
+	//currently, we only support float here
+	void GenCoordMatCrop_gpu(Blob<float>& tmat, const int height, const int width,
+		Blob<float>& ori_coord, Blob<float>& coord_idx, const Border& border, const Interp& interp){
+		float* tmat_cpu_data = tmat.mutable_cpu_data();
+		CHECK(border == CLAMP || border == CROP || border == REFLECT) << 
+			"Unknown border type: " << border;
+		//transform to inverse new_image => ori_image
+		Invert3x3(tmat_cpu_data);
+
+		float cy = static_cast<float>(height - 1) / 2.;
+		float cx = static_cast<float>(width - 1) / 2.;
+
+		//substract center
+		AddShift(-cy, -cx, tmat_cpu_data, LEFT);
+
+		//we can use ori_coord data and diff for buffer of coordinates
+		//since it is only used in this step
+		float *coord_data_tmp = ori_coord.mutable_gpu_data();
+		float *coord_data_res = ori_coord.mutable_gpu_diff();
+		float *tmat_gpu_data = tmat.mutable_gpu_data();
+
+		//Apply transformation
+		caffe_gpu_gemm<float>(CblasNoTrans, CblasNoTrans, height * width, 3, 3, 1.f,
+			coord_data_tmp, tmat_gpu_data, 0.f, coord_data_res);
+
+		//save the final result into coord_idx
+		float *coord_data_final = coord_idx.mutable_gpu_data();
+		int n = height * width;
+		switch (border)
+		{
+		case NN:
+			generate_nn_coord_kernel<float><< <CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS >>>(
+				n, height, width, height, width, border, coord_data_res, coord_data_final);
+		case BILINEAR:
+			generate_bilinear_coord_kernel<float><< <CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS >>>(
+				n, height, width, height, width, border, coord_data_res, coord_data_final);
+		default:
+			LOG(FATAL) << "Unkown interpolation type " << interp;
+			break;
+		}
+		CUDA_POST_KERNEL_CHECK;
+	}
+
+	template <typename Dtype>
 	__global__ void nn_interpolation_kernel(const int nthreads, const Dtype *oldDPtr,
 		const int oldSheetCount, Dtype* newDPtr,
 		const int newSheetCount, const float* coord){
@@ -52,9 +197,9 @@ namespace caffe{
 				float dc = coord[offset + 2 * newSheetCount];
 				float dr = coord[offset + 3 * newSheetCount];
 
-				float w00 = (1 - dc)*(1 - dr);
-				float w01 = (1 - dr)*dc;
-				float w10 = (1 - dc)*dr;
+				float w00 = (1 - dc) * (1 - dr);
+				float w01 = (1 - dr) * dc;
+				float w10 = (1 - dc) * dr;
 				float w11 = dr * dc;
 
 				int bigOffset = numSheet * oldSheetCount;

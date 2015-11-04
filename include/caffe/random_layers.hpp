@@ -93,7 +93,8 @@ namespace caffe{
 
 		//added by xu shen here
 		//get the coordination matrix after transformation
-		void GetTransCoord();
+		void GetTransCoord_cpu();
+		void GetTransCoord_gpu();
 
 		bool rotation_;
 		bool scale_;
@@ -117,8 +118,9 @@ namespace caffe{
 
 		Border BORDER_; // border type
 		Interp INTERP_; //interpolation type
+
 		//3x3 transform matrix buffer, row order
-		float tmat_[9];
+		Blob<float> tmat_;
 
 		//Indices for image transformation
 		//We use blob's data to be fwd and diff to be backward indices

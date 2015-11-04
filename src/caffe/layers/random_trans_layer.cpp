@@ -75,22 +75,25 @@ namespace caffe{
 		}
 		//to store the original row and colum index data of the matrix
 		original_coord_.Reshape(1, 1, Height_ * Width_ * 3, 1);
+		//the order stored in the original_coord_ is (y0, x0, 1, y1, x1, 1, ...)
 		GenBasicCoordMat(original_coord_.mutable_cpu_data(), Width_, Height_);
+		tmat_.Reshape(1, 1, 3, 3);
 	}
 
 	template <typename Dtype>
-	void RandomTransformLayer<Dtype>::GetTransCoord(){
+	void RandomTransformLayer<Dtype>::GetTransCoord_cpu(){
+		float* tmat_data = tmat_.mutable_cpu_data();
 		//compute transformation matrix
 		if (rotation_){
 			//randomly generate rotation angle
 			caffe_rng_uniform(1, start_angle_, end_angle_, &curr_angle_);
-			curr_angle_ = 90;
-			TMatFromParam(0, curr_angle_, curr_angle_, tmat_);
+			curr_angle_ = 45;
+			TMatFromParam(ROTATION, curr_angle_, curr_angle_, tmat_data);
 		}
 		if (scale_){
 			caffe_rng_uniform(1, start_scale_, end_scale_, &curr_scale_);
-			curr_scale_ = Dtype(1.7);
-			TMatFromParam(1, curr_scale_, curr_scale_, tmat_);
+			curr_scale_ = Dtype(2);
+			TMatFromParam(SCALE, curr_scale_, curr_scale_, tmat_data);
 		}
 		if (shift_){
 			float shift_pixels_x = dx_prop_ * Width_;
@@ -99,14 +102,17 @@ namespace caffe{
 			caffe_rng_uniform(1, -shift_pixels_y, shift_pixels_y, &curr_shift_y_);
 			curr_shift_x_ = 1;
 			curr_shift_y_ = 1;
-			TMatFromParam(2, curr_shift_x_, curr_shift_y_, tmat_);
+			TMatFromParam(SHIFT, curr_shift_x_, curr_shift_y_, tmat_data);
 		}
+		tmat_.ToTxt("transform_matrix");
 		//Canoincal size is set, so after finding the transformation,
 		//crop or pad to that canonical size.
 		//First find the coordinate matrix for this transformation
 		//here we don't change the shape of the input 2D map
 		//wo we don't need crop operation here
-		GenCoordMatCrop(tmat_, Height_, Width_, original_coord_, coord_idx_, BORDER_, INTERP_);
+		GenCoordMatCrop_cpu(tmat_, Height_, Width_, original_coord_, coord_idx_, BORDER_, INTERP_);
+		original_coord_.ToTxt("original_data", true);
+		coord_idx_.ToTxt("final_coord");
 	}
 
 	template <typename Dtype>
@@ -122,7 +128,8 @@ namespace caffe{
 			caffe_copy(count, bottom_data, top_data);
 		}
 		else{
-			GetTransCoord();
+			GetTransCoord_cpu();
+			coord_idx_.ToTxt("coord_data");
 			//apply Interpolation on bottom_data using tmat_[i] into top_data
 			//the coord_idx_[i] will be of size as the output data
 			InterpImageNN_cpu(bottom[0], coord_idx_.cpu_data(), top[0], INTERP_);
@@ -137,7 +144,9 @@ namespace caffe{
 		//Reset bottom diff.
 		const Dtype* top_diff = top[0]->cpu_diff();
 		const int count = top[0]->count();
+		CHECK_EQ(bottom[0]->count(), top[0]->count());
 		Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
+		//we must set all bottom diffs to zero before the backpropagation
 		caffe_set(count, Dtype(0.), bottom_diff);
 		if (propagate_down[0]){
 			if ((!shift_ && !rotation_ && !scale_)){

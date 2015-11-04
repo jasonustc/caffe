@@ -8,6 +8,38 @@
 
 namespace caffe{
 	template <typename Dtype>
+	void RandomTransformLayer<Dtype>::GetTransCoord_gpu(){
+		//here we use cpu to compute tranform matrix
+		float* tmat_cpu_data = tmat_.mutable_cpu_data();
+		if (rotation_){
+			//randomly generate rotation angle
+			caffe_rng_uniform(1, start_angle_, end_angle_, &curr_angle_);
+			curr_angle_ = 90;
+			TMatFromParam(ROTATION, curr_angle_, curr_angle_, tmat_cpu_data);
+		}
+		if (scale_){
+			caffe_rng_uniform(1, start_scale_, end_scale_, &curr_scale_);
+			curr_scale_ = Dtype(1.7);
+			TMatFromParam(SCALE, curr_scale_, curr_scale_, tmat_cpu_data);
+		}
+		if (shift_){
+			float shift_pixels_x = dx_prop_ * Width_;
+			float shift_pixels_y = dy_prop_ * Height_;
+			caffe_rng_uniform(1, -shift_pixels_x, shift_pixels_x, &curr_shift_x_);
+			caffe_rng_uniform(1, -shift_pixels_y, shift_pixels_y, &curr_shift_y_);
+			curr_shift_x_ = 1;
+			curr_shift_y_ = 1;
+			TMatFromParam(SHIFT, curr_shift_x_, curr_shift_y_, tmat_cpu_data);
+		}
+		//Canoincal size is set, so after finding the transformation,
+		//crop or pad to that canonical size.
+		//First find the coordinate matrix for this transformation
+		//here we don't change the shape of the input 2D map
+		//wo we don't need crop operation here
+		GenCoordMatCrop_gpu(tmat_, Height_, Width_, original_coord_, coord_idx_, BORDER_, INTERP_);
+	}
+
+	template <typename Dtype>
 	void RandomTransformLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
 		const vector<Blob<Dtype>*> &top){
 		const int count = bottom[0]->count();
@@ -20,7 +52,7 @@ namespace caffe{
 		}
 		else{
 			//get coordinate map matrix
-			GetTransCoord();
+			GetTransCoord_gpu();
 			//Apply Imterpolation on bottom_data using tmat_[i] into top_data.
 			InterpImageNN_gpu(bottom[0], coord_idx_.gpu_data(), top[0], INTERP_);
 		}

@@ -16,26 +16,26 @@ namespace caffe{
 
 	/*
 	 *Compute the transformation parameters in transform matrix
-	 * 1) trans_type == 0: rotation, rotation angle is stored in param1
-	 * 2) trans_type == 1: scale, scale proportion is stored in param1
-	 * 3) trans_type == 2: shift, shift_x and shift_y(pixel) is stored in param1, param2, respectively.
+	 * 1) trans_type == ROTATION, rotation angle is stored in param1
+	 * 2) trans_type == SCALE, scale proportion is stored in param1
+	 * 3) trans_type == SHIFT, shift_x and shift_y(pixel) is stored in param1, param2, respectively.
 	 * the last transform parameter in tmat will be updated, not reset: tmat_new = transform(tmat_old)
 	 */
-	void TMatFromParam(const int trans_type, const float param1, const float param2, float *tmat, bool invert){
+	void TMatFromParam(TransType transType, const float param1, const float param2, float *tmat, bool invert){
 		//initialize to identity
 		std::fill(tmat, tmat + 9, 0);
 		tmat[0] = tmat[4] = tmat[8] = 1;
-		//rotation
-		if (trans_type == 0){
+		switch (transType)
+		{
+		case caffe::ROTATION:
 			if (invert){
-				AddRotation(- param1, tmat);
+				AddRotation(-param1, tmat);
 			}
 			else{
 				AddRotation(param1, tmat);
 			}
-		}
-		//scale
-		if (trans_type == 1){
+			break;
+		case caffe::SCALE:
 			CHECK(param1 > 0) << "Scale has to be >= 0: " << param1;
 			if (invert){
 				AddScale(1. / param1, tmat);
@@ -43,10 +43,8 @@ namespace caffe{
 			else{
 				AddScale(param1, tmat);
 			}
-		}
-		//shift
-		//in current implementation, shift is x <--> y
-		if (trans_type == 2){
+			break;
+		case caffe::SHIFT:
 			if (param1 != 0 || param2 != 0){
 				if (invert){
 					AddShift(-param1, -param2, tmat);
@@ -55,6 +53,10 @@ namespace caffe{
 					AddShift(param1, param2, tmat);
 				}
 			}
+			break;
+		default:
+			LOG(FATAL) << "Unkown transform type";
+			break;
 		}
 	}
 
@@ -72,9 +74,9 @@ namespace caffe{
 		AddTransform(mat, tmp, dir);
 	}
 
-	void AddShift(const float &dx, const float &dy, float *mat, const Direction dir){
+	void AddShift(const float &dy, const float &dx, float *mat, const Direction dir){
 		//dx is width, dy is height
-		float tmp[9] = { 1, 0, 0, 0, 1, 0, dx, dy, 1};
+		float tmp[9] = { 1, 0, 0, 0, 1, 0, dy, dx, 1};
 		AddTransform(mat, tmp, dir);
 	}
 
@@ -82,17 +84,19 @@ namespace caffe{
 	 *all the 2D transformations can be modeled by the combination of following 3 basic
 	 *transformations
 	 *rotation:
-	 *                 [cos\theta  sin\theta  0]
-	 *[x y 1] = [x y 1][-sin\theta cos\theta  0]
-	 *                 [ 0            0       1]
+	 *                   [cos\theta   sin\theta  0]
+	 *[y' x' 1] = [y x 1][-sin\theta  cos\theta  0]
+	 *                   [ 0            0        1]
 	 *shift:
-	 *                 [1  0  0]
-	 *[x y 1] = [x y 1][0  1  0]
-	 *                 [dx dy 1]
+	 *                   [1  0  0]
+	 *[y' x' 1] = [y x 1][0  1  0] 
+	 *                   [dy dx 1]
 	 *scale:
-	 *                 [s_x  0    0]
-	 *[x y 1] = [x y 1][0    s_y  0]
-	 *                 [0    0    1]
+	 *                   [s_y  0    0]
+	 *[y' x' 1] = [y x 1][0    s_x  0]
+	 *                   [0    0    1]
+	 *T_new = T_old * T_k
+	 * X' = XT => X = X'T^{-1}
 	 */
 	void AddTransform(float *A, const float *B, const Direction dir){
 		//matrix multiply A and B and store to A
@@ -126,7 +130,6 @@ namespace caffe{
 		float d1 = A[0] * A[4] * A[8] + A[1] * A[5] * A[6] + A[2] * A[3] * A[7];
 		float d2 = A[0] * A[5] * A[7] + A[2] * A[4] * A[6] + A[8] * A[1] * A[3];
 		float det = d1 - d2;
-//		printf("det: %.2f - %.2f = %.2f", d1, d2, det);
 		CHECK_NE(det, 0);
 		inv[0] = (A[8] * A[4] - A[5] * A[7]) / det;
 		inv[1] = (A[7] * A[2] - A[1] * A[8]) / det;
@@ -234,6 +237,7 @@ namespace caffe{
 			switch (border)
 			{
 			case CROP:
+				//exceed half pixel
 				//ignored in bilinear interpolation
 				if ((row >= height - 0.5 || row < -0.5) || 
 					(col >= width - 0.5 || col < -0.5)){
@@ -265,8 +269,8 @@ namespace caffe{
 			//difference of truncation
 			//if no difference or difference is an int, we don't need to do 
 			//bilinear interpolation
-			dc = col0 == col1 ? 0 : col - col0;
-			dr = row0 == row1 ? 0 : row - row0;
+			dc = col1 == col0 ? 0 : col - col0;
+			dr = row1 == row0 ? 0 : row - row0;
 			DCHECK(dc >= 0) << "dc has to be pos " << dc;
 			DCHECK(dr >= 0) << "dr has to be pos " << dr;
 			//left up point
@@ -277,23 +281,30 @@ namespace caffe{
 			coord_data[ind + 2 * N] = dc;
 			//row difference
 			coord_data[ind + 3 * N] = dr;
+//			LOG(ERROR) << coord_data[ind] << "\t" << coord_data[ind + N] << 
+//				"\t" << dc << "\t" << dr;
 		}
 	}
 
 	//TODO: transfer these CPU code to GPU versions
 	//This doesn't change the size of the input
-	void GenCoordMatCrop(float* tmat,
+	void GenCoordMatCrop_cpu(Blob<float>& tmat,
 		const int &height, const int &width, Blob<float>& ori_coord,
 		Blob<float>& coord_idx, const Border &border, const Interp &interp){
 
+		float* tmat_data = tmat.mutable_cpu_data();
+		tmat.ToTxt("before_invert");
+
 		//transform tmat to it's inversed matrix
-		Invert3x3(tmat);
+		Invert3x3(tmat_data);
+		tmat.ToTxt("after_invert");
 
 		float cy = static_cast<float>(height - 1) / 2.;
 		float cx = static_cast<float>(width - 1) / 2.;
 
 		//substract center
-		AddShift(-cy, -cx, tmat, LEFT);
+		AddShift(-cy, -cx, tmat_data, LEFT);
+		tmat.ToTxt("after_shift");
 
 		//we can use coord data and diff for buffer of coordinate
 		//data, since it is only used after this computation
@@ -304,7 +315,7 @@ namespace caffe{
 
 		//Apply transformation
 		caffe_cpu_gemm<float>(CblasNoTrans, CblasNoTrans, height * width, 3, 3, 1.f,
-			coord_data_tmp, tmat, 0.f, coord_data_res);
+			coord_data_tmp, tmat_data, 0.f, coord_data_res);
 
 		//we can now put the final coordinate data into coord data again
 		switch (interp)
@@ -314,7 +325,6 @@ namespace caffe{
 				coord_data_final);
 			break;
 		case BILINEAR:
-			ori_coord.ToTxt("ori_coord",true);
 			generate_bilinear_coord(height, width, height, width, border,
 				coord_data_res, coord_data_final);
 			break;
@@ -337,20 +347,6 @@ namespace caffe{
 			coord[3 * ind] = row;
 			coord[3 * ind + 1] = col;
 			coord[3 * ind + 2] = 1;
-		}
-	}
-
-	//fills width * height x 1 vector with the identity indices
-	void GenBasicCoordInds(const int &width, const int &height,
-		Blob<float>* coord){
-		coord->Reshape(1, 1, width*height, 1);
-		float* coord_data = coord->mutable_cpu_data();
-		int row, col;
-		for (int ind = 0; ind < width * height; ++ind){
-			//compute subscripts from this index
-			row = ind / width;
-			col = ind % width;
-			coord_data[ind] = row * width + col;
 		}
 	}
 
@@ -403,7 +399,7 @@ namespace caffe{
 							h_orig = ind_orig / width_orig; //row in original
 							w_orig = ind_orig % width_orig; //col in original
 							warped_data[((n * channels + c) * height + h) * width + w] =
-								orig_data[((n * channels + c) * height_orig) * width_orig + w_orig];
+								orig_data[((n * channels + c) * height_orig + h_orig) * width_orig + w_orig];
 						}
 						else{
 							warped_data[((n*channels + c) * height + h) * width + w] = 0;
@@ -415,13 +411,13 @@ namespace caffe{
 	}
 
 	template <typename Dtype>
-	void bilinear_interpolation(const Blob<Dtype>* &orig, const float* &coord,
-		Blob<Dtype>* &warped){
+	void bilinear_interpolation(const Blob<Dtype>* orig, const float* coord,
+		Blob<Dtype>* warped){
 		//Get the parameters from the original and warped and apply the
 		//transformation to it.
 		int ind_warped, ind_orig, r0, c0, r1, c1, ind_p11;
 		float dc, dr, w00, w01, w10, w11;
-		Dtype p00, p01, p10, p11;
+		float p00, p01, p10, p11;
 		int width_orig = orig->width();
 		int height_orig = orig->height();
 		int num = warped->num();
@@ -477,8 +473,8 @@ namespace caffe{
 			}
 		}
 	}
-	template void bilinear_interpolation(const Blob<float>* &orig, const float* &coord,
-		Blob<float>* &warped);
+	template void bilinear_interpolation(const Blob<float>* orig, const float* coord,
+		Blob<float>* warped);
 
 	//back propagation according to the corresponding indexes
 	//in propatation
@@ -533,7 +529,7 @@ namespace caffe{
 					for (int w = 0; w < width; ++w){
 						ind_top = h*width + w;
 						ind_bottom = static_cast<int>(coord[ind_top]);
-						if (ind_bottom > 0){//do only for valid index
+						if (ind_bottom >= 0){//do only for valid index
 							h_bottom = ind_bottom / width_bottom; //row
 							w_bottom = ind_bottom % width_bottom; //col
 							bottom_diff[((n* channels + c) * height_bottom + h_bottom) * width_bottom
@@ -586,15 +582,15 @@ namespace caffe{
 							dc = coord[ind_top + 2 * N];
 							dr = coord[ind_top + 3 * N];
 
-							w00 = (1 - dc)*(1 - dc);
-							w01 = (1 - dr)*dc;
-							w10 = (1 - dc)*dr;
+							w00 = (1 - dc)*(1 - dr);
+							w01 = (1 - dr) * dc;
+							w10 = (1 - dc) * dr;
 							w11 = dr * dc;
 
-							int offset = (n * channels + c)*height_bottom;
+							int offset = (n * channels + c) * height_bottom;
 
 							float top_error =
-								top_diff[((n*channels + c) * height + h) * width + w];
+								top_diff[((n * channels + c) * height + h) * width + w];
 
 							//propagate error after weighting with its bilinear coefficients
 							//p00
