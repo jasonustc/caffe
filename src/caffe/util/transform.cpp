@@ -24,9 +24,6 @@
 using std::min;
 using std::max;
 
-/*
- * TODO: transfer all these transforms into GPU version
- */
 namespace caffe{
 
 	/*
