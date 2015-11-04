@@ -1,5 +1,19 @@
-//Please refer to https://github.com/akanazawa/si-convnet for more details
-
+/********************************************************************************
+** Copyright(c) 2015 USTC Reserved.
+** auth: Xu Shen
+** mail: shenxu@mail.ustc.edu.cn
+** date: 2015/11/4
+** desc: Image Transformation Functions(GPU && CPU)
+** Part of the code is borrowed from https://github.com/akanazawa/si-convnet
+** @misc{kanazawa14,
+** 	author    = {Angjoo Kanazawa and Abhishek Sharma and David W. Jacobs},
+** 	title     = {Locally Scale-Invariant Convolutional Neural Networks},
+** 	year      = {2014},
+** 	url       = {http://arxiv.org/abs/1412.5104},
+** 	Eprint = {arXiv:1412.5104}
+** }
+** Thanks for their nice work.
+*********************************************************************************/
 #ifndef CAFFE_UTIL_TRANSF_H_
 #define CAFFE_UTIL_TRANSF_H_
 

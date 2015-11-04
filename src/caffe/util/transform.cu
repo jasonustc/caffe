@@ -1,4 +1,19 @@
-//Implemented by Angjoo Kanzawa, Abhishek Sharma 2013
+/********************************************************************************
+** Copyright(c) 2015 USTC Reserved.
+** auth: Xu Shen
+** mail: shenxu@mail.ustc.edu.cn
+** date: 2015/11/4
+** desc: Image Transformation Functions(GPU)
+** Part of the code is borrowed from https://github.com/akanazawa/si-convnet
+** @misc{kanazawa14,
+** 	author    = {Angjoo Kanazawa and Abhishek Sharma and David W. Jacobs},
+** 	title     = {Locally Scale-Invariant Convolutional Neural Networks},
+** 	year      = {2014},
+** 	url       = {http://arxiv.org/abs/1412.5104},
+** 	Eprint = {arXiv:1412.5104}
+** }
+** Thanks for their nice work.
+*********************************************************************************/
 #include <cstdlib>
 #include <cstring>
 #include <stdio.h>

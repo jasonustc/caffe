@@ -1,4 +1,10 @@
-
+/********************************************************************************
+** Copyright(c) 2015 USTC Reserved.
+** auth: Xu Shen
+** mail: shenxu@mail.ustc.edu.cn
+** date: 2015/11/4
+** desc: RandomTransformLayer(CPU)
+*********************************************************************************/
 #include <vector>
 #include "caffe/layer.hpp"
 #include "caffe/vision_layers.hpp"
@@ -6,9 +12,6 @@
 #include "caffe/filler.hpp"
 #include "caffe/util/math_functions.hpp"
 #include "caffe/random_layers.hpp"
-//#include "caffe/util/imshow.hpp"
-
-//#include <opencv2/highgui/highgui.hpp>
 
 namespace caffe{
 	template <typename Dtype>
