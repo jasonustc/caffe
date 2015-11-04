@@ -61,11 +61,11 @@ namespace caffe{
 
 	template <typename Dtype>
 	__global__ void generate_bilinear_coord_kernel(const int N, const int height, const int width,
-		const int height_new, const int width_new, const Border &border,
-		const float* coord_data_res, float* &coord_data){
-		float old_cy = static_cast<float>(height - 1) / 2.;
-		float old_cx = static_cast<float>(width - 1) / 2.;
+		const int height_new, const int width_new, const Border border,
+		const float* coord_data_res, float* coord_data){
 		CUDA_KERNEL_LOOP(index, N){
+			float old_cy = static_cast<float>(height - 1) / 2.;
+			float old_cx = static_cast<float>(width - 1) / 2.;
 			float row = coord_data_res[3 * index] + old_cy;
 			float col = coord_data_res[3 * index + 1] + old_cx;
 			//p00 => (r0, c0) p11 => (r1,c1)
@@ -129,7 +129,7 @@ namespace caffe{
 
 		//we can use ori_coord data and diff for buffer of coordinates
 		//since it is only used in this step
-		float *coord_data_tmp = ori_coord.mutable_gpu_data();
+		const float *coord_data_tmp = ori_coord.gpu_data();
 		float *coord_data_res = ori_coord.mutable_gpu_diff();
 		float *tmat_gpu_data = tmat.mutable_gpu_data();
 
@@ -140,14 +140,16 @@ namespace caffe{
 		//save the final result into coord_idx
 		float *coord_data_final = coord_idx.mutable_gpu_data();
 		int n = height * width;
-		switch (border)
+		switch (interp)
 		{
 		case NN:
 			generate_nn_coord_kernel<float><< <CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS >>>(
 				n, height, width, height, width, border, coord_data_res, coord_data_final);
+			break;
 		case BILINEAR:
 			generate_bilinear_coord_kernel<float><< <CAFFE_GET_BLOCKS(n), CAFFE_CUDA_NUM_THREADS >>>(
 				n, height, width, height, width, border, coord_data_res, coord_data_final);
+			break;
 		default:
 			LOG(FATAL) << "Unkown interpolation type " << interp;
 			break;

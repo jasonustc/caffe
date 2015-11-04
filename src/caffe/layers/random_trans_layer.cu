@@ -14,12 +14,10 @@ namespace caffe{
 		if (rotation_){
 			//randomly generate rotation angle
 			caffe_rng_uniform(1, start_angle_, end_angle_, &curr_angle_);
-			curr_angle_ = 90;
 			TMatFromParam(ROTATION, curr_angle_, curr_angle_, tmat_cpu_data);
 		}
 		if (scale_){
 			caffe_rng_uniform(1, start_scale_, end_scale_, &curr_scale_);
-			curr_scale_ = Dtype(1.7);
 			TMatFromParam(SCALE, curr_scale_, curr_scale_, tmat_cpu_data);
 		}
 		if (shift_){
@@ -27,15 +25,12 @@ namespace caffe{
 			float shift_pixels_y = dy_prop_ * Height_;
 			caffe_rng_uniform(1, -shift_pixels_x, shift_pixels_x, &curr_shift_x_);
 			caffe_rng_uniform(1, -shift_pixels_y, shift_pixels_y, &curr_shift_y_);
-			curr_shift_x_ = 1;
-			curr_shift_y_ = 1;
 			TMatFromParam(SHIFT, curr_shift_x_, curr_shift_y_, tmat_cpu_data);
 		}
 		//Canoincal size is set, so after finding the transformation,
 		//crop or pad to that canonical size.
 		//First find the coordinate matrix for this transformation
 		//here we don't change the shape of the input 2D map
-		//wo we don't need crop operation here
 		GenCoordMatCrop_gpu(tmat_, Height_, Width_, original_coord_, coord_idx_, BORDER_, INTERP_);
 	}
 
@@ -66,7 +61,6 @@ namespace caffe{
 		Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
 		//Reset bottom diff.
 		caffe_gpu_set(count, Dtype(0.), bottom_diff);
-		//we must set the diff to zero before backpropagation
 		if (propagate_down[0]){
 			if (!scale_ && !shift_ && !rotation_){
 				caffe_copy(count, top_diff, bottom_diff);

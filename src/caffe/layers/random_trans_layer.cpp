@@ -42,7 +42,8 @@ namespace caffe{
 			CHECK_LE(dx_prop_, 1);
 			CHECK_GE(dy_prop_, 0);
 			CHECK_LE(dy_prop_, 1);
-			LOG(INFO) << "Random shift image by dx <= " << dx_prop_ << "\%, dy <= " << dy_prop_ << "\%.";
+			LOG(INFO) << "Random shift image by dx <= " << dx_prop_ << 
+				"*Width_, dy <= " << dy_prop_ << "*Height_.";
 		}
 		if (scale_){
 			start_scale_ = this->layer_param_.rand_trans_param().start_scale();
@@ -61,7 +62,6 @@ namespace caffe{
 	template <typename Dtype>
 	void RandomTransformLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 		const vector<Blob<Dtype>*>& top){
-		//TODO: shape the parameter blobs
 		top[0]->ReshapeLike(*bottom[0]);
 		switch (INTERP_){
 		case NN:
@@ -104,15 +104,12 @@ namespace caffe{
 			curr_shift_y_ = 1;
 			TMatFromParam(SHIFT, curr_shift_x_, curr_shift_y_, tmat_data);
 		}
-		tmat_.ToTxt("transform_matrix");
 		//Canoincal size is set, so after finding the transformation,
 		//crop or pad to that canonical size.
 		//First find the coordinate matrix for this transformation
 		//here we don't change the shape of the input 2D map
 		//wo we don't need crop operation here
 		GenCoordMatCrop_cpu(tmat_, Height_, Width_, original_coord_, coord_idx_, BORDER_, INTERP_);
-		original_coord_.ToTxt("original_data", true);
-		coord_idx_.ToTxt("final_coord");
 	}
 
 	template <typename Dtype>
@@ -129,7 +126,6 @@ namespace caffe{
 		}
 		else{
 			GetTransCoord_cpu();
-			coord_idx_.ToTxt("coord_data");
 			//apply Interpolation on bottom_data using tmat_[i] into top_data
 			//the coord_idx_[i] will be of size as the output data
 			InterpImageNN_cpu(bottom[0], coord_idx_.cpu_data(), top[0], INTERP_);
