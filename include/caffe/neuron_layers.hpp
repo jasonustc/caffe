@@ -204,30 +204,6 @@ class DropoutLayer : public NeuronLayer<Dtype> {
   unsigned int uint_thres_;
 };
 
-/*
- * @brief: copy layer: just copy data from bottom to top
- *
- */
-template <typename Dtype>
-class CopyLayer : public NeuronLayer<Dtype> {
- public:
-
-  explicit CopyLayer(const LayerParameter& param)
-      : NeuronLayer<Dtype>(param) {}
-
-  virtual inline const char* type() const { return "Copy"; }
-
- protected:
-  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
-  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
-  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
-      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
-  virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
-      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
-};
-
 /**
  * @brief Computes @f$ y = \gamma ^ {\alpha x + \beta} @f$,
  *        as specified by the scale @f$ \alpha @f$, shift @f$ \beta @f$,

@@ -35,7 +35,6 @@
     <ClCompile Include="..\src\caffe\layers\constrain_ip_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\contrastive_loss_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\conv_layer.cpp" />
-    <ClCompile Include="..\src\caffe\layers\copy_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\cudnn_conv_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\cudnn_pooling_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\cudnn_relu_layer.cpp" />
@@ -116,7 +115,7 @@
     <ClCompile Include="..\src\caffe\util\math_functions.cpp" />
     <ClCompile Include="..\src\caffe\util\upgrade_proto.cpp" />
     <ClCompile Include="..\src\gtest\gtest-all.cpp" />
-    <ClCompile Include="..\tools\test\test_norm_loss_layer.cpp" />
+    <ClCompile Include="..\tools\convert_imageset.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu" />
@@ -126,7 +125,6 @@
     <CudaCompile Include="..\src\caffe\layers\constrain_ip_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\contrastive_loss_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\conv_layer.cu" />
-    <CudaCompile Include="..\src\caffe\layers\copy_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\cudnn_conv_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\cudnn_pooling_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\cudnn_relu_layer.cu" />
