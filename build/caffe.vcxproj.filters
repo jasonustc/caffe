@@ -321,7 +321,7 @@
     <ClCompile Include="..\src\caffe\layers\rbm_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\test\test_norm_loss_layer.cpp" />
+    <ClCompile Include="..\tools\extract_features2files.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
