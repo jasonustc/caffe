@@ -57,10 +57,6 @@ namespace caffe{
 
 			EXPECT_NEAR(loss / Dtype(bottom_[0]->num()), top_[1]->cpu_data()[0], 1e-3);
 			
-			//internal variables
-			layer->positive_state_h_.ToTxt("state_h_data");
-			layer->pos_v_.ToTxt("pos_v_data");
-			layer->pos_h_.ToTxt("pos_h_data");
 		}
 
 		void TestGPUForward(){
@@ -87,11 +83,6 @@ namespace caffe{
 			}
 
 			EXPECT_NEAR(loss / Dtype(bottom_[0]->num()), top_[1]->cpu_data()[0], 1e-3);
-			
-			//internal variables
-			layer->positive_state_h_.ToTxt("state_h_data");
-			layer->pos_v_.ToTxt("pos_v_data");
-			layer->pos_h_.ToTxt("pos_h_data");
 		}
 
 		void TestCPUGradients(){
@@ -255,8 +246,8 @@ int main(int argc, char** argv){
 	caffe::RBMTest<float> test;
 	test.TestSetUp();
 //	test.TestCPUForward();
-	test.TestCPUGradients();
-//	test.TestGPUForward();
-//	test.TestGPUGradients();
+//	test.TestCPUGradients();
+	test.TestGPUForward();
+	test.TestGPUGradients();
 	return 0;
 }
