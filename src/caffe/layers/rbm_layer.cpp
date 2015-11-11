@@ -202,6 +202,13 @@ namespace caffe{
 		const Dtype* neg_v_data = neg_v_.cpu_data();
 		const Dtype* neg_h_data = neg_h_.cpu_data();
 		const Dtype* top_diff = top[0]->cpu_diff();
+		top[0]->ToTxt("top_data", true);
+		bottom[0]->ToTxt("pos_v", true);
+		pos_h_.ToTxt("pos_h", true);
+		neg_v_.ToTxt("neg_v", true);
+		neg_h_.ToTxt("neg_h", true);
+		positive_state_h_.ToTxt("sample_h");
+		negative_state_v_.ToTxt("sample_v");
 		Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
 		Dtype* weight_diff = this->blobs_[0]->mutable_cpu_diff();
 		const Dtype* weight_data = this->blobs_[0]->cpu_data();
@@ -253,6 +260,9 @@ namespace caffe{
 			caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, K_, N_, (Dtype)1.,
 				top_diff, weight_data, (Dtype)0., bottom_diff);
 		}
+		bottom[0]->ToTxt("bottom", true);
+		this->blobs_[0]->ToTxt("weight", true);
+		this->blobs_[1]->ToTxt("bias", true);
 	}
 
 #ifdef CPU_ONLY
