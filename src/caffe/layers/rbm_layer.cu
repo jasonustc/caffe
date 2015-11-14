@@ -150,6 +150,14 @@ namespace caffe{
 			caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, K_, N_, (Dtype)1.,
 				top_diff, weight_data, (Dtype)0., bottom_diff);
 		}
+		LOG(INFO) <<"sqr_diff: " << this->blobs_[0]->sumsq_diff();
+		LOG(INFO) <<"abs_diff: " << this->blobs_[0]->asum_diff();
+		LOG(INFO) << "abs_data: " << this->blobs_[0]->asum_data();
+		LOG(INFO) << "sqr_data: " << this->blobs_[0]->sumsq_data();
+		LOG(INFO) << "sqr_top: " << top[0]->sumsq_data();
+		LOG(INFO) << "abs_top: " << top[0]->asum_data();
+		LOG(INFO) << "abs_top_diff: " << top[0]->asum_diff();
+		LOG(INFO) << "sqr_top_diff: " << top[0]->sumsq_data();
 	}
 
 	INSTANTIATE_LAYER_GPU_FUNCS(RBMLayer);
