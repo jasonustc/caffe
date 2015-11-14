@@ -228,19 +228,7 @@
     <ClCompile Include="..\src\caffe\layers\embed_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\lstm_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\lstm_unit_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\recurrent_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\caffe\layers\reshape_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\rnn_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
     <ClCompile Include="..\src\caffe\layers\video_unroll_layer.cpp">
@@ -415,12 +403,6 @@
       <Filter>src\util</Filter>
     </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\embed_layer.cu">
-      <Filter>src\layers</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\lstm_unit_layer.cu">
-      <Filter>src\layers</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\recurrent_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\prelu_layer.cu">
