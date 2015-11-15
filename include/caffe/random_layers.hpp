@@ -72,7 +72,7 @@ namespace caffe{
 			const vector<Blob<Dtype>*>& top);
 		virtual void Reshape(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
 
-		virtual inline const char* type(){ return "random_transform"; }
+		virtual inline const char* type() const { return "random_transform"; }
 
 	protected:
 		virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
