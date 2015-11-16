@@ -16,6 +16,7 @@ using namespace std;
 using namespace caffe;
 using boost::scoped_ptr;
 using std::string;
+using std::pair;
 
 DEFINE_bool(gray, false, "when this option is on, treat image as grayscale ones.");
 DEFINE_bool(shuffle, false, "Randomly shuffle the order of images and their labels.");

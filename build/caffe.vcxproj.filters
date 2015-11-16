@@ -28,6 +28,12 @@
     <Filter Include="src\test">
       <UniqueIdentifier>{092f3330-9d6f-454e-a244-3bc94bd0bd32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\extract_feat">
+      <UniqueIdentifier>{aa7cd7a4-464f-42da-8859-ec84a3cbf5cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\extract_feat">
+      <UniqueIdentifier>{13fe0edf-748e-4f5c-bbc9-f59262ca3765}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\caffe\layers\absval_layer.cpp">
@@ -243,7 +249,16 @@
     <ClCompile Include="..\src\gtest\gtest-all.cpp">
       <Filter>src\test</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\extract_features2files.cpp" />
+    <ClCompile Include="..\tools\main.cpp" />
+    <ClCompile Include="..\src\caffe\dmodel_loader.cpp">
+      <Filter>src\extract_feat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\fea_extractor.cpp">
+      <Filter>src\extract_feat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\image_reader.cpp">
+      <Filter>src\extract_feat</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
@@ -472,6 +487,15 @@
     </ClInclude>
     <ClInclude Include="..\include\caffe\test\test_gradient_check_util.hpp">
       <Filter>include\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dmodel_loader.h">
+      <Filter>include\extract_feat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\fea_extractor.h">
+      <Filter>include\extract_feat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\image_reader.h">
+      <Filter>include\extract_feat</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

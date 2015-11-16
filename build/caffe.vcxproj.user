@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>..\bin\test_db test_db_data</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>bvlc_reference_caffenet.caffemodel deploy.prototxt imagenet_mean.binaryproto fc7 index.txt fc7_max_row.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>D:\materials\DeepLearning\mypapers\nips\drop_connect_ex\cifar10\cifar-train-leveldb img_info</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>D:\data\testPhotos\index.txt test_db</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>
