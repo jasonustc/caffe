@@ -4,7 +4,8 @@
 
 #include "glog/logging.h"
 #include "google/protobuf/text_format.h"
-#include "leveldb\db.h"
+#include "caffe/util/io.hpp"
+#include "caffe/util/db.hpp"
 #include "stdint.h"
 #include "caffe/util/io.hpp"
 #include "caffe/proto/caffe.pb.h"
@@ -18,14 +19,14 @@ using boost::scoped_ptr;
 using std::string;
 using std::vector;
 
-DEFINE_int32(image_channels, 28, "The channels * sequence length value");
+DEFINE_int32(image_channels, 1, "The channels of the image");
 DEFINE_int32(image_height, 28, "The image height of each frame");
 DEFINE_int32(image_width, 28, "The image width of each frame");
 DEFINE_int32(num_samples, 60000, "Num of samples in the dataset");
+DEFINE_string(backend, "lmdb", "The backend{lmdb, leveldb} for storing the result.");
 
 void create_db(const string& feat_file, const string& label_file, const string& db_name, 
-	const int image_width, const int image_height, 
-	const int image_channels, const int num_samples){
+	const int image_width, const int image_height, const int num_samples){
 	//load feat file
 	ifstream in_feat(feat_file);
 	CHECK(in_feat.is_open()) << "open " << feat_file << " failed!";
@@ -33,13 +34,16 @@ void create_db(const string& feat_file, const string& label_file, const string& 
 	CHECK(in_label.is_open()) << "open " << label_file << "failed!";
 
 	//create new db
-	leveldb::DB* db;
-	leveldb::Options options;
-	options.create_if_missing = true;
-	options.error_if_exists = true;
-	leveldb::Status status = leveldb::DB::Open(options, db_name, &db);
-	CHECK(status.ok()) << "Failed to open leveldb " << db_name <<
-		", maybe it already exists.";
+//	leveldb::DB* db;
+//	leveldb::Options options;
+//	options.create_if_missing = true;
+//	options.error_if_exists = true;
+//	leveldb::Status status = leveldb::DB::Open(options, db_name, &db);
+//	CHECK(status.ok()) << "Failed to open leveldb " << db_name <<
+//		", maybe it already exists.";
+	scoped_ptr<db::DB> db(db::GetDB(FLAGS_backend));
+	db->Open(db_name, db::NEW);
+	scoped_ptr<db::Transaction> txn(db->NewTransaction());
 
 	const int kMaxKeyLength = 256;
 	char key_cstr[kMaxKeyLength];
@@ -79,18 +83,25 @@ void create_db(const string& feat_file, const string& label_file, const string& 
 		image_datum.SerializeToString(&out);
 		int length = sprintf_s(key_cstr, kMaxKeyLength, "%09d", i);
 		//put into db
-		leveldb::Status s = db->Put(leveldb::WriteOptions(), std::string(key_cstr, length), out);
-		if (++count % 100 == 0){
+//		leveldb::Status s = db->Put(leveldb::WriteOptions(), std::string(key_cstr, length), out);
+		txn->Put(string(key_cstr, length), out);
+		if (++count % 1000 == 0){
+			//Commit db
+			txn->Commit();
+			txn.reset(db->NewTransaction());
 			time2 = clock();
 			float diff_time((float)time2 - (float)time1);
 			diff_time /= CLOCKS_PER_SEC;
-			LOG(INFO) << "Processed " << count << " training images in " << diff_time << " s.";
+			LOG(INFO) << "Processed " << count << " images in " << diff_time << " s.";
 		}
 	}// for (int line_id = 0; line_id < train_end; line_id++)
-	LOG(INFO) << "Processed " << count << " images";
+	//write the last batch
+	if (count % 1000 != 0){
+		txn->Commit();
+		LOG(INFO) << "Processed " << count << "files.";
+	}
 	in_feat.close();
 	in_label.close();
-	delete db;
 }
 
 int main(int argc, char** argv){
@@ -110,6 +121,6 @@ int main(int argc, char** argv){
 	gflags::ParseCommandLineFlags(&argc, &argv, true);
 
 	create_db(argv[1], argv[2], argv[3], FLAGS_image_width, FLAGS_image_height, 
-		FLAGS_image_channels, FLAGS_num_samples);
+		FLAGS_num_samples);
 	return 0;
 }
