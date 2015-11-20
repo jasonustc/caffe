@@ -318,7 +318,10 @@
     <ClCompile Include="..\src\caffe\layers\rbm_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\convert_imageset.cpp" />
+    <ClCompile Include="..\tools\caffe.cpp" />
+    <ClCompile Include="lstm_conv_unit_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">

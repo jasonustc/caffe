@@ -57,10 +57,6 @@ namespace caffe{
 
 			EXPECT_NEAR(loss / Dtype(bottom_[0]->num()), top_[1]->cpu_data()[0], 1e-3);
 			
-			//internal variables
-			layer->positive_state_h_.ToTxt("state_h_data");
-			layer->pos_v_.ToTxt("pos_v_data");
-			layer->pos_h_.ToTxt("pos_h_data");
 		}
 
 		void TestGPUForward(){
@@ -87,11 +83,6 @@ namespace caffe{
 			}
 
 			EXPECT_NEAR(loss / Dtype(bottom_[0]->num()), top_[1]->cpu_data()[0], 1e-3);
-			
-			//internal variables
-			layer->positive_state_h_.ToTxt("state_h_data");
-			layer->pos_v_.ToTxt("pos_v_data");
-			layer->pos_h_.ToTxt("pos_h_data");
 		}
 
 		void TestCPUGradients(){
@@ -100,11 +91,54 @@ namespace caffe{
 			layer.SetUp(bottom_, top_);
 			GradientChecker<Dtype> checker(1e-2, 1e-3);
 			layer.Forward(bottom_, top_);
+			Dtype* top_diff = top_[0]->mutable_cpu_diff();
+			top_diff[2] = 1;
+			top_diff[4] = 4;
+			caffe_set(top_[0]->count(), Dtype(0.1), top_diff);
 			layer.Backward(top_, propagate_down_, bottom_);
+			const Dtype* pos_v_data = layer.pos_v_.cpu_data();
+			const Dtype* neg_v_data = layer.neg_v_.cpu_data();
+			const Dtype* pos_h_data = layer.pos_h_.cpu_data();
+			const Dtype* neg_h_data = layer.neg_h_.cpu_data();
+			const int count_v = layer.pos_v_.count(1);
+			const int count_h = layer.pos_h_.count(1);
+			const int num = layer.pos_v_.num();
+			const Dtype* weight_diff = layer.blobs()[0]->cpu_diff();
+			const Dtype* h_bias_diff = layer.blobs()[1]->cpu_diff();
+			const Dtype* v_bias_diff = layer.blobs()[2]->cpu_diff();
+			for (int i = 0; i < count_h; i++){
+				for (int j = 0; j < count_v; j++){
+					Dtype pos_en = 0;
+					Dtype neg_en = 0;
+					for (int n = 0; n < num; n++){
+						pos_en += pos_v_data[n * count_v + j] * pos_h_data[n * count_h + i];
+						neg_en += neg_v_data[n * count_v + j] * neg_h_data[n * count_h + i];
+					}
+					Dtype diff = (pos_en - neg_en) / num;
+					LOG(INFO) << weight_diff[i * count_v + j];
+					EXPECT_NEAR(weight_diff[i * count_v + j], diff, 1e-3);
+				}
+			}
+			for (int i = 0; i < count_h; i++){
+				Dtype diff = 0;
+				for (int n = 0; n < num; n++){
+					diff += pos_h_data[n * count_h + i] - neg_h_data[n * count_h + i];
+				}
+				diff /= num;
+				EXPECT_NEAR(h_bias_diff[i], diff, 1e-3);
+			}
+			for (int j = 0; j < count_v; j++){
+				Dtype diff = 0;
+				for (int n = 0; n < num; n++){
+					diff += pos_v_data[n * count_v + j] - neg_v_data[n * count_v + j];
+				}
+				diff /= num;
+				EXPECT_NEAR(v_bias_diff[j], diff, 1e-3);
+			}
 			//because decoding parameters is not correlated with h_enc,
 			//so the computed and estimated gradient will be 0
-			CHECK_GT(top_.size(), 0) << "Exhaustive mode requires at least one top blob.";
-			checker.CheckGradientExhaustive(&layer, bottom_, top_);
+//			CHECK_GT(top_.size(), 0) << "Exhaustive mode requires at least one top blob.";
+//			checker.CheckGradientExhaustive(&layer, bottom_, top_);
 //			LOG(INFO) << top_[0]->count();
 //			for (int i = 0; i < top_[0]->count(); i++){
 //				checker.CheckGradientSingle(&layer, bottom_, top_, 0, 0, i);
@@ -115,9 +149,54 @@ namespace caffe{
 			RBMLayer<Dtype> layer(layer_param_);
 			Caffe::set_mode(Caffe::GPU);
 			layer.SetUp(bottom_, top_);
-			GradientChecker<Dtype> checker(1e-2, 1e-3);
-			CHECK_GT(top_.size(), 0) << "Exhaustive mode requires at least one top blob.";
-			checker.CheckGradientExhaustive(&layer, bottom_, top_);
+			layer.Forward(bottom_, top_);
+			Dtype* top_diff = top_[0]->mutable_cpu_diff();
+			top_diff[2] = 1;
+			top_diff[4] = 4;
+			caffe_set(top_[0]->count(), Dtype(0.1), top_diff);
+			layer.Backward(top_, propagate_down_, bottom_);
+			const Dtype* pos_v_data = layer.pos_v_.cpu_data();
+			const Dtype* neg_v_data = layer.neg_v_.cpu_data();
+			const Dtype* pos_h_data = layer.pos_h_.cpu_data();
+			const Dtype* neg_h_data = layer.neg_h_.cpu_data();
+			const int count_v = layer.pos_v_.count(1);
+			const int count_h = layer.pos_h_.count(1);
+			const int num = layer.pos_v_.num();
+			const Dtype* weight_diff = layer.blobs()[0]->cpu_diff();
+			const Dtype* h_bias_diff = layer.blobs()[1]->cpu_diff();
+			const Dtype* v_bias_diff = layer.blobs()[2]->cpu_diff();
+			for (int i = 0; i < count_h; i++){
+				for (int j = 0; j < count_v; j++){
+					Dtype pos_en = 0;
+					Dtype neg_en = 0;
+					for (int n = 0; n < num; n++){
+						pos_en += pos_v_data[n * count_v + j] * pos_h_data[n * count_h + i];
+						neg_en += neg_v_data[n * count_v + j] * neg_h_data[n * count_h + i];
+					}
+					Dtype diff = (pos_en - neg_en) / num;
+					LOG(INFO) << weight_diff[i * count_v + j];
+					EXPECT_NEAR(weight_diff[i * count_v + j], diff, 1e-3);
+				}
+			}
+			for (int i = 0; i < count_h; i++){
+				Dtype diff = 0;
+				for (int n = 0; n < num; n++){
+					diff += pos_h_data[n * count_h + i] - neg_h_data[n * count_h + i];
+				}
+				diff /= num;
+				EXPECT_NEAR(h_bias_diff[i], diff, 1e-3);
+			}
+			for (int j = 0; j < count_v; j++){
+				Dtype diff = 0;
+				for (int n = 0; n < num; n++){
+					diff += pos_v_data[n * count_v + j] - neg_v_data[n * count_v + j];
+				}
+				diff /= num;
+				EXPECT_NEAR(v_bias_diff[j], diff, 1e-3);
+			}
+//			GradientChecker<Dtype> checker(1e-2, 1e-3);
+//			CHECK_GT(top_.size(), 0) << "Exhaustive mode requires at least one top blob.";
+//			checker.CheckGradientExhaustive(&layer, bottom_, top_);
 //			for (int i = 0; i < top_[0]->count(); i++){
 //				checker.CheckGradientSingle(&layer, bottom_, top_, 0, 0, i);
 //			}
