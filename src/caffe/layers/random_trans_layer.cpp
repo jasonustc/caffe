@@ -18,44 +18,79 @@ namespace caffe{
 	void RandomTransformLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 		const vector<Blob<Dtype>*>& top){
 		Layer<Dtype>::LayerSetUp(bottom, top);
+		sample_type_ = this->layer_param_.rand_trans_param().sample_type();
 		CHECK_EQ(bottom.size(), 1) << "RandomTranform Layer only takes one single blob as input.";
 		CHECK_EQ(top.size(), 1) << "RandomTransform Layer only takes one single blob as output.";
-
 		LOG(INFO) << "Random Transform Layer using border type: " << this->layer_param_.rand_trans_param().border()
 			<< ", using interpolation: " << this->layer_param_.rand_trans_param().interp();
-		rotation_ = this->layer_param_.rand_trans_param().has_start_angle() &&
-			this->layer_param_.rand_trans_param().has_end_angle();
-		shift_ = this->layer_param_.rand_trans_param().has_dx_prop() &&
-			this->layer_param_.rand_trans_param().has_dy_prop();
-		scale_ = this->layer_param_.rand_trans_param().has_start_scale()&&
-			this->layer_param_.rand_trans_param().has_end_scale();
-		
-		if (rotation_){
-			start_angle_ = this->layer_param_.rand_trans_param().start_angle();
-			end_angle_ = this->layer_param_.rand_trans_param().end_angle();
-			CHECK_GE(start_angle_, 0);
-			CHECK_LE(end_angle_, 360);
-			CHECK_LE(start_angle_, end_angle_);
-			LOG(INFO) << "random rotate in [" << start_angle_ << "," << end_angle_ << "].";
-		}
-		if (shift_){
-			dx_prop_ = this->layer_param_.rand_trans_param().dx_prop();
-			dy_prop_ = this->layer_param_.rand_trans_param().dy_prop();
-			CHECK_GE(dx_prop_, 0);
-			CHECK_LE(dx_prop_, 1);
-			CHECK_GE(dy_prop_, 0);
-			CHECK_LE(dy_prop_, 1);
-			LOG(INFO) << "Random shift image by dx <= " << dx_prop_ << 
-				"*Width_, dy <= " << dy_prop_ << "*Height_.";
-		}
-		if (scale_){
-			start_scale_ = this->layer_param_.rand_trans_param().start_scale();
-			end_scale_ = this->layer_param_.rand_trans_param().end_scale();
-			CHECK_GT(start_scale_, 0);
-			CHECK_LE(start_scale_, end_scale_);
-			LOG(INFO) << "Random scale image in [" << start_scale_ << "," << end_scale_ << "]";
-		}
+		switch (sample_type_){
+		case RandTransformParameter_SampleType_UNIFORM:
+			rotation_ = this->layer_param_.rand_trans_param().has_start_angle() &&
+				this->layer_param_.rand_trans_param().has_end_angle();
+			shift_ = this->layer_param_.rand_trans_param().has_dx_prop() &&
+				this->layer_param_.rand_trans_param().has_dy_prop();
+			scale_ = this->layer_param_.rand_trans_param().has_start_scale() &&
+				this->layer_param_.rand_trans_param().has_end_scale();
 
+			if (rotation_){
+				start_angle_ = this->layer_param_.rand_trans_param().start_angle();
+				end_angle_ = this->layer_param_.rand_trans_param().end_angle();
+				CHECK_GE(start_angle_, -180) << "start angle should be larger than -180";
+				CHECK_LE(end_angle_, 180) << "end angle should be less than 180";
+				CHECK_LE(start_angle_, end_angle_);
+				LOG(INFO) << "random rotate in [" << start_angle_ << "," << end_angle_ << "].";
+			}
+			if (shift_){
+				dx_prop_ = this->layer_param_.rand_trans_param().dx_prop();
+				dy_prop_ = this->layer_param_.rand_trans_param().dy_prop();
+				CHECK_GE(dx_prop_, 0);
+				CHECK_LE(dx_prop_, 1);
+				CHECK_GE(dy_prop_, 0);
+				CHECK_LE(dy_prop_, 1);
+				LOG(INFO) << "Random shift image by dx <= " << dx_prop_ <<
+					"*Width_, dy <= " << dy_prop_ << "*Height_.";
+			}
+			if (scale_){
+				start_scale_ = this->layer_param_.rand_trans_param().start_scale();
+				end_scale_ = this->layer_param_.rand_trans_param().end_scale();
+				CHECK_GT(start_scale_, 0);
+				CHECK_LE(start_scale_, end_scale_);
+				LOG(INFO) << "Random scale image in [" << start_scale_ << "," << end_scale_ << "]";
+			}
+			break;
+		case RandTransformParameter_SampleType_GAUSSIAN:
+			rotation_ = this->layer_param_.rand_trans_param().has_std_angle();
+			scale_ = this->layer_param_.rand_trans_param().has_std_scale();
+			shift_ = this->layer_param_.rand_trans_param().has_std_dx_prop() &&
+				this->layer_param_.rand_trans_param().has_std_dy_prop();
+			if (scale_){
+				std_scale_ = this->layer_param_.rand_trans_param().std_scale();
+				CHECK_GT(std_scale_, 0) << "std of scale sampling should be positive";
+				LOG(INFO) << "random scale input by variance of " << std_scale_;
+			}
+			if (rotation_){
+				std_angle_ = this->layer_param_.rand_trans_param().std_angle();
+				CHECK_GT(std_angle_, 0) << "std of angle sampling should be positive";
+				LOG(INFO) << "random rotate input by variance of " << std_angle_;
+			}
+			if (shift_){
+				std_dx_prop_ = this->layer_param_.rand_trans_param().std_dx_prop();
+				std_dy_prop_ = this->layer_param_.rand_trans_param().std_dy_prop();
+				CHECK_GT(std_dx_prop_, 0) << "std of shift proportion should be positive";
+				CHECK_LE(std_dx_prop_, 1) << "std of shift proportions should be less than 1";
+				CHECK_GT(std_dy_prop_, 0);
+				CHECK_LE(std_dy_prop_, 1);
+				LOG(INFO) << "random shift input by variance of x,y " 
+					<< std_dx_prop_ << "," << std_dy_prop_;
+			}
+			min_scale_ = this->layer_param_.rand_trans_param().min_scale();
+			max_scale_ = this->layer_param_.rand_trans_param().max_scale();
+			max_shift_prop_ = this->layer_param_.rand_trans_param().max_shift_prop();
+			break;
+		default:
+			LOG(FATAL) << "Unkown sampling type";
+			break;
+		}
 		Height_ = bottom[0]->height();
 		Width_ = bottom[0]->width();
 		BORDER_ = static_cast<Border>(this->layer_param_.rand_trans_param().border());
@@ -87,21 +122,59 @@ namespace caffe{
 	void RandomTransformLayer<Dtype>::GetTransCoord_cpu(){
 		float* tmat_data = tmat_.mutable_cpu_data();
 		//compute transformation matrix
-		if (rotation_){
-			//randomly generate rotation angle
-			caffe_rng_uniform(1, start_angle_, end_angle_, &curr_angle_);
-			TMatFromParam(ROTATION, curr_angle_, curr_angle_, tmat_data);
-		}
-		if (scale_){
-			caffe_rng_uniform(1, start_scale_, end_scale_, &curr_scale_);
-			TMatFromParam(SCALE, curr_scale_, curr_scale_, tmat_data);
-		}
-		if (shift_){
-			float shift_pixels_x = dx_prop_ * Width_;
-			float shift_pixels_y = dy_prop_ * Height_;
-			caffe_rng_uniform(1, -shift_pixels_x, shift_pixels_x, &curr_shift_x_);
-			caffe_rng_uniform(1, -shift_pixels_y, shift_pixels_y, &curr_shift_y_);
-			TMatFromParam(SHIFT, curr_shift_x_, curr_shift_y_, tmat_data);
+		switch (sample_type_){
+		case RandTransformParameter_SampleType_UNIFORM:
+			if (rotation_){
+				//randomly generate rotation angle
+				caffe_rng_uniform(1, start_angle_, end_angle_, &curr_angle_);
+				TMatFromParam(ROTATION, curr_angle_, curr_angle_, tmat_data);
+			}
+			if (scale_){
+				caffe_rng_uniform(1, start_scale_, end_scale_, &curr_scale_);
+				TMatFromParam(SCALE, curr_scale_, curr_scale_, tmat_data);
+			}
+			if (shift_){
+				float shift_pixels_x = dx_prop_ * Width_;
+				float shift_pixels_y = dy_prop_ * Height_;
+				caffe_rng_uniform(1, -shift_pixels_x, shift_pixels_x, &curr_shift_x_);
+				caffe_rng_uniform(1, -shift_pixels_y, shift_pixels_y, &curr_shift_y_);
+				TMatFromParam(SHIFT, curr_shift_x_, curr_shift_y_, tmat_data);
+			}
+			break;
+		//TODO: check if the threshold of the parameters are reasonable
+		case RandTransformParameter_SampleType_GAUSSIAN:
+			if (rotation_){
+				//clip to be in [-180, 180]
+				caffe_rng_gaussian(1, (Dtype)0., std_angle_, &curr_angle_);
+				curr_angle_ = curr_angle_ > -180 ? curr_angle_ : -180;
+				curr_angle_ = curr_angle_ < 180 ? curr_angle_ : 180;
+				TMatFromParam(ROTATION, curr_angle_, curr_angle_, tmat_data);
+			}
+			if (scale_){
+				caffe_rng_gaussian(1, (Dtype)1., std_scale_, &curr_scale_);
+				//clip to be in [min_scale_, max_scale_]
+				curr_scale_ = curr_scale_ > min_scale_ ? curr_scale_ : min_scale_;
+				curr_scale_ = curr_scale_ < max_scale_ ? curr_scale_ : max_scale_;
+				TMatFromParam(SCALE, curr_scale_, curr_scale_, tmat_data);
+			}
+			if (shift_){
+				Dtype shift_std_x = std_dx_prop_ * Width_;
+				Dtype shift_std_y = std_dy_prop_ * Height_;
+				caffe_rng_gaussian(1, (Dtype)0., shift_std_x, &curr_shift_x_);
+				caffe_rng_gaussian(1, (Dtype)0., shift_std_y, &curr_shift_y_);
+				Dtype max_shift_pixels_width = max_shift_prop_ * Width_;
+				Dtype max_shift_pixels_height = max_shift_prop_ * Height_;
+				//clip shift proportion to less or equal max_shift_prop_
+				curr_shift_x_ = curr_shift_x_ < max_shift_pixels_width ? curr_shift_x_ : max_shift_pixels_width;
+				curr_shift_x_ = curr_shift_x_ > (-max_shift_pixels_width) ? curr_shift_x_ : (-max_shift_pixels_width);
+				curr_shift_y_ = curr_shift_y_ < max_shift_pixels_height ? curr_shift_y_ : max_shift_pixels_height;
+				curr_shift_y_ = curr_shift_y_ > (-max_shift_pixels_height) ? curr_shift_y_ : (-max_shift_pixels_height);
+				TMatFromParam(SHIFT, curr_shift_x_, curr_shift_y_, tmat_data);
+			}
+			break;
+		default:
+			LOG(FATAL) << "Unkown sampling type";
+			break;
 		}
 		//Canoincal size is set, so after finding the transformation,
 		//crop or pad to that canonical size.

@@ -18,21 +18,58 @@ namespace caffe{
 	void RandomTransformLayer<Dtype>::GetTransCoord_gpu(){
 		//here we use cpu to compute tranform matrix
 		float* tmat_cpu_data = tmat_.mutable_cpu_data();
-		if (rotation_){
-			//randomly generate rotation angle
-			caffe_rng_uniform(1, start_angle_, end_angle_, &curr_angle_);
-			TMatFromParam(ROTATION, curr_angle_, curr_angle_, tmat_cpu_data);
-		}
-		if (scale_){
-			caffe_rng_uniform(1, start_scale_, end_scale_, &curr_scale_);
-			TMatFromParam(SCALE, curr_scale_, curr_scale_, tmat_cpu_data);
-		}
-		if (shift_){
-			float shift_pixels_x = dx_prop_ * Width_;
-			float shift_pixels_y = dy_prop_ * Height_;
-			caffe_rng_uniform(1, -shift_pixels_x, shift_pixels_x, &curr_shift_x_);
-			caffe_rng_uniform(1, -shift_pixels_y, shift_pixels_y, &curr_shift_y_);
-			TMatFromParam(SHIFT, curr_shift_x_, curr_shift_y_, tmat_cpu_data);
+		switch (sample_type_){
+		case RandTransformParameter_SampleType_UNIFORM:
+			if (rotation_){
+				//randomly generate rotation angle
+				caffe_rng_uniform(1, start_angle_, end_angle_, &curr_angle_);
+				TMatFromParam(ROTATION, curr_angle_, curr_angle_, tmat_cpu_data);
+			}
+			if (scale_){
+				caffe_rng_uniform(1, start_scale_, end_scale_, &curr_scale_);
+				TMatFromParam(SCALE, curr_scale_, curr_scale_, tmat_cpu_data);
+			}
+			if (shift_){
+				float shift_pixels_x = dx_prop_ * Width_;
+				float shift_pixels_y = dy_prop_ * Height_;
+				caffe_rng_uniform(1, -shift_pixels_x, shift_pixels_x, &curr_shift_x_);
+				caffe_rng_uniform(1, -shift_pixels_y, shift_pixels_y, &curr_shift_y_);
+				TMatFromParam(SHIFT, curr_shift_x_, curr_shift_y_, tmat_cpu_data);
+			}
+		//TODO: check if the threshold of the parameters are reasonable
+		case RandTransformParameter_SampleType_GAUSSIAN:
+			if (rotation_){
+				//clip to in [-180, 180]
+				caffe_rng_gaussian(1, (Dtype)0., std_angle_, &curr_angle_);
+				curr_angle_ = curr_angle_ > -180 ? curr_angle_ : -180;
+				curr_angle_ = curr_angle_ < 180 ? curr_angle_ : 180;
+				TMatFromParam(ROTATION, curr_angle_, curr_angle_, tmat_cpu_data);
+			}
+			if (scale_){
+				caffe_rng_gaussian(1, (Dtype)1., std_scale_, &curr_scale_);
+				//clip to be in [min_scale_, max_scale_]
+				curr_scale_ = curr_scale_ > min_scale_ ? curr_scale_ : min_scale_;
+				curr_scale_ = curr_scale_ < max_scale_ ? curr_scale_ : max_scale_;
+				TMatFromParam(SCALE, curr_scale_, curr_scale_, tmat_cpu_data);
+			}
+			if (shift_){
+				Dtype shift_std_x = std_dx_prop_ * Width_;
+				Dtype shift_std_y = std_dy_prop_ * Height_;
+				caffe_rng_gaussian(1, (Dtype)0., shift_std_x, &curr_shift_x_);
+				caffe_rng_gaussian(1, (Dtype)0., shift_std_y, &curr_shift_y_);
+				Dtype max_shift_pixels_width = max_shift_prop_ * Width_;
+				Dtype max_shift_pixels_height = max_shift_prop_ * Height_;
+				//clip shift proportion to be less or equal max_shift_prop_
+				curr_shift_x_ = curr_shift_x_ < max_shift_pixels_width ? curr_shift_x_ : max_shift_pixels_width;
+				curr_shift_x_ = curr_shift_x_ > (-max_shift_pixels_width) ? curr_shift_x_ : (-max_shift_pixels_width);
+				curr_shift_y_ = curr_shift_y_ < max_shift_pixels_height ? curr_shift_y_ : max_shift_pixels_height;
+				curr_shift_y_ = curr_shift_y_ > (-max_shift_pixels_height) ? curr_shift_y_ : (-max_shift_pixels_height);
+				TMatFromParam(SHIFT, curr_shift_x_, curr_shift_y_, tmat_cpu_data);
+			}
+			break;
+		default:
+			LOG(FATAL) << "Unkown sampling type";
+			break;
 		}
 		//Canoincal size is set, so after finding the transformation,
 		//crop or pad to that canonical size.

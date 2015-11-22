@@ -103,30 +103,42 @@ namespace caffe{
 		int Height_;
 		int Width_;
 
-		float start_angle_;
-		float end_angle_;
-		float start_scale_;
-		float end_scale_;
-		float dx_prop_;
-		float dy_prop_;
+		Dtype start_angle_;
+		Dtype end_angle_;
+		Dtype start_scale_;
+		Dtype end_scale_;
+		Dtype dx_prop_;
+		Dtype dy_prop_;
 
-		float curr_scale_;
-		float curr_angle_;
+		Dtype curr_scale_;
+		Dtype curr_angle_;
 		//shift by #pixels
-		float curr_shift_x_;
-		float curr_shift_y_;
+		Dtype curr_shift_x_;
+		Dtype curr_shift_y_;
+
+		//std of scale, angle, shift_x, shift_y sampling
+		Dtype std_scale_;
+		Dtype std_angle_;
+		Dtype std_dx_prop_;
+		Dtype std_dy_prop_;
+		//clip of scale and shift in the transform
+		Dtype min_scale_;
+		Dtype max_scale_;
+		Dtype max_shift_prop_;
 
 		Border BORDER_; // border type
 		Interp INTERP_; //interpolation type
+		//sampling type for transform parameters
+		RandTransformParameter_SampleType sample_type_; 
 
 		//3x3 transform matrix buffer, row order
-		Blob<float> tmat_;
+		Blob<Dtype> tmat_;
 
 		//Indices for image transformation
 		//We use blob's data to be fwd and diff to be backward indices
-		Blob<float> coord_idx_;
+		Blob<Dtype> coord_idx_;
 		//here to store the original coord_
-		Blob<float> original_coord_;
+		Blob<Dtype> original_coord_;
 	};
 
 	template <typename Dtype>

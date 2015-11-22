@@ -38,6 +38,7 @@ namespace caffe{
 			const Dtype* x_data = x_->cpu_data();
 			const Dtype* top_data = top_[0]->cpu_data();
 			//check rotation
+			//NOTE: a little bit different with rotation in matlab for small angles
 			for (int i = 0; i < 4; i++){
 				for (int j = 0; j < 4; j++){
 					cout << top_data[i * 4 + j] << "\t";
@@ -130,12 +131,20 @@ namespace caffe{
 			propagate_down_.resize(1, true);
 
 			//set layer param
-			layer_param_.mutable_rand_trans_param()->set_start_angle(0);
-			layer_param_.mutable_rand_trans_param()->set_end_angle(90);
-			layer_param_.mutable_rand_trans_param()->set_dy_prop(0.8);
-			layer_param_.mutable_rand_trans_param()->set_dx_prop(0.1);
-			layer_param_.mutable_rand_trans_param()->set_start_scale(0.3);
-			layer_param_.mutable_rand_trans_param()->set_end_scale(0.7);
+			//uniform
+//			layer_param_.mutable_rand_trans_param()->set_sample_type(RandTransformParameter_SampleType_UNIFORM);
+//			layer_param_.mutable_rand_trans_param()->set_start_angle(-90);
+//			layer_param_.mutable_rand_trans_param()->set_end_angle(90);
+//			layer_param_.mutable_rand_trans_param()->set_dy_prop(0.8);
+//			layer_param_.mutable_rand_trans_param()->set_dx_prop(0.1);
+//			layer_param_.mutable_rand_trans_param()->set_start_scale(0.3);
+//			layer_param_.mutable_rand_trans_param()->set_end_scale(0.7);
+			//gaussian
+//			layer_param_.mutable_rand_trans_param()->set_sample_type(RandTransformParameter_SampleType_GAUSSIAN);
+//			layer_param_.mutable_rand_trans_param()->set_std_angle(30);
+//			layer_param_.mutable_rand_trans_param()->set_std_scale(0.6);
+//			layer_param_.mutable_rand_trans_param()->set_std_dx_prop(0.2);
+//			layer_param_.mutable_rand_trans_param()->set_std_dy_prop(0.2);
 		}
 
 		Blob<Dtype>* x_;
@@ -156,7 +165,7 @@ int main(int argc, char** argv){
 	test.TestSetUp();
 	test.TestCPUForward();
 	test.TestCPUGradients();
-	test.TestGPUForward();
-	test.TestGPUGradients();
+//	test.TestGPUForward();
+//	test.TestGPUGradients();
 	return 0;
 }

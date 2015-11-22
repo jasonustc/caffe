@@ -48,7 +48,7 @@ namespace caffe{
 			}
 			break;
 		case caffe::SCALE:
-			CHECK(param1 > 0) << "Scale has to be >= 0: " << param1;
+			CHECK(param1 > 0) << "Scale has to be > 0: " << param1;
 			if (invert){
 				AddScale(1. / param1, tmat);
 			}
@@ -302,18 +302,15 @@ namespace caffe{
 		Blob<float>& coord_idx, const Border &border, const Interp &interp){
 
 		float* tmat_data = tmat.mutable_cpu_data();
-		tmat.ToTxt("before_invert");
 
 		//transform tmat to it's inversed matrix
 		Invert3x3(tmat_data);
-		tmat.ToTxt("after_invert");
 
 		float cy = static_cast<float>(height - 1) / 2.;
 		float cx = static_cast<float>(width - 1) / 2.;
 
 		//substract center
 		AddShift(-cy, -cx, tmat_data, LEFT);
-		tmat.ToTxt("after_shift");
 
 		//we can use coord data and diff for buffer of coordinate
 		//data, since it is only used after this computation

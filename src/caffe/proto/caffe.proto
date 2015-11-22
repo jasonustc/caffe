@@ -354,6 +354,7 @@ message LayerParameter {
 
 //Message that stores parameters used to do random transformation
 message RandTransformParameter{
+    //parameters for uniform sampling
     //rotation angle in [start_angle, end_angle]
     optional float start_angle = 1;
     optional float end_angle = 2;
@@ -366,6 +367,20 @@ message RandTransformParameter{
     optional int32 border = 6 [default = 0];
     //0 = NN, 1 = BILINEAR
     optional int32 interp = 7 [default = 1];
+    //specify the sampling type of transform parameters
+    enum SampleType{
+        UNIFORM = 1;
+        GAUSSIAN = 2;
+    }
+    optional SampleType sample_type = 9 [default = UNIFORM];
+    //parameters for gaussian sampling
+    optional float std_scale = 10;
+    optional float std_angle = 11;
+    optional float std_dx_prop = 12;
+    optional float std_dy_prop = 13;
+    optional float min_scale = 14 [default = 0.1];
+    optional float max_scale = 15 [default = 10];
+    optional float max_shift_prop = 16 [default = 0.9];
 }
 
 //Message that stores parameters used to calculate l1/l2 loss

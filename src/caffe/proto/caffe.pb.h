@@ -154,6 +154,25 @@ inline bool ParamSpec_DimCheckMode_Parse(
   return ::google::protobuf::internal::ParseNamedEnum<ParamSpec_DimCheckMode>(
     ParamSpec_DimCheckMode_descriptor(), name, value);
 }
+enum RandTransformParameter_SampleType {
+  RandTransformParameter_SampleType_UNIFORM = 1,
+  RandTransformParameter_SampleType_GAUSSIAN = 2
+};
+bool RandTransformParameter_SampleType_IsValid(int value);
+const RandTransformParameter_SampleType RandTransformParameter_SampleType_SampleType_MIN = RandTransformParameter_SampleType_UNIFORM;
+const RandTransformParameter_SampleType RandTransformParameter_SampleType_SampleType_MAX = RandTransformParameter_SampleType_GAUSSIAN;
+const int RandTransformParameter_SampleType_SampleType_ARRAYSIZE = RandTransformParameter_SampleType_SampleType_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* RandTransformParameter_SampleType_descriptor();
+inline const ::std::string& RandTransformParameter_SampleType_Name(RandTransformParameter_SampleType value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    RandTransformParameter_SampleType_descriptor(), value);
+}
+inline bool RandTransformParameter_SampleType_Parse(
+    const ::std::string& name, RandTransformParameter_SampleType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<RandTransformParameter_SampleType>(
+    RandTransformParameter_SampleType_descriptor(), name, value);
+}
 enum NormLossParameter_NormType {
   NormLossParameter_NormType_L1 = 1,
   NormLossParameter_NormType_L2 = 2
@@ -3202,6 +3221,30 @@ class RandTransformParameter : public ::google::protobuf::Message {
 
   // nested types ----------------------------------------------------
 
+  typedef RandTransformParameter_SampleType SampleType;
+  static const SampleType UNIFORM = RandTransformParameter_SampleType_UNIFORM;
+  static const SampleType GAUSSIAN = RandTransformParameter_SampleType_GAUSSIAN;
+  static inline bool SampleType_IsValid(int value) {
+    return RandTransformParameter_SampleType_IsValid(value);
+  }
+  static const SampleType SampleType_MIN =
+    RandTransformParameter_SampleType_SampleType_MIN;
+  static const SampleType SampleType_MAX =
+    RandTransformParameter_SampleType_SampleType_MAX;
+  static const int SampleType_ARRAYSIZE =
+    RandTransformParameter_SampleType_SampleType_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  SampleType_descriptor() {
+    return RandTransformParameter_SampleType_descriptor();
+  }
+  static inline const ::std::string& SampleType_Name(SampleType value) {
+    return RandTransformParameter_SampleType_Name(value);
+  }
+  static inline bool SampleType_Parse(const ::std::string& name,
+      SampleType* value) {
+    return RandTransformParameter_SampleType_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
   // optional float start_angle = 1;
@@ -3260,6 +3303,62 @@ class RandTransformParameter : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 interp() const;
   inline void set_interp(::google::protobuf::int32 value);
 
+  // optional .caffe.RandTransformParameter.SampleType sample_type = 9 [default = UNIFORM];
+  inline bool has_sample_type() const;
+  inline void clear_sample_type();
+  static const int kSampleTypeFieldNumber = 9;
+  inline ::caffe::RandTransformParameter_SampleType sample_type() const;
+  inline void set_sample_type(::caffe::RandTransformParameter_SampleType value);
+
+  // optional float std_scale = 10;
+  inline bool has_std_scale() const;
+  inline void clear_std_scale();
+  static const int kStdScaleFieldNumber = 10;
+  inline float std_scale() const;
+  inline void set_std_scale(float value);
+
+  // optional float std_angle = 11;
+  inline bool has_std_angle() const;
+  inline void clear_std_angle();
+  static const int kStdAngleFieldNumber = 11;
+  inline float std_angle() const;
+  inline void set_std_angle(float value);
+
+  // optional float std_dx_prop = 12;
+  inline bool has_std_dx_prop() const;
+  inline void clear_std_dx_prop();
+  static const int kStdDxPropFieldNumber = 12;
+  inline float std_dx_prop() const;
+  inline void set_std_dx_prop(float value);
+
+  // optional float std_dy_prop = 13;
+  inline bool has_std_dy_prop() const;
+  inline void clear_std_dy_prop();
+  static const int kStdDyPropFieldNumber = 13;
+  inline float std_dy_prop() const;
+  inline void set_std_dy_prop(float value);
+
+  // optional float min_scale = 14 [default = 0.1];
+  inline bool has_min_scale() const;
+  inline void clear_min_scale();
+  static const int kMinScaleFieldNumber = 14;
+  inline float min_scale() const;
+  inline void set_min_scale(float value);
+
+  // optional float max_scale = 15 [default = 10];
+  inline bool has_max_scale() const;
+  inline void clear_max_scale();
+  static const int kMaxScaleFieldNumber = 15;
+  inline float max_scale() const;
+  inline void set_max_scale(float value);
+
+  // optional float max_shift_prop = 16 [default = 0.9];
+  inline bool has_max_shift_prop() const;
+  inline void clear_max_shift_prop();
+  static const int kMaxShiftPropFieldNumber = 16;
+  inline float max_shift_prop() const;
+  inline void set_max_shift_prop(float value);
+
   // @@protoc_insertion_point(class_scope:caffe.RandTransformParameter)
  private:
   inline void set_has_start_angle();
@@ -3278,6 +3377,22 @@ class RandTransformParameter : public ::google::protobuf::Message {
   inline void clear_has_border();
   inline void set_has_interp();
   inline void clear_has_interp();
+  inline void set_has_sample_type();
+  inline void clear_has_sample_type();
+  inline void set_has_std_scale();
+  inline void clear_has_std_scale();
+  inline void set_has_std_angle();
+  inline void clear_has_std_angle();
+  inline void set_has_std_dx_prop();
+  inline void clear_has_std_dx_prop();
+  inline void set_has_std_dy_prop();
+  inline void clear_has_std_dy_prop();
+  inline void set_has_min_scale();
+  inline void clear_has_min_scale();
+  inline void set_has_max_scale();
+  inline void clear_has_max_scale();
+  inline void set_has_max_shift_prop();
+  inline void clear_has_max_shift_prop();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -3291,6 +3406,14 @@ class RandTransformParameter : public ::google::protobuf::Message {
   float dy_prop_;
   ::google::protobuf::int32 border_;
   ::google::protobuf::int32 interp_;
+  int sample_type_;
+  float std_scale_;
+  float std_angle_;
+  float std_dx_prop_;
+  float std_dy_prop_;
+  float min_scale_;
+  float max_scale_;
+  float max_shift_prop_;
   friend void  protobuf_AddDesc_caffe_2eproto();
   friend void protobuf_AssignDesc_caffe_2eproto();
   friend void protobuf_ShutdownFile_caffe_2eproto();
@@ -15422,6 +15545,199 @@ inline void RandTransformParameter::set_interp(::google::protobuf::int32 value) 
   // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.interp)
 }
 
+// optional .caffe.RandTransformParameter.SampleType sample_type = 9 [default = UNIFORM];
+inline bool RandTransformParameter::has_sample_type() const {
+  return (_has_bits_[0] & 0x00000100u) != 0;
+}
+inline void RandTransformParameter::set_has_sample_type() {
+  _has_bits_[0] |= 0x00000100u;
+}
+inline void RandTransformParameter::clear_has_sample_type() {
+  _has_bits_[0] &= ~0x00000100u;
+}
+inline void RandTransformParameter::clear_sample_type() {
+  sample_type_ = 1;
+  clear_has_sample_type();
+}
+inline ::caffe::RandTransformParameter_SampleType RandTransformParameter::sample_type() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.sample_type)
+  return static_cast< ::caffe::RandTransformParameter_SampleType >(sample_type_);
+}
+inline void RandTransformParameter::set_sample_type(::caffe::RandTransformParameter_SampleType value) {
+  assert(::caffe::RandTransformParameter_SampleType_IsValid(value));
+  set_has_sample_type();
+  sample_type_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.sample_type)
+}
+
+// optional float std_scale = 10;
+inline bool RandTransformParameter::has_std_scale() const {
+  return (_has_bits_[0] & 0x00000200u) != 0;
+}
+inline void RandTransformParameter::set_has_std_scale() {
+  _has_bits_[0] |= 0x00000200u;
+}
+inline void RandTransformParameter::clear_has_std_scale() {
+  _has_bits_[0] &= ~0x00000200u;
+}
+inline void RandTransformParameter::clear_std_scale() {
+  std_scale_ = 0;
+  clear_has_std_scale();
+}
+inline float RandTransformParameter::std_scale() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.std_scale)
+  return std_scale_;
+}
+inline void RandTransformParameter::set_std_scale(float value) {
+  set_has_std_scale();
+  std_scale_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.std_scale)
+}
+
+// optional float std_angle = 11;
+inline bool RandTransformParameter::has_std_angle() const {
+  return (_has_bits_[0] & 0x00000400u) != 0;
+}
+inline void RandTransformParameter::set_has_std_angle() {
+  _has_bits_[0] |= 0x00000400u;
+}
+inline void RandTransformParameter::clear_has_std_angle() {
+  _has_bits_[0] &= ~0x00000400u;
+}
+inline void RandTransformParameter::clear_std_angle() {
+  std_angle_ = 0;
+  clear_has_std_angle();
+}
+inline float RandTransformParameter::std_angle() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.std_angle)
+  return std_angle_;
+}
+inline void RandTransformParameter::set_std_angle(float value) {
+  set_has_std_angle();
+  std_angle_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.std_angle)
+}
+
+// optional float std_dx_prop = 12;
+inline bool RandTransformParameter::has_std_dx_prop() const {
+  return (_has_bits_[0] & 0x00000800u) != 0;
+}
+inline void RandTransformParameter::set_has_std_dx_prop() {
+  _has_bits_[0] |= 0x00000800u;
+}
+inline void RandTransformParameter::clear_has_std_dx_prop() {
+  _has_bits_[0] &= ~0x00000800u;
+}
+inline void RandTransformParameter::clear_std_dx_prop() {
+  std_dx_prop_ = 0;
+  clear_has_std_dx_prop();
+}
+inline float RandTransformParameter::std_dx_prop() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.std_dx_prop)
+  return std_dx_prop_;
+}
+inline void RandTransformParameter::set_std_dx_prop(float value) {
+  set_has_std_dx_prop();
+  std_dx_prop_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.std_dx_prop)
+}
+
+// optional float std_dy_prop = 13;
+inline bool RandTransformParameter::has_std_dy_prop() const {
+  return (_has_bits_[0] & 0x00001000u) != 0;
+}
+inline void RandTransformParameter::set_has_std_dy_prop() {
+  _has_bits_[0] |= 0x00001000u;
+}
+inline void RandTransformParameter::clear_has_std_dy_prop() {
+  _has_bits_[0] &= ~0x00001000u;
+}
+inline void RandTransformParameter::clear_std_dy_prop() {
+  std_dy_prop_ = 0;
+  clear_has_std_dy_prop();
+}
+inline float RandTransformParameter::std_dy_prop() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.std_dy_prop)
+  return std_dy_prop_;
+}
+inline void RandTransformParameter::set_std_dy_prop(float value) {
+  set_has_std_dy_prop();
+  std_dy_prop_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.std_dy_prop)
+}
+
+// optional float min_scale = 14 [default = 0.1];
+inline bool RandTransformParameter::has_min_scale() const {
+  return (_has_bits_[0] & 0x00002000u) != 0;
+}
+inline void RandTransformParameter::set_has_min_scale() {
+  _has_bits_[0] |= 0x00002000u;
+}
+inline void RandTransformParameter::clear_has_min_scale() {
+  _has_bits_[0] &= ~0x00002000u;
+}
+inline void RandTransformParameter::clear_min_scale() {
+  min_scale_ = 0.1f;
+  clear_has_min_scale();
+}
+inline float RandTransformParameter::min_scale() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.min_scale)
+  return min_scale_;
+}
+inline void RandTransformParameter::set_min_scale(float value) {
+  set_has_min_scale();
+  min_scale_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.min_scale)
+}
+
+// optional float max_scale = 15 [default = 10];
+inline bool RandTransformParameter::has_max_scale() const {
+  return (_has_bits_[0] & 0x00004000u) != 0;
+}
+inline void RandTransformParameter::set_has_max_scale() {
+  _has_bits_[0] |= 0x00004000u;
+}
+inline void RandTransformParameter::clear_has_max_scale() {
+  _has_bits_[0] &= ~0x00004000u;
+}
+inline void RandTransformParameter::clear_max_scale() {
+  max_scale_ = 10;
+  clear_has_max_scale();
+}
+inline float RandTransformParameter::max_scale() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.max_scale)
+  return max_scale_;
+}
+inline void RandTransformParameter::set_max_scale(float value) {
+  set_has_max_scale();
+  max_scale_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.max_scale)
+}
+
+// optional float max_shift_prop = 16 [default = 0.9];
+inline bool RandTransformParameter::has_max_shift_prop() const {
+  return (_has_bits_[0] & 0x00008000u) != 0;
+}
+inline void RandTransformParameter::set_has_max_shift_prop() {
+  _has_bits_[0] |= 0x00008000u;
+}
+inline void RandTransformParameter::clear_has_max_shift_prop() {
+  _has_bits_[0] &= ~0x00008000u;
+}
+inline void RandTransformParameter::clear_max_shift_prop() {
+  max_shift_prop_ = 0.9f;
+  clear_has_max_shift_prop();
+}
+inline float RandTransformParameter::max_shift_prop() const {
+  // @@protoc_insertion_point(field_get:caffe.RandTransformParameter.max_shift_prop)
+  return max_shift_prop_;
+}
+inline void RandTransformParameter::set_max_shift_prop(float value) {
+  set_has_max_shift_prop();
+  max_shift_prop_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RandTransformParameter.max_shift_prop)
+}
+
 // -------------------------------------------------------------------
 
 // NormLossParameter
@@ -23994,6 +24310,11 @@ template <> struct is_proto_enum< ::caffe::ParamSpec_DimCheckMode> : ::google::p
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::caffe::ParamSpec_DimCheckMode>() {
   return ::caffe::ParamSpec_DimCheckMode_descriptor();
+}
+template <> struct is_proto_enum< ::caffe::RandTransformParameter_SampleType> : ::google::protobuf::internal::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::caffe::RandTransformParameter_SampleType>() {
+  return ::caffe::RandTransformParameter_SampleType_descriptor();
 }
 template <> struct is_proto_enum< ::caffe::NormLossParameter_NormType> : ::google::protobuf::internal::true_type {};
 template <>
