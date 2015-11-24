@@ -77,7 +77,7 @@ namespace caffe{
 			top_vec_.push_back(top_);
 
 			//set layer parameter
-			layer_param_.mutable_dropout_param()->set_drop_type(DropoutParameter_DROPTYPE_GAUSSIAN);
+			layer_param_.mutable_dropout_param()->set_drop_type(DropoutParameter_DROPTYPE_UNIFORM);
 		}
 
 		Blob<Dtype>* bottom_;
@@ -92,9 +92,9 @@ namespace caffe{
 int main(int argc, char** argv){
 	google::InitGoogleLogging(*argv);
 	caffe::DropoutTest<float> test;
-	test.TestSetUp();
-	test.TestCPUForward();
-	test.TestCPUGradients();
+//	test.TestSetUp();
+//	test.TestCPUForward();
+//	test.TestCPUGradients();
 	test.TestGPUForward();
 	test.TestGPUGradients();
 }

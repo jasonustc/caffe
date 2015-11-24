@@ -101,9 +101,9 @@ int main(int argc, char** argv){
 	google::InitGoogleLogging(*argv);
 	google::SetStderrLogging(0);
 	caffe::AdaptiveDropoutTest<float> test;
-	test.TestSetUp();
-	test.TestCPUForward();
-	test.TestCPUGradients();
+//	test.TestSetUp();
+//	test.TestCPUForward();
+//	test.TestCPUGradients();
 	test.TestGPUForward();
 	test.TestGPUGradients();
 }
