@@ -4,6 +4,7 @@ package caffe;
 
 // Specifies the shape (dimensions) of a Blob.
 message BlobShape {
+    //packed: allow more effective coding
   repeated int64 dim = 1 [packed = true];
 }
 

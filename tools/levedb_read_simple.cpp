@@ -17,6 +17,7 @@ using std::max;
 int main(int argc, char** argv) 
 {
 	::google::InitGoogleLogging(argv[0]);
+	FLAGS_alsologtostderr = 1;
 
 	if (argc != 3) {
 		LOG(ERROR) << "Usage: leveldb_read input_leveldb output_file";

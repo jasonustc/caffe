@@ -135,6 +135,7 @@ void BaseConvolutionLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
     conv_out_spatial_dim_ = height_out_ * width_out_;
   }
   kernel_dim_ = conv_in_channels_ * kernel_h_ * kernel_w_;
+  //the number of parameters used when finish one convolution
   weight_offset_ = conv_out_channels_ * kernel_dim_ / group_ / group_;
   col_offset_ = kernel_dim_ * conv_out_spatial_dim_ / group_;
   output_offset_ = conv_out_channels_ * conv_out_spatial_dim_ / group_;
@@ -159,6 +160,7 @@ template <typename Dtype>
 void BaseConvolutionLayer<Dtype>::forward_cpu_gemm(const Dtype* input,
     const Dtype* weights, Dtype* output, bool skip_im2col) {
   const Dtype* col_buff = input;
+  //1x1 filter no need to do dimension change
   if (!is_1x1_) {
     if (!skip_im2col) {
       conv_im2col_cpu(input, col_buffer_.mutable_cpu_data());
