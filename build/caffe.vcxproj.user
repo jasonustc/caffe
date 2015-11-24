@@ -5,7 +5,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>D:\materials\DeepLearning\mypapers\nips\drop_connect_ex\cifar10\cifar-train-leveldb img_info</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>train -solver=D:/Users/v-xushe/caffe/cifar10/proto/cifar10_full_solver_do.prototxt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

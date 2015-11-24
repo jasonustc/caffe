@@ -169,10 +169,10 @@ namespace caffe{
 
 int main(int argc, char** argv){
 	caffe::LocalLayerTest<float> test;
-	test.TestSetup();
-	test.TestCPUGradient();
-	test.TestCPUSimpleConvolution();
+//	test.TestSetup();
+//	test.TestCPUGradient();
+//	test.TestCPUSimpleConvolution();
 	test.TestGPUGradient();
-	test.TestGPUSimpleConvolution();
+//	test.TestGPUSimpleConvolution();
 	return 0;
 }

@@ -74,10 +74,10 @@ void AdaptiveDropoutLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom
         this->blobs_[1]->gpu_data(), (Dtype)1., this->prob_vec_.mutable_gpu_data());
   }
   //prob_act = f(alpha*(pi * bottom + bias) + beta)
-  ad_axpb<Dtype> << <CAFFE_GET_BLOCKS(count_prob), CAFFE_CUDA_NUM_THREADS >> >
-	  (count_prob, prob_data, prob_data, alpha_, beta_);
+  ad_axpb<Dtype> <<<CAFFE_GET_BLOCKS(count_prob), CAFFE_CUDA_NUM_THREADS >>>
+	  (count_prob, prob_vec_.gpu_data(), prob_data, alpha_, beta_);
   //activate probability
-  activate_gpu<Dtype>(count_prob, prob_data, prob_data, this->prob_act_type_);
+  activate_gpu<Dtype>(count_prob, prob_vec_.gpu_data(), prob_data, this->prob_act_type_);
   //compute hidden units
   caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasTrans, M_, N_, K_, (Dtype)1.,
       bottom_data, weight_data, (Dtype)0., unact_hidden_.mutable_gpu_data());
