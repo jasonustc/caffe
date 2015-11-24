@@ -99,6 +99,8 @@ void GradientChecker<Dtype>::CheckGradientSingle(Layer<Dtype>* layer,
   Caffe::set_random_seed(seed_);
   // Ignore the loss from the layer (it's just the weighted sum of the losses
   // from the top blobs, whose gradients we may want to test individually).
+  // only forward one time to ensure that every variables not change during
+  // compute gradient and estimate gradient
   layer->Forward(bottom, top);
   // Get additional loss from the objective
   GetObjAndGradient(*layer, top, top_id, top_data_id);
