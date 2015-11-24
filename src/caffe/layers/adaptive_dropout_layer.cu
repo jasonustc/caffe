@@ -19,7 +19,7 @@ __global__ void SigmoidActivate_gpu(const int n, const Dtype* in, Dtype* out){
 template <typename Dtype>
 __global__ void ReluActivate_gpu(const int n, const Dtype* in, Dtype* out){
 	CUDA_KERNEL_LOOP(index, n){
-		out[index] = in[index]> 0 ? in[index] : 0;
+		out[index] = in[index] > 0 ? in[index] : 0;
 	}
 }
 
@@ -56,15 +56,6 @@ void AdaptiveDropoutLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom
   unsigned int *rand_vec_data = this->rand_vec_.mutable_gpu_data();
   const int count_weight = this->blobs_[0]->count();
   const int count_prob = this->prob_vec_.count();
-  //compute prob_weight_data from weight_data
-  //prob_weight_data = alpha_ * weight_data + beta_
-//  if (alpha_ != 1 && beta_ != 0){
-//	  caffe_mult_and_add_scalar_gpu<Dtype> << <CAFFE_GET_BLOCKS(count_weight), CAFFE_CUDA_NUM_THREADS >> >
-//		  (count_weight, weight_data, prob_weight_data, alpha_, beta_);
-//  }
-//  else{
-//	  caffe_copy(count_weight, weight_data, this->prob_weight_.mutable_gpu_data());
-//  }
   //prob_data = alpha * op(bottom_data) * (weight_data) + beta * prob_data
   caffe_gpu_gemm<Dtype>(CblasNoTrans, CblasTrans, M_, N_, K_, (Dtype)1.,
       bottom_data, weight_data, (Dtype)0., prob_data);
@@ -90,9 +81,12 @@ void AdaptiveDropoutLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom
   CUDA_POST_KERNEL_CHECK;
   if (this->phase_ == TRAIN){
 	  //p[i] is the probability of r[i]=1
+	  prob_vec_.ToTxt("prob_data");
 	  caffe_gpu_rng_bernoulli<Dtype>(count_prob, prob_vec_.gpu_data(), rand_vec_.mutable_gpu_data());
+	  rand_vec_.ToTxt("rand_vec");
 	  caffe_gpu_mul_b<Dtype>(count_prob, top[0]->gpu_data(), rand_vec_.gpu_data(), 
 		  top[0]->mutable_gpu_data());
+	  top[0]->ToTxt("top_data");
   }
   else{
 	caffe_gpu_mul<Dtype>(count_prob, top[0]->gpu_data(), prob_data, top[0]->mutable_gpu_data());
@@ -153,9 +147,8 @@ void AdaptiveDropoutLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 	//backward through dropout
 	const unsigned int* rand_vec_data = this->rand_vec_.gpu_data();
 	//top_diff = top_diff * rand_vec_data
-	//		caffe_gpu_mul_b<Dtype>(count_top, top_diff, rand_vec_data, top_diff);
 	DropoutBackward_gpu<Dtype> << < CAFFE_GET_BLOCKS(count_top), CAFFE_CUDA_NUM_THREADS >> >(
-		count_top, top_diff, rand_vec_data, 2., prob_vec_.mutable_gpu_diff());
+		count_top, top_diff, rand_vec_data, (Dtype)2., prob_vec_.mutable_gpu_diff());
 	//backward through non-linear activation
 	const Dtype* in_data = unact_hidden_.gpu_data();
 	ActBackward_gpu(count_top, prob_vec_.gpu_diff(), in_data, unact_hidden_diff, hidden_act_type_);
@@ -164,12 +157,12 @@ void AdaptiveDropoutLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 		const Dtype* bottom_data = bottom[0]->gpu_data();
 		// Gradient with respect to weight
 		caffe_gpu_gemm<Dtype>(CblasTrans, CblasNoTrans, N_, K_, M_, (Dtype)1.,
-			unact_hidden_diff, bottom_data, (Dtype)0., this->blobs_[0]->mutable_gpu_diff());
+			unact_hidden_diff, bottom_data, (Dtype)1., this->blobs_[0]->mutable_gpu_diff());
 	}
 	if (bias_term_ && this->param_propagate_down_[1]) {
 		// Gradient with respect to bias
 		caffe_gpu_gemv<Dtype>(CblasTrans, M_, N_, (Dtype)1., unact_hidden_diff,
-			bias_multiplier_.gpu_data(), (Dtype)0.,
+			bias_multiplier_.gpu_data(), (Dtype)1.,
 			this->blobs_[1]->mutable_gpu_diff());
 	}
 	if (propagate_down[0]) {
