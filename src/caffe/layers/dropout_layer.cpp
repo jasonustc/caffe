@@ -22,10 +22,10 @@ void DropoutLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   mu_ = this->layer_param_.dropout_param().mu();
   sigma_ = this->layer_param_.dropout_param().sigma();
   //debug only check, not check in non-debug mode
-  DCHECK(threshold_ > 0.);
-  DCHECK(threshold_ < 1.);
-  DCHECK(a_ < b_);
-  DCHECK(sigma_ > 0.);
+  CHECK(threshold_ > 0.);
+  CHECK(threshold_ < 1.);
+  CHECK(a_ < b_);
+  CHECK(sigma_ > 0.);
   if (drop_type_ == DropoutParameter_DROPTYPE_UNIFORM){
 	  scale_ = 2. / (b_ + a_);
   }
@@ -62,7 +62,6 @@ void DropoutLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 	  }
 	  else if(this->drop_type_ == DropoutParameter_DROPTYPE_GAUSSIAN){
 		  caffe_rng_gaussian(count, (Dtype)mu_, (Dtype)sigma_, mask);
-		  rand_vec_.ToTxt("mask_before_clip");
 		  //clip to be in [0,1]
 		  for (int i = 0; i < count; i++){
 			  Dtype m = mask[i];

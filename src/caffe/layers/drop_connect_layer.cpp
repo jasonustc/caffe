@@ -105,7 +105,7 @@ void DropConnectLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   unsigned int* weight_multiplier = this->weight_multiplier_.mutable_cpu_data();
   Dtype* dropped_weight = this->dropped_weight_.mutable_cpu_data();
   const int count = this->blobs_[0]->count();
-  //weight: K_xN_
+  //weight: N_ x K_
   if (this->phase_ == TRAIN){
 	  //create random numbers
 	  caffe_rng_bernoulli(count, 1. - threshold_, weight_multiplier);

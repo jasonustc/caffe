@@ -81,12 +81,9 @@ void AdaptiveDropoutLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom
   CUDA_POST_KERNEL_CHECK;
   if (this->phase_ == TRAIN){
 	  //p[i] is the probability of r[i]=1
-	  prob_vec_.ToTxt("prob_data");
 	  caffe_gpu_rng_bernoulli<Dtype>(count_prob, prob_vec_.gpu_data(), rand_vec_.mutable_gpu_data());
-	  rand_vec_.ToTxt("rand_vec");
 	  caffe_gpu_mul_b<Dtype>(count_prob, top[0]->gpu_data(), rand_vec_.gpu_data(), 
 		  top[0]->mutable_gpu_data());
-	  top[0]->ToTxt("top_data");
   }
   else{
 	caffe_gpu_mul<Dtype>(count_prob, top[0]->gpu_data(), prob_data, top[0]->mutable_gpu_data());
@@ -137,6 +134,11 @@ __global__ void DropoutBackward_gpu(const int n, const Dtype* in_diff,
 	}
 }
 
+/* Two choices in dropout:
+ * 1. scale output by expection of dropout
+ * 2. scale gradient by invert of expection in training
+ */
+
 template <typename Dtype>
 void AdaptiveDropoutLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down,
@@ -148,7 +150,7 @@ void AdaptiveDropoutLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 	const unsigned int* rand_vec_data = this->rand_vec_.gpu_data();
 	//top_diff = top_diff * rand_vec_data
 	DropoutBackward_gpu<Dtype> << < CAFFE_GET_BLOCKS(count_top), CAFFE_CUDA_NUM_THREADS >> >(
-		count_top, top_diff, rand_vec_data, (Dtype)2., prob_vec_.mutable_gpu_diff());
+		count_top, top_diff, rand_vec_data, (Dtype)1., prob_vec_.mutable_gpu_diff());
 	//backward through non-linear activation
 	const Dtype* in_data = unact_hidden_.gpu_data();
 	ActBackward_gpu(count_top, prob_vec_.gpu_diff(), in_data, unact_hidden_diff, hidden_act_type_);
@@ -157,12 +159,12 @@ void AdaptiveDropoutLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 		const Dtype* bottom_data = bottom[0]->gpu_data();
 		// Gradient with respect to weight
 		caffe_gpu_gemm<Dtype>(CblasTrans, CblasNoTrans, N_, K_, M_, (Dtype)1.,
-			unact_hidden_diff, bottom_data, (Dtype)1., this->blobs_[0]->mutable_gpu_diff());
+			unact_hidden_diff, bottom_data, (Dtype)0., this->blobs_[0]->mutable_gpu_diff());
 	}
 	if (bias_term_ && this->param_propagate_down_[1]) {
 		// Gradient with respect to bias
 		caffe_gpu_gemv<Dtype>(CblasTrans, M_, N_, (Dtype)1., unact_hidden_diff,
-			bias_multiplier_.gpu_data(), (Dtype)1.,
+			bias_multiplier_.gpu_data(), (Dtype)0.,
 			this->blobs_[1]->mutable_gpu_diff());
 	}
 	if (propagate_down[0]) {

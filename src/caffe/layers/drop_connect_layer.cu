@@ -31,8 +31,10 @@ void DropConnectLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
 	  unsigned int* weight_multiplier =
 		  static_cast<unsigned int*>(weight_multiplier_.mutable_gpu_data());
 	  caffe_gpu_rng_uniform(count, weight_multiplier);
+	  weight_multiplier_.ToTxt("weight_multi");
 	  DropWeight<Dtype> << <CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS >> >(
 		  count, weight, weight_multiplier, uint_thres_, scale_, dropped_weight);
+	  dropped_weight_.ToTxt("dropped_weight");
   }
   else{
 	  caffe_copy(count, weight, dropped_weight);

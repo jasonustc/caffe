@@ -23,9 +23,7 @@ namespace caffe{
 			shared_ptr<DropConnectLayer<Dtype>> layer(new DropConnectLayer<Dtype>(layer_param_));
 			layer->SetUp(bottom_vec_, top_vec_);
 			CHECK_EQ(top_vec_[0]->shape(0), 2);
-			CHECK_EQ(top_vec_[0]->shape(1), 1);
-			CHECK_EQ(top_vec_[0]->shape(2), 2);
-			CHECK_EQ(top_vec_[0]->shape(3), 2);
+			CHECK_EQ(top_vec_[0]->shape(1), 3);
 		}
 		void TestCPUForward(){
 			shared_ptr<DropConnectLayer<Dtype>> layer(new DropConnectLayer<Dtype>(layer_param_));
@@ -78,6 +76,12 @@ namespace caffe{
 
 			//set layer parameter
 			layer_param_.mutable_drop_connect_param()->set_dropout_ratio(0.5);
+			layer_param_.mutable_drop_connect_param()->set_num_output(3);
+			layer_param_.mutable_drop_connect_param()->mutable_weight_filler()->set_type("gaussian");
+			layer_param_.mutable_drop_connect_param()->mutable_weight_filler()->set_mean(0);
+			layer_param_.mutable_drop_connect_param()->mutable_weight_filler()->set_std(0.1);
+			layer_param_.mutable_drop_connect_param()->mutable_bias_filler()->set_type("constant");
+			layer_param_.mutable_drop_connect_param()->mutable_bias_filler()->set_value(0);
 		}
 
 		Blob<Dtype>* bottom_;
@@ -91,6 +95,7 @@ namespace caffe{
 
 int main(int argc, char** argv){
 	google::InitGoogleLogging(*argv);
+	google::SetStderrLogging(0);
 	caffe::DropConnectTest<float> test;
 	test.TestSetUp();
 	test.TestCPUForward();
