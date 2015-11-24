@@ -151,7 +151,7 @@ void AdaptiveDropoutLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
 	activate_cpu<Dtype>(prob_vec_.count(), this->prob_vec_.cpu_data(), prob_vec_data, prob_act_type_);
 
 	//output = W^T * Input
-	//weight: K_xN_
+	//weight: N_ x K_
 	caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasTrans, M_, N_, K_, (Dtype)1.,
 		bottom_data, weight_data, (Dtype)0., unact_hidden_.mutable_cpu_data());
 

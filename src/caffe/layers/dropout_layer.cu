@@ -10,18 +10,12 @@
 
 namespace caffe {
 
+//here we should clip the mask vector to be in [0, 1]
 template <typename Dtype>
 __global__ void DropoutForwardContinuous_gpu(const int n, const Dtype* in,
     Dtype* mask, const Dtype lower_bound,  const Dtype higher_bound,
 	const float scale, Dtype* out) {
 	CUDA_KERNEL_LOOP(index, n) {
-//		if (mask[index] > higher_bound){
-//			mask[index] = higher_bound;
-//		}
-//		else if (mask[index] < lower_bound){
-//			mask[index] = lower_bound;
-//		}
-		//too much IO will cost a lot of time
 		Dtype mask_value = mask[index] > higher_bound ? higher_bound : (
 			mask[index] < lower_bound ? lower_bound : mask[index]);
 		out[index] = in[index] * mask_value * scale;
@@ -33,12 +27,6 @@ __global__ void DropoutForwardBinary_gpu(const int n, const Dtype* in,
 	Dtype* mask, const Dtype threshold, const float scale,
 	Dtype* out){
 	CUDA_KERNEL_LOOP(index, n){
-//		if (mask[index] > threshold){
-//			mask[index] = 1;
-//		}
-//		else{
-//			mask[index] = 0;
-//		}
 		int mask_value = mask[index] > threshold ? 1 : 0;
 		out[index] = in[index] * mask_value * scale;
 	}
@@ -93,12 +81,6 @@ __global__ void DropoutBackwardBinary_gpu(const int n, const Dtype* in_diff,
 	const Dtype* mask, const Dtype threshold, const Dtype scale,
 	Dtype* out_diff){
 	CUDA_KERNEL_LOOP(index, n){
-//		if (mask[index] > threshold){
-//			mask[index] = 1;
-//		}
-//		else{
-//			mask[index] = 0;
-//		}
 		out_diff[index] = in_diff[index] * (mask[index] > threshold)* scale;
 	}
 }

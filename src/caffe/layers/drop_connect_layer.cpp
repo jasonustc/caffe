@@ -161,11 +161,6 @@ void DropConnectLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 			top_diff, this->dropped_weight_.cpu_data(), (Dtype)0.,
 			bottom[0]->mutable_cpu_diff());
 	}
-	top[0]->PrintDataToFile("top_con");
-	top[0]->PrintDiffToFile("top_con");
-	bottom[0]->PrintDiffToFile("bottom_con");
-	this->blobs_[0]->PrintDiffToFile("weight_con");
-	this->blobs_[0]->PrintDataToFile("weight_con");
 }
 
 #ifdef CPU_ONLY
