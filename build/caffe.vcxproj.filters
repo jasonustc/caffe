@@ -243,6 +243,16 @@
     <ClCompile Include="..\src\gtest\gtest-all.cpp">
       <Filter>src\test</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\caffe\dmodel_loader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\fea_extractor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\image_reader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tools\convert_imageset.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
@@ -471,6 +481,15 @@
     </ClInclude>
     <ClInclude Include="..\include\caffe\test\test_gradient_check_util.hpp">
       <Filter>include\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\caffe\dmodel_loader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\caffe\fea_extractor.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\caffe\image_reader.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

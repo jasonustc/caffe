@@ -40,6 +40,7 @@ DEFINE_string(backend, "lmdb",
         "The backend {lmdb, leveldb} for storing the result");
 DEFINE_int32(resize_width, 0, "Width images are resized to");
 DEFINE_int32(resize_height, 0, "Height images are resized to");
+DEFINE_int32(resize_min_size, 0, "size of small side of the image");
 DEFINE_bool(check_size, false,
     "When this option is on, check that all the datum have the same size");
 DEFINE_bool(encoded, false,
@@ -91,9 +92,13 @@ int main(int argc, char** argv) {
 
   int resize_height = std::max<int>(0, FLAGS_resize_height);
   int resize_width = std::max<int>(0, FLAGS_resize_width);
-  if (resize_height > 0 && resize_width > 0)
+  int resize_min_size = std::max<int>(0, FLAGS_resize_min_size);
+  if (resize_height > 0 && resize_width > 0 && (resize_min_size == 0))
   {
 	  LOG(INFO) << "Resize images: resize_width=" << resize_width << ",resize_height=" << resize_height;
+  }
+  else if ((resize_height == 0 && resize_width == 0) && (resize_min_size > 0)){
+	  LOG(INFO) << "Resize image with small side: " << resize_min_size;
   }
   else
   {
@@ -126,9 +131,16 @@ int main(int argc, char** argv) {
       enc = fn.substr(p);
       std::transform(enc.begin(), enc.end(), enc.begin(), ::tolower);
     }
-    status = ReadImageToDatum(root_folder + lines[line_id].first,
-        lines[line_id].second, resize_height, resize_width, is_color,
-        enc, &datum);
+	if (resize_min_size > 0){
+		status = ReadImageToDatum(root_folder + lines[line_id].first,
+			lines[line_id].second, resize_min_size, is_color,
+			enc, &datum);
+	}
+	else{
+		status = ReadImageToDatum(root_folder + lines[line_id].first,
+			lines[line_id].second, resize_height, resize_width, is_color,
+			enc, &datum);
+	}
     if (status == false) continue;
     if (check_size) {
       if (!data_size_initialized) {

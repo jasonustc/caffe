@@ -155,6 +155,7 @@ int test() {
 	// Instantiate the caffe net.
 	Net<float> caffe_net(FLAGS_model, caffe::TEST);
 	caffe_net.CopyTrainedLayersFrom(FLAGS_weights);
+	LOG(INFO) << "Loading weights from:" << FLAGS_weights;
 	LOG(INFO) << "Running for " << FLAGS_iterations << " iterations.";
 
 	vector<Blob<float>* > bottom_vec;

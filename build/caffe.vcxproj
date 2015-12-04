@@ -22,6 +22,9 @@
     <ClCompile Include="..\src\caffe\blob.cpp" />
     <ClCompile Include="..\src\caffe\common.cpp" />
     <ClCompile Include="..\src\caffe\data_transformer.cpp" />
+    <ClCompile Include="..\src\caffe\dmodel_loader.cpp" />
+    <ClCompile Include="..\src\caffe\fea_extractor.cpp" />
+    <ClCompile Include="..\src\caffe\image_reader.cpp" />
     <ClCompile Include="..\src\caffe\internal_thread.cpp" />
     <ClCompile Include="..\src\caffe\layers\absval_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\accuracy_layer.cpp" />
@@ -90,6 +93,7 @@
     <ClCompile Include="..\src\caffe\util\math_functions.cpp" />
     <ClCompile Include="..\src\caffe\util\upgrade_proto.cpp" />
     <ClCompile Include="..\src\gtest\gtest-all.cpp" />
+    <ClCompile Include="..\tools\convert_imageset.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu" />
@@ -143,7 +147,10 @@
     <ClInclude Include="..\include\caffe\common_layers.hpp" />
     <ClInclude Include="..\include\caffe\data_layers.hpp" />
     <ClInclude Include="..\include\caffe\data_transformer.hpp" />
+    <ClInclude Include="..\include\caffe\dmodel_loader.h" />
+    <ClInclude Include="..\include\caffe\fea_extractor.h" />
     <ClInclude Include="..\include\caffe\filler.hpp" />
+    <ClInclude Include="..\include\caffe\image_reader.h" />
     <ClInclude Include="..\include\caffe\internal_thread.hpp" />
     <ClInclude Include="..\include\caffe\layer.hpp" />
     <ClInclude Include="..\include\caffe\layer_factory.hpp" />
