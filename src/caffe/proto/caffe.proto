@@ -350,6 +350,12 @@ message LayerParameter {
   optional NoiseParameter noise_param = 143;
   optional NormLossParameter norm_loss_param = 145;
   optional RBMParameter rbm_param = 146;
+  optional ConvRecurrentParameter conv_recurrent_param = 147;
+  optional BLEUParameter bleu_param = 148;
+}
+
+//Message that stores parameters used to calculate bleu score
+message BLEUParameter{
 }
 
 //Message that stores parameters used to calculate rbm loss
@@ -844,20 +850,6 @@ message RecurrentParameter {
 
   // Whether to enable displaying debug_info in the unrolled recurrent net.
   optional bool debug_info = 4 [default = false];
-
-  //added by xu shen
-  optional bool no_memory_cell = 5 [default = false];
-
-  //it's a prediction recurrent layer or decoding recurrent layer
-  optional bool pred = 6 [default = false];
-
-  //number of features to be predicted
-  optional uint32 num_rec_feature = 7;
-
-  //weight filler of transformation of decoder hidden feature
-  optional FillerParameter dec_trans_weight_filler = 8;
-  //bias filler of transformation of decoder hidden feature
-  optional FillerParameter dec_trans_bias_filler = 11;
   
   //if this LSTM used for decode 
   //will output c_Ts and h_Ts 
@@ -866,10 +858,38 @@ message RecurrentParameter {
   //the sequence length
   optional uint32 sequence_length = 9;
 
-  //if dropout on input
-  optional float drop_input_prob = 12[default = 0];
-  //if dropout on output
-  optional float drop_output_prob = 13[default = 0];
+}
+
+// Message that stores parameters used by ConvRecurrentLayer
+message ConvRecurrentParameter {
+    //parameters for normal LSTM
+    optional uint32 num_output = 1 [default = 0];
+    optional FillerParameter weight_filler = 2; // The filler for the weight
+    optional FillerParameter bias_filler = 3; // The filler for the bias
+
+    // Whether to enable displaying debug_info in the unrolled recurrent net.
+    optional bool debug_info = 4 [default = false];
+
+    //parameters for Convolution
+    optional uint32 pad = 5;
+    optional uint32 pad_h = 6 [default = 0]; // The padding height
+    optional uint32 pad_w = 7 [default = 0]; // The padding width
+    optional uint32 kernel_size = 8; // The kernel size (square)
+    optional uint32 kernel_h = 9; // The kernel height
+    optional uint32 kernel_w = 10; // The kernel width
+    optional uint32 group = 11 [default = 1]; // The group size for group conv
+    optional uint32 stride = 12 [default = 1]; // The stride (equal in Y, X)
+    optional uint32 stride_h = 13; // The stride height
+    optional uint32 stride_w = 14; // The stride width
+    enum Engine {
+        DEFAULT = 0;
+        CAFFE = 1;
+        CUDNN = 2;
+    }
+    optional Engine engine = 15 [default = DEFAULT];
+
+    //length of a single sequence
+    optional uint32 sequence_length = 16 [default = 0];
 }
 
 // Message that stores parameters used by ReLULayer

@@ -11,38 +11,33 @@
 namespace caffe {
 
 template <typename Dtype>
-string DRecurrentLayer<Dtype>::int_to_str(const int t) const {
+string ConvRecurrentLayer<Dtype>::int_to_str(const int t) const {
   ostringstream num;
   num << t;
   return num.str();
 }
 
-/*
- *bottom[0]: x_
- *bottom[1]: h_
- *bottom[2]: c_
- */
 template <typename Dtype>
-void DRecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+void ConvRecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
 	//if this is an encoding-decoding structure or not
-	const int seq_len = this->layer_param_.recurrent_param().sequence_length();
-	const int num_out = this->layer_param_.recurrent_param().num_output();
-	CHECK_GT(seq_len, 0) << "sequence lenght must be positive.";
+	decode_ = this->layer_param_.recurrent_param().decode();
 	CHECK_GE(bottom[0]->num_axes(), 2)
 		<< "bottom[0] must have at least 2 axes -- (#timesteps, #streams, ...)";
 	//timesteps
 	LOG(INFO) << "bottom[0] shape: " << bottom[0]->shape_string();
 	T_ = bottom[0]->shape(0);
-	//streams
-	N_ = bottom[0]->shape(1);
+	channels_ = bottom[0]->shape(1);
+	height_ = bottom[0]->shape(2);
+	width_ = bottom[0]->shape(3);
 	LOG(INFO) << "Initializing recurrent layer: assuming input batch contains "
-		<< T_ << " timesteps of " << N_ << " independent streams.";
+		<< T_ << " timesteps";
 
 	//the cont indicator
-	CHECK(bottom[1]->shape() == bottom[2]->shape())<<"the shape of c and h should be the same";
-	CHECK_EQ(N_, bottom[1]->shape(1));
-	CHECK_EQ(num_out, bottom[1]->shape(2));
+	LOG(INFO) << "bottom[1] shape: " << bottom[1]->shape_string();
+	CHECK_EQ(bottom[1]->num_axes(), 2)
+		<< "bottom[1] must have exactly 2 axes -- (#timesteps, #streams)";
+	CHECK_EQ(T_, bottom[1]->shape(0));
 
 	// Create a NetParameter; setup the inputs that aren't unique to particular
 	// recurrent architectures.
@@ -59,20 +54,16 @@ void DRecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 	//repeated message can be added 
 	net_param.add_input_shape()->CopyFrom(input_shape);
 
-	//h_T
 	input_shape.Clear();
+	input_shape.add_dim(1);
+	//#streams
 	for (int i = 0; i < bottom[1]->num_axes(); ++i) {
 		input_shape.add_dim(bottom[1]->shape(i));
 	}
-	net_param.add_input("enc_h_T");
+	//cont: 1 x T x N
+	net_param.add_input("cont");
 	net_param.add_input_shape()->CopyFrom(input_shape);
-	//c_T
-	input_shape.Clear();
-	for (int i = 0; i < bottom[2]->num_axes(); ++i) {
-		input_shape.add_dim(bottom[2]->shape(i));
-	}
-	net_param.add_input("enc_c_T");
-	net_param.add_input_shape()->CopyFrom(input_shape);
+
 
 	// Call the child's FillUnrolledNet implementation to specify the unrolled
 	// recurrent architecture.
@@ -96,36 +87,37 @@ void DRecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
 	// Setup pointers to the inputs.
 	x_input_blob_ = CHECK_NOTNULL(unrolled_net_->blob_by_name("x").get());
-	h_input_blob_ = CHECK_NOTNULL(unrolled_net_->blob_by_name("enc_h_T").get());
-	c_input_blob_ = CHECK_NOTNULL(unrolled_net_->blob_by_name("enc_c_T").get());
+	cont_input_blob_ = CHECK_NOTNULL(unrolled_net_->blob_by_name("cont").get());
 
 	// Setup pointers to paired recurrent inputs/outputs.
 	vector<string> recur_input_names;
 	RecurrentInputBlobNames(&recur_input_names);
 	vector<string> recur_output_names;
 	RecurrentOutputBlobNames(&recur_output_names);
-	vector<string> recur_end_names;
 	const int num_recur_blobs = recur_input_names.size();
 	//number of recurrent input blobs must be equal to number of output blobs
 	CHECK_EQ(num_recur_blobs, recur_output_names.size());
 	recur_input_blobs_.resize(num_recur_blobs);
 	recur_output_blobs_.resize(num_recur_blobs);
-	if (decode){
-		//h_Ts
-		EndSequenceBlobNames(&recur_end_names);
-		CHECK_EQ(num_recur_blobs, recur_end_names.size());
-		all_end_seq_h_ = CHECK_NOTNULL(unrolled_net_->blob_by_name(recur_end_names[0]).get());
-		//c_Ts
-		all_end_seq_c_ = CHECK_NOTNULL(unrolled_net_->blob_by_name(recur_end_names[1]).get());
-	}
 	for (int i = 0; i < recur_input_names.size(); ++i) {
-		//make sure they are defined and built in recurr architec
+		//make sure they are defined and built in recurr architecture
 		recur_input_blobs_[i] =
 			CHECK_NOTNULL(unrolled_net_->blob_by_name(recur_input_names[i]).get());
 		recur_output_blobs_[i] =
 			CHECK_NOTNULL(unrolled_net_->blob_by_name(recur_output_names[i]).get());
 	}
 
+	//deal with decoding situations
+	if (decode_){
+		vector<string> seq_end_output_names;
+		ConcatSeqEndBlobNames(&seq_end_output_names);
+		CHECK_EQ(num_recur_blobs, seq_end_output_names.size());
+		seq_end_output_blobs_.resize(num_recur_blobs);
+		for (int i = 0; i < num_recur_blobs; i++){
+			seq_end_output_blobs_[i] =
+				CHECK_NOTNULL(unrolled_net_->blob_by_name(seq_end_output_names[i]).get());
+		}
+	}
 	// Setup pointers to outputs.
 	vector<string> output_names;
 	OutputBlobNames(&output_names);
@@ -141,7 +133,7 @@ void DRecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
 	// We should have 2 inputs (x and cont), plus a number of recurrent inputs,
 	// plus maybe a static input.
-	CHECK_EQ(2 + num_recur_blobs + static_input_,
+	CHECK_EQ(2 + num_recur_blobs,
 		unrolled_net_->input_blobs().size());
 
 	// This layer's parameters are any parameters in the layers of the unrolled
@@ -171,9 +163,9 @@ void DRecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 	// loss weight is set to 0 means we don't backpropagate diff of this layer down
 	// Set the diffs of recurrent outputs to 0 -- we can't backpropagate across
 	// batches.
-	//if this is a decode LSTM, the error of c_T and h_T must be propagated down
-	//because it is correlated with decoder LSTM.:w
-	if (!decode){
+	// but in decoder LSTM we don't need this, because C_T and h_T will be connected
+	// with decoder LSTM units
+	if (!decode_){
 		for (int i = 0; i < recur_output_blobs_.size(); ++i) {
 			caffe_set(recur_output_blobs_[i]->count(), Dtype(0),
 				recur_output_blobs_[i]->mutable_cpu_diff());
@@ -182,7 +174,7 @@ void DRecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 }
 
 template <typename Dtype>
-void DRecurrentLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
+void ConvRecurrentLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
 //  CHECK_EQ(top.size(), output_blobs_.size());
 	CHECK_GE(top.size(), output_blobs_.size());
@@ -192,73 +184,67 @@ void DRecurrentLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 		top[i]->ShareData(*output_blobs_[i]);
 		top[i]->ShareDiff(*output_blobs_[i]);
 	}
-
-	//added by xu shen
-	//output all c_Ts and h_Ts
-	if (top.size() > output_blobs_.size()){
-		top[output_blobs_.size()] = all_end_seq_h_;
-		top[output_blobs_.size() + 1] = all_end_seq_c_;
+	//added by xu shen: to get the all h_Ts and c_Ts as output
+	if (top.size() > output_blobs_.size() && decode_){
+		for (size_t r = output_blobs_.size(); r < top.size(); r++){
+			//allocate memory 
+			top[r]->ReshapeLike(*seq_end_output_blobs_[r - output_blobs_.size()]);
+			top[r]->ShareData(*seq_end_output_blobs_[r - output_blobs_.size()]);
+			top[r]->ShareDiff(*seq_end_output_blobs_[r - output_blobs_.size()]);
+		}
 	}
 
 	x_input_blob_->ShareData(*bottom[0]);
 	x_input_blob_->ShareDiff(*bottom[0]);
 	cont_input_blob_->ShareData(*bottom[1]);
-	if (static_input_) {
-		x_static_input_blob_->ShareData(*bottom[2]);
-		x_static_input_blob_->ShareDiff(*bottom[2]);
-	}
 }
 
 template <typename Dtype>
-void DRecurrentLayer<Dtype>::Reset() {
-	// "Reset" the hidden state of the net by zeroing out all recurrent outputs.
-	for (int i = 0; i < recur_output_blobs_.size(); ++i) {
-		caffe_set(recur_output_blobs_[i]->count(), Dtype(0),
-			recur_output_blobs_[i]->mutable_cpu_data());
-	}
+void ConvRecurrentLayer<Dtype>::Reset() {
+  // "Reset" the hidden state of the net by zeroing out all recurrent outputs.
+  for (int i = 0; i < recur_output_blobs_.size(); ++i) {
+    caffe_set(recur_output_blobs_[i]->count(), Dtype(0),
+              recur_output_blobs_[i]->mutable_cpu_data());
+  }
 }
 
 template <typename Dtype>
-void DRecurrentLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+void ConvRecurrentLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
-	// Hacky fix for test time... reshare all the shared blobs.
-	// TODO: somehow make this work non-hackily.
-	if (this->phase_ == TEST) {
-		unrolled_net_->ShareWeightData();
-	}
+  // Hacky fix for test time... reshare all the shared blobs.
+  // TODO: somehow make this work non-hackily.
+  if (this->phase_ == TEST) {
+    unrolled_net_->ShareWeightData();
+  }
 
-	//before the forward pass, we copy the last c and last h 
-	//to c_0 and h_0
-	DCHECK_EQ(recur_input_blobs_.size(), recur_output_blobs_.size());
-	for (int i = 0; i < recur_input_blobs_.size(); ++i) {
-		const int count = recur_input_blobs_[i]->count();
-		DCHECK_EQ(count, recur_output_blobs_[i]->count());
-		const Dtype* timestep_T_data = recur_output_blobs_[i]->cpu_data();
-		Dtype* timestep_0_data = recur_input_blobs_[i]->mutable_cpu_data();
-		//from time T to time 0
-		caffe_copy(count, timestep_T_data, timestep_0_data);
-	}
+  //before the forward pass, we copy the last c and last h 
+  //to c_0 and h_0
+  DCHECK_EQ(recur_input_blobs_.size(), recur_output_blobs_.size());
+  for (int i = 0; i < recur_input_blobs_.size(); ++i) {
+    const int count = recur_input_blobs_[i]->count();
+    DCHECK_EQ(count, recur_output_blobs_[i]->count());
+    const Dtype* timestep_T_data = recur_output_blobs_[i]->cpu_data();
+    Dtype* timestep_0_data = recur_input_blobs_[i]->mutable_cpu_data();
+	//from time T to time 0
+    caffe_copy(count, timestep_T_data, timestep_0_data);
+  }
 
-	unrolled_net_->ForwardPrefilled();
+  unrolled_net_->ForwardPrefilled();
 }
 
 template <typename Dtype>
-void DRecurrentLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
+void ConvRecurrentLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
-	CHECK(!propagate_down[1]) << "Cannot backpropagate to sequence indicators.";
+  CHECK(!propagate_down[1]) << "Cannot backpropagate to sequence indicators.";
 	//if (!propagate_down[0] && !propagate_down[2]) { LOG(INFO) << "NOT BP"; return; }
-	//TODO: skip backpropagation to inputs and parameters inside the unrolled
-	//net according to propagate_down[0] and propagate_down[2]. For now just
-	//backprop to inputs and parameters unconditionally, as either the inputs or 
-	//the parameters do need backward(or Net would have set layer_needs_backward_[i]==false
-	//for this layer).
-	unrolled_net_->Backward();
+
+  unrolled_net_->Backward();
 }
 
 #ifdef CPU_ONLY
-STUB_GPU_FORWARD(DRecurrentLayer, Forward);
+STUB_GPU_FORWARD(RecurrentLayer, Forward);
 #endif
 
-INSTANTIATE_CLASS(DRecurrentLayer);
+INSTANTIATE_CLASS(RecurrentLayer);
 
 }  // namespace caffe
