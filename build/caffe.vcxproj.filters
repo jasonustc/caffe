@@ -318,12 +318,7 @@
     <ClCompile Include="..\src\caffe\layers\rbm_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\conv_lstm_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\conv_recurrent_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
+    <ClCompile Include="..\tools\test\test_declstm_layer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
@@ -483,9 +478,6 @@
       <Filter>src\layers</Filter>
     </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\rbm_layer.cu">
-      <Filter>src\layers</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\conv_recurrent_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
   </ItemGroup>

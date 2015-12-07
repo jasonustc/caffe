@@ -16,7 +16,6 @@ namespace caffe{
 		(*names)[0] = "h_dec";
 	}
 
-	//TODO: split the process of encoding and decoding
 	template <typename Dtype>
 	void DLSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const{
 		const int num_output = this->layer_param_.recurrent_param().num_output();
@@ -162,7 +161,7 @@ namespace caffe{
 				{
 					LayerParameter* input_sum_layer = net_param->add_layer();
 					if (s == 1){
-						input_sum_layer->set_type("Copy");
+						input_sum_layer->set_type("Split");
 						input_sum_layer->set_name("gate_input_" + units);
 						input_sum_layer->add_bottom("W_hc_h_" + unitm1s);
 						input_sum_layer->add_top("gate_input_" + units);

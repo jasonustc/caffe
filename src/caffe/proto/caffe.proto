@@ -351,6 +351,11 @@ message LayerParameter {
   optional NormLossParameter norm_loss_param = 145;
   optional RBMParameter rbm_param = 146;
   optional ConvRecurrentParameter conv_recurrent_param = 147;
+  optional BLEUParameter bleu_param = 148;
+}
+
+//Message that stores parameters used to calculate bleu score
+message BLEUParameter{
 }
 
 //Message that stores parameters used to calculate rbm loss

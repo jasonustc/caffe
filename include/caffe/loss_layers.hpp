@@ -93,6 +93,35 @@ namespace caffe {
 		Dtype denominator_;
 	};
 
+	/*
+	 * @brief given word id and predict feature, compute the BLEU score
+	 */
+	/*
+	template <typename Dtype>
+	class BLEULayer : public Layer<Dtype>{
+	public:
+		explicit BLEULayer(const LayerParameter& param)
+			: Layer<Dtype>(param){}
+		virtual inline const char* type() const { return "BLEU"; }
+		virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+		virtual void Reshape(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+		virtual inline int ExactNumBottomBlobs() const { return 2; }
+		virtual inline int ExactNumTopBlobs() const { return 1; }
+	protected:
+		virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+		virtual void Backward_cpu(const vector<Dtype>* > & top,
+			const vector<bool>& propatate_down, const vector<Blob<Dtype>*>& bottom){
+			for (int i = 0; i < propagate_down.size(); ++i){
+				if (propagate_down[i]){ NOT_IMPLEMENTED; }
+			}
+		}
+
+		Dtype small_;
+		Dtype tiny_;
+	};
+	*/
+
 	/**
 	 * @brief An interface for Layer%s that take two Blob%s as input -- usually
 	 *        (1) predictions and (2) ground-truth labels -- and output a

@@ -22,13 +22,15 @@ DEFINE_int32(feat_dim, 160001, "The # of words in the word set");
 DEFINE_string(backend, "lmdb", "The backend{leveldb/lmdb} for storing the result");
 DEFINE_bool(train, true, "if the dataset is for train(true: train, false: test)");
 
-void parse_line_feat(const string& line, vector<int>& feat){
+void parse_line_feat(string& line, vector<int>& feat){
 	feat.clear();
 	vector<string> strs;
+	//delete spaces in the beginning and ending of the sequence
+	boost::trim(line);
 	boost::split(strs, line, boost::is_any_of(" "));
 	int feat_i;
 	for (vector<string>::iterator it = strs.begin(); 
-		it != strs.end(); it++){
+		it != strs.end(); ++it){
 		feat_i = stoi(*it);
 		feat.push_back(feat_i);
 	}
@@ -38,6 +40,11 @@ void create_db(const string& feat_file, const string& db_name){
 	//load feat file
 	ifstream in_feat(feat_file);
 	CHECK(in_feat.is_open()) << "open " << feat_file << " failed!";
+
+	string test_line;
+	getline(in_feat, test_line);
+	vector<int> feats;
+	parse_line_feat(test_line, feats);
 
 	//create new db
 	scoped_ptr<db::DB> db(db::GetDB(FLAGS_backend));
@@ -49,10 +56,9 @@ void create_db(const string& feat_file, const string& db_name){
 
 	//save image data into leveldb
 	int count = 0;
-	clock_t time1, time2;
-	time1 = clock();
 	Datum sentence_datum;
 	const int dim = FLAGS_train ? FLAGS_feat_dim : (FLAGS_feat_dim + 2);
+	LOG(INFO) << "dim: " << dim;
 	/*
 	 *datum: channels, width, height, encoded, data(), float_data()
 	 *export: datum.SerializeToString(&out)
@@ -64,13 +70,12 @@ void create_db(const string& feat_file, const string& db_name){
 	//build training dataset
 	int num_sentences = 0;
 	const int label = 1;
-	float feat_buf;
-	std::ifstream in_feat(feat_file);
-	CHECK(in_feat.is_open()) << "failed to open file " << feat_file;
 	string line;
 	vector<int> feat_ids;
 	while (getline(in_feat, line)){
 		parse_line_feat(line, feat_ids);
+		//for targeting sequence, we need to add start mark and end 
+		//mark
 		if (!FLAGS_train){
 			//begin mark
 			feat_ids.insert(feat_ids.begin(), FLAGS_feat_dim + 1);
@@ -78,7 +83,9 @@ void create_db(const string& feat_file, const string& db_name){
 			feat_ids.push_back(FLAGS_feat_dim + 2);
 		}
 		sentence_datum.set_channels((int)feat_ids.size());
+		sentence_datum.clear_float_data();
 		for (int i = 0; i < feat_ids.size(); i++){
+//			cout << feat_ids[i] << "\t";
 			for (int f = 0; f < dim; f++){
 				if (f == feat_ids[i]){
 					sentence_datum.add_float_data(1);
@@ -91,6 +98,8 @@ void create_db(const string& feat_file, const string& db_name){
 		//sequential 
 		string out;
 		sentence_datum.SerializeToString(&out);
+//		LOG(INFO)<< "feat_id size: " << feat_ids.size();
+//		LOG(INFO) << "float data size: " << sentence_datum.float_data_size();
 		int length = sprintf_s(key_cstr, kMaxKeyLength, "%09d", count);
 		//put into db
 		txn->Put(std::string(key_cstr, length), out);
