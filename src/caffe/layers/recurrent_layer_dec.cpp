@@ -182,6 +182,12 @@ void RecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 	// loss weight is set to 0 means we don't backpropagate diff of this layer down
 	// Set the diffs of recurrent outputs to 0 -- we can't backpropagate across
 	// batches.
+	// because recur_output_blobs is only the last states of the last sequence,
+	// so we can not let them to back propagation errors accross the whole unrolled 
+	// sequence.
+	// but we still need to store the states of them to pass to the next beginning of 
+	// batch input. Because it may be not the end of a sequence, so we need to pass them 
+	// to be c_0 and h_0 for the next input batch.
 	// but in decoder LSTM we don't need this, because C_T and h_T will be connected
 	// with decoder LSTM units
 	if (!decode_){
@@ -195,14 +201,9 @@ void RecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void RecurrentLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
-//  CHECK_EQ(top.size(), output_blobs_.size());
 	CHECK_GE(top.size(), output_blobs_.size());
-//	for (int i = 0; i < top.size(); ++i) {
 	for (int i = 0; i < output_blobs_.size(); ++i) {
 		top[i]->ReshapeLike(*output_blobs_[i]);
-		//!!!!
-		//output_blobs_[i]->ShareData(*top[i]); 
-		//output_blobs_[i]->ShareDiff(*top[i]);
 		top[i]->ShareData(*output_blobs_[i]);
 		top[i]->ShareDiff(*output_blobs_[i]);
 	}
@@ -249,6 +250,9 @@ void RecurrentLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   for (int i = 0; i < recur_input_blobs_.size(); ++i) {
     const int count = recur_input_blobs_[i]->count();
     DCHECK_EQ(count, recur_output_blobs_[i]->count());
+	//here why we need to copy recur_output_blobs_ to the recur_input_blobs_
+	//because the last input may not be the end of the sequence, so we need to 
+	//copy it to the recurrent input to be used as c_0 and h_0 for the next batch
     const Dtype* timestep_T_data = recur_output_blobs_[i]->cpu_data();
     Dtype* timestep_0_data = recur_input_blobs_[i]->mutable_cpu_data();
 	//from time T to time 0
@@ -262,8 +266,12 @@ template <typename Dtype>
 void RecurrentLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
   CHECK(!propagate_down[1]) << "Cannot backpropagate to sequence indicators.";
-	//if (!propagate_down[0] && !propagate_down[2]) { LOG(INFO) << "NOT BP"; return; }
 
+  //TODO: skip backpropagation to inputs and parameters inside the unrolled 
+  // net according to propagate_down[0] and propagate_down[2]. For now just
+  // backprop to inputs and parameters unconditionally, as either the inputs
+  // the parameters do need backward(or Net would have set
+  // layer_needs_backward_[i] == false for this layer).
   unrolled_net_->Backward();
 }
 

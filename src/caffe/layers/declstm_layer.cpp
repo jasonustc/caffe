@@ -160,13 +160,13 @@ namespace caffe{
 				//to do prediction, first input is zero
 				{
 					LayerParameter* input_sum_layer = net_param->add_layer();
-					if (s == 1){
-						input_sum_layer->set_type("Split");
-						input_sum_layer->set_name("gate_input_" + units);
-						input_sum_layer->add_bottom("W_hc_h_" + unitm1s);
-						input_sum_layer->add_top("gate_input_" + units);
-					}
-					else{
+//					if (s == 1){
+//						input_sum_layer->set_type("Split");
+//						input_sum_layer->set_name("gate_input_" + units);
+//						input_sum_layer->add_bottom("W_hc_h_" + unitm1s);
+//						input_sum_layer->add_top("gate_input_" + units);
+//					}
+//					else{
 						input_sum_layer->CopyFrom(sum_param);
 						input_sum_layer->set_name("gate_input_" + units);
 						input_sum_layer->add_bottom("W_hc_h_" + unitm1s);
@@ -175,7 +175,7 @@ namespace caffe{
 							input_sum_layer->add_bottom("W_xc_x_static");
 						}
 						input_sum_layer->add_top("gate_input_" + units);
-					}
+//					}
 				}
 
 				//Add LSTMUnit layer to compute the cell & hidden vectors c_t and h_t.

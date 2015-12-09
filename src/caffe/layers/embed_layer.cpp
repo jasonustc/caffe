@@ -72,6 +72,8 @@ void EmbedLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   Dtype* top_data = top[0]->mutable_cpu_data();
   int index;
   for (int n = 0; n < M_; ++n) {
+	//bottom_data is a one shot vector representing words in the dictionary
+	//bottom_data[n] is in [0, K], is the index of words in dictionary
     index = static_cast<int>(bottom_data[n]);
     DCHECK_GE(index, 0);
     DCHECK_LT(index, K_);

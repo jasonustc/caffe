@@ -65,7 +65,7 @@ namespace caffe{
 			LayerParameter layer_param;
 			NormLossParameter* norm_param =
 				layer_param.mutable_norm_loss_param();
-			norm_param->set_norm_type(NormLossParameter_NormType_L2);
+			norm_param->set_norm_type(NormLossParameter_NormType_L1);
 
 			shared_ptr<Layer<Dtype>> layer(new NormLossLayer<Dtype>(layer_param));
 			layer->SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
@@ -94,7 +94,7 @@ namespace caffe{
 			LayerParameter layer_param;
 			NormLossParameter* norm_param =
 				layer_param.mutable_norm_loss_param();
-			norm_param->set_norm_type(NormLossParameter_NormType_L2);
+			norm_param->set_norm_type(NormLossParameter_NormType_L1);
 			shared_ptr<Layer<Dtype>> layer(new NormLossLayer<Dtype>(layer_param));
 			layer->SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
 			Caffe::set_mode(Caffe::GPU);
@@ -115,7 +115,7 @@ namespace caffe{
 			LayerParameter layer_param;
 			NormLossParameter* norm_param =
 				layer_param.mutable_norm_loss_param();
-			norm_param->set_norm_type(NormLossParameter_NormType_L2);
+			norm_param->set_norm_type(NormLossParameter_NormType_L1);
 	  		Caffe::set_mode(Caffe::CPU);
 			NormLossLayer<Dtype> checker_layer(layer_param);
 			checker_layer.SetUp(blob_bottom_vec_, blob_top_vec_);
@@ -127,7 +127,7 @@ namespace caffe{
 			LayerParameter layer_param;
 			NormLossParameter* norm_param =
 				layer_param.mutable_norm_loss_param();
-			norm_param->set_norm_type(NormLossParameter_NormType_L2);
+			norm_param->set_norm_type(NormLossParameter_NormType_L1);
 			Caffe::set_mode(Caffe::GPU);
 			NormLossLayer<Dtype> layer(layer_param);
 			layer.SetUp(blob_bottom_vec_, blob_top_vec_);
@@ -142,7 +142,7 @@ int main(int argc, char** argv){
 	test.TestSetup();
 	test.TestCPUNormLoss();
 	test.TestCPUGradient();
-	test.TestGPUNormLoss();
-	test.TestGPUGradient();
+//	test.TestGPUNormLoss();
+//	test.TestGPUGradient();
 	return 0;
 }
