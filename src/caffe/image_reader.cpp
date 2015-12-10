@@ -1,14 +1,26 @@
+<<<<<<< HEAD
 #include "image_reader.h"
 #include <opencv\highgui.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <fstream>
+=======
+#include "caffe/image_reader.h"
+#include <opencv\highgui.h>
+#include <fstream>
+#include "caffe/common.hpp"
+>>>>>>> my_dropout_layers
 
 template <typename Dtype>
 ImageReader<Dtype>::ImageReader()
 {
 	image_data_ = NULL;
+<<<<<<< HEAD
 	resize_height_ = 255;
 	resize_width_ = 255;
+=======
+	resize_height_ = 256;
+	resize_width_ = 256;
+>>>>>>> my_dropout_layers
 }
 
 template <typename Dtype>
@@ -36,6 +48,84 @@ void ImageReader<Dtype>::Print()
 }
 
 template <typename Dtype>
+<<<<<<< HEAD
+=======
+bool ImageReader<Dtype>::ReadImage(string image_path){
+//	cv::Mat cv_img;
+	cv::Mat cv_img_origin = cv::imread(image_path, CV_LOAD_IMAGE_COLOR);
+
+	if (!cv_img_origin.data) 
+	{
+		std::cout << "Could not open or find file " << image_path << std::endl;
+		return false;
+	}
+	if (cv_img_origin.channels() != 3)
+	{
+		std::cout << "error, the channel of image must be 3" << std::endl;
+		return false;
+	}
+
+	if (resize_width_ <= 0 && resize_height_ <= 0)
+	{
+		std::cout << "resize_width_ or resize_height_ must > 0" << std::endl;
+		return false;
+	}
+	cv::resize(cv_img_origin, cv_ori_img_, cv::Size(resize_width_, resize_height_));
+	return true;
+}
+
+template <typename Dtype>
+bool ImageReader<Dtype>::GetCropImageData(const int crop_type, const bool mirror){
+	int h_off;
+	int w_off;
+	switch (crop_type)
+	{
+	case 0:
+		//left up
+		h_off = 0;
+		w_off = 0;
+		break;
+	case 1:
+		//right up
+		h_off = 0;
+		w_off = resize_width_ - crop_width_;
+		break;
+	case 2:
+		//middle
+		h_off = (resize_height_ - crop_height_) / 2;
+		w_off = (resize_width_ - crop_width_) / 2;
+		break;
+	case 3:
+		//left down
+		h_off = resize_height_ - crop_height_;
+		w_off = 0;
+		break;
+	case 4:
+		//right down
+		h_off = resize_height_ - crop_height_;
+		w_off = resize_width_ - crop_width_;
+		break;
+	default:
+		LOG(FATAL) << "unkown crop type " << crop_type;
+		break;
+	}
+	cv::Rect roi(w_off, h_off, crop_width_, crop_height_);
+	cv::Mat cv_cropped_img = cv_ori_img_(roi);
+
+	for (int h = 0; h < crop_height_; h++)
+	{
+		uchar *ptr = cv_cropped_img.ptr<uchar>(h);
+		for (int w = 0; w < crop_width_ * 3; w++)
+		{
+			image_data_[h * crop_width_ * 3 + w] = static_cast<Dtype>(ptr[w]);
+		}
+	}
+
+	return true;
+}
+
+template <typename Dtype>
+>>>>>>> my_dropout_layers
 bool ImageReader<Dtype>::ReadResizeImage(string image_path)
 {
 	cv::Mat cv_img;
@@ -61,6 +151,82 @@ bool ImageReader<Dtype>::ReadResizeImage(string image_path)
 
 	int h_off = (resize_height_ - crop_height_) / 2;
 	int w_off = (resize_width_ - crop_width_) / 2;
+<<<<<<< HEAD
+=======
+	//here just use the middle crop for feature extraction
+	cv::Rect roi(w_off, h_off, crop_width_, crop_height_);
+	cv::Mat cv_cropped_img = cv_img(roi);
+
+	for (int h = 0; h < crop_height_; h++)
+	{
+		uchar *ptr = cv_cropped_img.ptr<uchar>(h);
+		for (int w = 0; w < crop_width_ * 3; w++)
+		{
+			image_data_[h * crop_width_ * 3 + w] = static_cast<Dtype>(ptr[w]);
+		}
+	}
+
+	return true;
+}
+
+template <typename Dtype>
+bool ImageReader<Dtype>::ReadResizeImage(string image_path, int crop_type, bool mirror)
+{
+	cv::Mat cv_img;
+	cv::Mat cv_img_origin = cv::imread(image_path, CV_LOAD_IMAGE_COLOR);
+
+	if (!cv_img_origin.data) 
+	{
+		std::cout << "Could not open or find file " << image_path << std::endl;
+		return false;
+	}
+	if (cv_img_origin.channels() != 3)
+	{
+		std::cout << "error, the channel of image must be 3" << std::endl;
+		return false;
+	}
+
+	if (resize_width_ <= 0 && resize_height_ <= 0)
+	{
+		std::cout << "resize_width_ or resize_height_ must > 0" << std::endl;
+		return false;
+	}
+	cv::resize(cv_img_origin, cv_img, cv::Size(resize_width_, resize_height_));
+
+	int h_off;
+	int w_off;
+	switch (crop_type)
+	{
+	case 0:
+		//left up
+		h_off = 0;
+		w_off = 0;
+		break;
+	case 1:
+		//right up
+		h_off = 0;
+		w_off = resize_width_ - crop_width_;
+		break;
+	case 2:
+		//middle
+		h_off = (resize_height_ - crop_height_) / 2;
+		w_off = (resize_width_ - crop_width_) / 2;
+		break;
+	case 3:
+		//left down
+		h_off = resize_height_ - crop_height_;
+		w_off = 0;
+		break;
+	case 4:
+		//right down
+		h_off = resize_height_ - crop_height_;
+		w_off = resize_width_ - crop_width_;
+		break;
+	default:
+		LOG(FATAL) << "unkown crop type " << crop_type;
+		break;
+	}
+>>>>>>> my_dropout_layers
 	cv::Rect roi(w_off, h_off, crop_width_, crop_height_);
 	cv::Mat cv_cropped_img = cv_img(roi);
 

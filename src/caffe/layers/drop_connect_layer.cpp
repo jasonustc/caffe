@@ -105,7 +105,7 @@ void DropConnectLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   unsigned int* weight_multiplier = this->weight_multiplier_.mutable_cpu_data();
   Dtype* dropped_weight = this->dropped_weight_.mutable_cpu_data();
   const int count = this->blobs_[0]->count();
-  //weight: K_xN_
+  //weight: N_ x K_
   if (this->phase_ == TRAIN){
 	  //create random numbers
 	  caffe_rng_bernoulli(count, 1. - threshold_, weight_multiplier);
@@ -161,11 +161,6 @@ void DropConnectLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 			top_diff, this->dropped_weight_.cpu_data(), (Dtype)0.,
 			bottom[0]->mutable_cpu_diff());
 	}
-	top[0]->PrintDataToFile("top_con");
-	top[0]->PrintDiffToFile("top_con");
-	bottom[0]->PrintDiffToFile("bottom_con");
-	this->blobs_[0]->PrintDiffToFile("weight_con");
-	this->blobs_[0]->PrintDataToFile("weight_con");
 }
 
 #ifdef CPU_ONLY

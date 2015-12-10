@@ -124,6 +124,10 @@ namespace caffe{
 		int N_;
 
 		Blob<Dtype> col_buffer_;
+		Blob<Dtype> intermediate_;
+		Blob<Dtype> E_;
+		Blob<Dtype> weight_diff_temp_;
+		Blob<Dtype> x_diff_temp_;
 	};
 
 	template <typename Dtype>

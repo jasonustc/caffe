@@ -440,6 +440,7 @@ void caffe_gpu_rng_uniform<float>(const int n, const float a, const float b,
   }
 }
 
+//p[i] is the probability to retain the units
 template <typename Dtype>
 __global__ void thred_kernel(const int n, const Dtype* p, unsigned int* r){
 	CUDA_KERNEL_LOOP(index, n){

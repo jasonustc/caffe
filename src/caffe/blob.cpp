@@ -491,151 +491,36 @@ void Blob<Dtype>::ToProto(BlobProto* proto, bool write_diff) const {
 }
 
 template <typename Dtype>
-void Blob<Dtype>::PrintDataToFile(string blob_name, bool print_norm){
-	string file_name = blob_name + "_data";
-	std::ofstream out_data(file_name, std::ofstream::out);
-	this->mutable_cpu_data();
-	this->mutable_gpu_data();
-	const Dtype* blob_data = this->cpu_data();
-	out_data << "num:" << this->num() << "\t";
-	out_data << "channels:" << this->channels() << "\t";
-	out_data << "height:" << this->height() << "\t";
-	out_data << "width:" << this->width() << "\t";
-	if (print_norm){
-		out_data << "L1 norm:" << this->asum_data() << "\t";
-		out_data << "L2 norm:" << this->sumsq_data() << "\n";
+void Blob<Dtype>::ToTxt(const char* filePath, const bool write_diff){
+	CHECK(this->cpu_data());
+	std::ofstream out(filePath);
+	CHECK(out.is_open()) << "can not open " << filePath << " for writing data";
+	int num = this->num();
+	int channels = this->channels();
+	int height = this->height();
+	int width = this->width();
+	out <<  num << "\t";
+	out <<  channels << "\t";
+	out <<  height << "\t";
+	out <<  width << "\n";
+	for (int d = 0; d < this->count(); d++){
+		out << this->cpu_data()[d] << "\t";
 	}
-	out_data << "data:\n";
-	for (int i = 0; i < this->count(); i++){
-		out_data << blob_data[i] << "\t";
-	}
-	out_data.close();
-}
-
-template <typename Dtype>
-void Blob<Dtype>::PrintDiffToFile(string blob_name){
-	string file_name = blob_name + "_diff";
-	std::ofstream out_data(file_name, std::ofstream::out);
-	this->mutable_cpu_diff();
-	this->mutable_gpu_diff();
-	const Dtype* blob_diff = this->cpu_diff();
-	out_data << "num:" << this->num() << "\t";
-	out_data << "channels:" << this->channels() << "\t";
-	out_data << "height:" << this->height() << "\t";
-	out_data << "width:" << this->width() << "\t";
-	out_data << "L1 norm:" << this->asum_diff() << "\t";
-	out_data << "L2 norm:" << this->sumsq_diff() << "\n";
-	out_data << "diff:\n";
-	for (int i = 0; i < this->count(); i++){
-		out_data << blob_diff[i] << "\t";
-	}
-	out_data.close();
-}
-
-template <typename Dtype>
-void Blob<Dtype>::ReadDataFromFile(string blob_name) {
-	string file_name = blob_name + "_data";
-	std::ifstream in_data(file_name, std::ifstream::in);
-	if (!in_data.is_open()){
-		LOG(ERROR) << "open data file " << file_name.c_str() << " failed.";
-		return;
-	}
-	string line;
-	std::getline(in_data, line);
-	vector<string> strs;
-	boost::split(strs, line, boost::is_any_of("\t"));
-	string item;
-	istringstream strstm;
-	int value, num = 1, channels = 1, height = 1, width = 1;
-	for (int i = 0; i < strs.size(); i++){
-		vector<string> infos;
-		line = strs[i];
-		boost::split(infos, line, boost::is_any_of(":"));
-		strstm.clear();
-		strstm.str(infos[1]);
-		if (!(strstm >> value)){
-			value = 1;
+	out.close();
+	if (write_diff){
+		CHECK(this->cpu_diff());
+		string diff_file(filePath);
+		diff_file += "_diff";
+		std::ofstream out_diff(diff_file);
+		CHECK(out_diff.is_open()) << "can not open " << diff_file << " for writing data";
+		out_diff << num << "\t";
+		out_diff << channels << "\t";
+		out_diff << height << "\t";
+		out_diff << width << "\n";
+		for (int d = 0; d < this->count(); d++){
+			out_diff << this->cpu_diff()[d] << "\t";
 		}
-		if (!strcmp(infos[0].c_str(), "num")){
-			num = value;
-		}
-		else if (!strcmp(infos[0].c_str(), "channels")){
-			channels = value;
-		}
-		else if (!strcmp(infos[0].c_str(), "height")){
-			height = value;
-		}
-		else if (!strcmp(infos[0].c_str(), "width")){
-			width = value;
-		}
-	}
-	this->Reshape(num, channels, height, width);
-	std::getline(in_data, line);
-	std::getline(in_data, line);
-	vector<string> feats;
-	boost::split(feats, line, boost::is_any_of("\t"));
-	CHECK_EQ(feats.size(), num*channels*height*width) 
-		<< "num of feats is not compatible with the dim info.";
-	Dtype* blob_data = this->mutable_cpu_data();
-	for (int i = 0; i < feats.size(); i++){
-		strstm.clear();
-		strstm.str(feats[i]);
-		if (!(strstm >> blob_data[i])){
-			blob_data[i] = (Dtype)0.;
-		}
-		std::cout << blob_data[i] << "\t";
-	}
-}
-
-template <typename Dtype>
-void Blob<Dtype>::ReadDiffFromFile(string blob_name) {
-	string file_name = blob_name + "_diff";
-	std::ifstream in_data(file_name, std::ifstream::in);
-	if (!in_data.is_open()){
-		LOG(ERROR) << "open diff file " << file_name.c_str() << " failed.";
-		return;
-	}
-	string line;
-	std::getline(in_data, line);
-	vector<string> strs;
-	boost::split(strs, line, boost::is_any_of("\t"));
-	string item;
-	stringstream strstm;
-	int value, num = 1, channels = 1, height = 1, width = 1;
-	for (int i = 0; i < strs.size(); i++){
-		vector<string> infos;
-		line = strs[i];
-		boost::split(infos, line, boost::is_any_of(": "));
-		strstm.str(infos[1]);
-		if (!(strstm >> value)){
-			value = 1;
-		}
-		if (strcmp(infos[0].c_str(), "num")){
-			num = value;
-		}
-		else if (strcmp(infos[0].c_str(), "channels")){
-			channels = value;
-		}
-		else if (strcmp(infos[0].c_str(), "height")){
-			height = value;
-		}
-		else if (strcmp(infos[0].c_str(), "width")){
-			width = value;
-		}
-	}
-	this->Reshape(num, channels, height, width);
-	std::getline(in_data, line);
-	std::getline(in_data, line);
-	vector<string> feats;
-	boost::split(feats, line, boost::is_any_of("\t"));
-	CHECK_EQ(feats.size(), num*channels*height*width) 
-		<< "num of feats is not compatible with the dim info.";
-	Dtype* blob_data = this->mutable_cpu_diff();
-	for (int i = 0; i < feats.size(); i++){
-		strstm.str(feats[i]);
-		if (!(strstm >> blob_data[i])){
-			blob_data[i] = (Dtype)0.;
-		}
+		out_diff.close();
 	}
 }
 

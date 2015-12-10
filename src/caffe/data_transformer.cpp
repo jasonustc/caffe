@@ -338,6 +338,7 @@ void DataTransformer<Dtype>::Transform(const cv::Mat& cv_img,
         }
         // int top_index = (c * height + h) * width + w;
         Dtype pixel = static_cast<Dtype>(ptr[img_index++]);
+		//we don't need to flip the mean file
         if (has_mean_file) {
           int mean_index = (c * img_height + h_off + h) * img_width + w_off + w;
           transformed_data[top_index] =

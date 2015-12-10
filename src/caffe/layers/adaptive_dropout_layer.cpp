@@ -16,7 +16,7 @@ inline Dtype sigmoid_cpu(Dtype x){
 
 template <typename Dtype>
 inline Dtype relu_cpu(Dtype x){
-	return std::max(x, Dtype(0));
+	return x > 0 ? x : Dtype(0);
 }
 
 template <typename Dtype>
@@ -44,6 +44,8 @@ void AdaptiveDropoutLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 	beta_ = this->layer_param_.adaptive_dropout_param().beta();
 	const int num_output = this->layer_param_.adaptive_dropout_param().num_output();
 	bias_term_ = this->layer_param_.adaptive_dropout_param().bias_term();
+	//dropout layers must have same dim of output as input
+	//index axis is not included
 	N_ = num_output;
 	hidden_act_type_ = this->layer_param_.adaptive_dropout_param().neuron_act_type();
 	prob_act_type_ = this->layer_param_.adaptive_dropout_param().prob_act_type();
@@ -58,6 +60,8 @@ void AdaptiveDropoutLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 	if (this->blobs_.size() > 0) {
 		LOG(INFO) << "Skipping parameter initialization";
 	}
+	//here the binary belief network shares weights and biases with forward network
+	//only use alpha and beta to do affine transformation
 	else {
 		if (bias_term_) {
 			this->blobs_.resize(2);
@@ -142,6 +146,12 @@ void AdaptiveDropoutLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
 	//get probabilities by prob_weight
 	caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasTrans, M_, N_, K_, (Dtype)1.,
 		bottom_data, weight_data, (Dtype)0., prob_vec_data);
+	if (bias_term_) {
+		//add bias
+		caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, N_, 1, (Dtype)1.,
+			bias_multiplier_.cpu_data(),
+			this->blobs_[1]->cpu_data(), (Dtype)1., prob_vec_data);
+	}
 	//compute prob_weight_data from weight_data
 	//prob_act = f(alpha*(pi * bottom + bias) + beta)
 	for (int i = 0; i < this->prob_vec_.count(); i++){
@@ -150,17 +160,16 @@ void AdaptiveDropoutLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom
 	//activation for probability
 	activate_cpu<Dtype>(prob_vec_.count(), this->prob_vec_.cpu_data(), prob_vec_data, prob_act_type_);
 
-	//output = W^T * Input
-	//weight: K_xN_
+	//weight
 	caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasTrans, M_, N_, K_, (Dtype)1.,
 		bottom_data, weight_data, (Dtype)0., unact_hidden_.mutable_cpu_data());
 
 	const int count_top = top[0]->count();
+	//bias
 	if (bias_term_) {
-		//top_data = 1* top_data + bias_multiplier * blobs_[1]
 		caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasNoTrans, M_, N_, 1, (Dtype)1.,
 			bias_multiplier_.cpu_data(),
-			this->blobs_[1]->cpu_data(), (Dtype)1., top_data);
+			this->blobs_[1]->cpu_data(), (Dtype)1., unact_hidden_.mutable_cpu_data());
 	}
 	//activation for hidden units
 	const Dtype* unact_data = unact_hidden_.cpu_data();
@@ -182,7 +191,7 @@ template<typename Dtype>
 inline void SigmoidBackward_cpu(const int n, const Dtype* in_diff,
 	const Dtype* unact_data, Dtype* out_diff){
 	for(int i= 0; i < n ; i++){
-		const Dtype sigmoid_x = 1. / (1. + exp(- unact_data[i]));
+		const Dtype sigmoid_x = 1. / (1. + exp(-unact_data[i]));
 		out_diff[i] = in_diff[i] * sigmoid_x * (1 - sigmoid_x);
 	}
 }
@@ -233,13 +242,14 @@ void AdaptiveDropoutLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 		const Dtype* bottom_data = bottom[0]->cpu_data();
 		// Gradient with respect to weight
 		caffe_cpu_gemm<Dtype>(CblasTrans, CblasNoTrans, N_, K_, M_, (Dtype)1.,
-			unact_diff, bottom_data, (Dtype)0., this->blobs_[0]->mutable_cpu_diff());
+			unact_diff, bottom_data, (Dtype)1., this->blobs_[0]->mutable_cpu_diff());
 	}
 	if (bias_term_ && this->param_propagate_down_[1]) {
 		const Dtype* top_diff = top[0]->cpu_diff();
 		// Gradient with respect to bias
+		// [N_, M_] x [M_, 1] = N_ x 1
 		caffe_cpu_gemv<Dtype>(CblasTrans, M_, N_, (Dtype)1., unact_diff,
-			bias_multiplier_.cpu_data(), (Dtype)0.,
+			bias_multiplier_.cpu_data(), (Dtype)1.,
 			this->blobs_[1]->mutable_cpu_diff());
 	}
 	if (propagate_down[0]) {

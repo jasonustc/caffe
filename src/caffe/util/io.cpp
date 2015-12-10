@@ -91,9 +91,45 @@ cv::Mat ReadImageToCVMat(const string& filename,
   return cv_img;
 }
 
+/*
+ * added by xushen
+ * do isotropic scaling the make the small side of the image is image_size
+ */
+cv::Mat ReadImageToCVMat(const string& filename,
+    const int image_size, const bool is_color) {
+  cv::Mat cv_img;
+  int cv_read_flag = (is_color ? CV_LOAD_IMAGE_COLOR :
+    CV_LOAD_IMAGE_GRAYSCALE);
+  cv::Mat cv_img_origin = cv::imread(filename, cv_read_flag);
+  if (!cv_img_origin.data) {
+    LOG(ERROR) << "Could not open or find file " << filename;
+    return cv_img_origin;
+  }
+  if (image_size > 0) {
+	  int width = cv_img_origin.cols;
+	  int height = cv_img_origin.rows;
+	  int min_size = width > height ? height : width;
+	  float scale = float(image_size) / float(min_size);
+	  if (min_size == width){
+		cv::resize(cv_img_origin, cv_img, cv::Size(image_size, int(height * scale)));
+	  }
+	  else{
+		cv::resize(cv_img_origin, cv_img, cv::Size(int(width * scale), image_size));
+	  }
+  } else {
+    cv_img = cv_img_origin;
+  }
+  return cv_img;
+}
+
 cv::Mat ReadImageToCVMat(const string& filename,
     const int height, const int width) {
   return ReadImageToCVMat(filename, height, width, true);
+}
+
+cv::Mat ReadImageToCVMat(const string& filename,
+    const int image_size) {
+  return ReadImageToCVMat(filename, image_size, true);
 }
 
 cv::Mat ReadImageToCVMat(const string& filename,
@@ -124,6 +160,35 @@ bool ReadImageToDatum(const string& filename, const int label,
   if (cv_img.data) {
     if (encoding.size()) {
       if ( (cv_img.channels() == 3) == is_color && !height && !width &&
+          matchExt(filename, encoding) )
+        return ReadFileToDatum(filename, label, datum);
+      std::vector<uchar> buf;
+      cv::imencode("."+encoding, cv_img, buf);
+      datum->set_data(std::string(reinterpret_cast<char*>(&buf[0]),
+                      buf.size()));
+      datum->set_label(label);
+      datum->set_encoded(true);
+      return true;
+    }
+    CVMatToDatum(cv_img, datum);
+    datum->set_label(label);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/*
+ *Added by xushen, to rescale image to make the
+ *smallest side of the image is image_size
+ */
+bool ReadImageToDatum(const string& filename, const int label,
+    const int image_size, const bool is_color,
+    const std::string & encoding, Datum* datum) {
+  cv::Mat cv_img = ReadImageToCVMat(filename, image_size, is_color);
+  if (cv_img.data) {
+    if (encoding.size()) {
+      if ( (cv_img.channels() == 3) == is_color && !image_size &&
           matchExt(filename, encoding) )
         return ReadFileToDatum(filename, label, datum);
       std::vector<uchar> buf;

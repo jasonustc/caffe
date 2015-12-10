@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 #include "dmodel_loader.h"
+=======
+#include "caffe/dmodel_loader.h"
+>>>>>>> my_dropout_layers
 #include "caffe/proto/caffe.pb.h"
 #include "caffe/util/io.hpp"
 
@@ -16,11 +20,29 @@ DModelLoader<Dtype>::~DModelLoader()
 	std::cout << "model release" << std::endl;
 }
 
+<<<<<<< HEAD
 template <typename Dtype>
 bool DModelLoader<Dtype>::LoadModel(string vgg_mean_path, string vgg_net_path, string vgg_model_path)
 {
 	//::google::InitGoogleLogging("extract vgg");
 	Caffe::set_mode(Caffe::CPU);
+=======
+//allow for both CPU and GPU mode
+template <typename Dtype>
+bool DModelLoader<Dtype>::LoadModel(string vgg_mean_path, string vgg_net_path, string vgg_model_path,
+	Caffe::Brew device, const int device_id)
+{
+	//::google::InitGoogleLogging("extract vgg");
+	if (device == Caffe::CPU){
+		Caffe::set_mode(Caffe::CPU);
+		LOG(INFO) << "Using CPU";
+	}
+	else{
+		Caffe::set_mode(Caffe::GPU);
+		Caffe::SetDevice(device_id);
+		LOG(INFO) << "Using GPU " << device_id;
+	}
+>>>>>>> my_dropout_layers
 
 	feature_extraction_net_ = boost::shared_ptr<Net<Dtype> >(new Net<Dtype>(vgg_net_path, caffe::TEST));
 	feature_extraction_net_->CopyTrainedLayersFrom(vgg_model_path);
@@ -35,6 +57,10 @@ bool DModelLoader<Dtype>::LoadModel(string vgg_mean_path, string vgg_net_path, s
 		return false;
 	}
 
+<<<<<<< HEAD
+=======
+	//set the input of the net to data_layer_
+>>>>>>> my_dropout_layers
 	data_layer_ = feature_extraction_net_->blob_by_name(data_layer_name_);
 
 	batch_size_ = data_layer_->num();
@@ -74,13 +100,81 @@ void DModelLoader<Dtype>::SubMean(const Dtype *x, const Dtype *y, Dtype *dst)
 				top_index = (c * height_ + h) * width_ + w;
 				mean_index = (c * mean_height_ + h_off + h) * mean_width_ + w_off + w;
 				dst[top_index] = (x[img_index] - y[mean_index]);
+<<<<<<< HEAD
 
+=======
 				img_index++;
 			}
 		}
 	}
 }
 
+//mean_width_: resize width, width_: width after crop
+template <typename Dtype>
+void DModelLoader<Dtype>::SubMean(const Dtype *x, const Dtype *y, Dtype *dst,
+	int crop_type, bool mirror)
+{
+	int img_index, top_index, mean_index;
+	int h_off;
+	int w_off;
+	switch (crop_type)
+	{
+	case 0:
+		//left up
+		h_off = 0;
+		w_off = 0;
+		break;
+	case 1:
+		//right up
+		h_off = 0;
+		w_off = mean_width_ - width_;
+		break;
+	case 2:
+		//middle
+		h_off = (mean_height_ - height_) / 2;
+		w_off = (mean_width_ - width_) / 2;
+		break;
+	case 3:
+		//left down
+		h_off = mean_height_ - height_;
+		w_off = 0;
+		break;
+	case 4:
+		//right down
+		h_off = mean_height_ - height_;
+		w_off = mean_width_ - width_;
+		break;
+	default:
+		LOG(FATAL) << "unkown crop type " << crop_type;
+		break;
+	}
+
+	for (int h = 0; h < height_; ++h) 
+	{
+		img_index = h * width_ * channels_;
+		for (int w = 0; w < width_; ++w) 
+		{
+			for (int c = 0; c < channels_; ++c) 
+			{	
+				if (mirror){
+					top_index = (c * height_ + h) * width_ + (width_ - 1 - w);
+				}
+				else{
+					top_index = (c * height_ + h) * width_ + w;
+				}
+				mean_index = (c * mean_height_ + h_off + h) * mean_width_ + w_off + w;
+				dst[top_index] = (x[img_index] - y[mean_index]);
+>>>>>>> my_dropout_layers
+				img_index++;
+			}
+		}
+	}
+}
+
+<<<<<<< HEAD
+=======
+//TODO: refine to deal with multi-crops
+>>>>>>> my_dropout_layers
 template <typename Dtype>
 void DModelLoader<Dtype>::Forward(const Dtype *image_data)
 {
@@ -93,6 +187,21 @@ void DModelLoader<Dtype>::Forward(const Dtype *image_data)
 }
 
 template <typename Dtype>
+<<<<<<< HEAD
+=======
+void DModelLoader<Dtype>::Forward(const Dtype *image_data, int crop_type, bool mirror)
+{
+	std::vector<Blob<Dtype>*> input_vec;
+	
+	SubMean(image_data, data_mean_.cpu_data(), data_sub_mean_.mutable_cpu_data(),
+		crop_type, mirror);
+
+	memcpy(data_layer_->mutable_cpu_data(), data_sub_mean_.cpu_data(), sizeof(Dtype)* count_);
+	feature_extraction_net_->Forward(input_vec);
+}
+
+template <typename Dtype>
+>>>>>>> my_dropout_layers
 bool DModelLoader<Dtype>::GetFeatures(Dtype *fea, const char *layer_name)
 {
 	if (!feature_extraction_net_->has_blob(layer_name))

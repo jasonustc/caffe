@@ -229,12 +229,7 @@ class Blob {
   void Update();
   void FromProto(const BlobProto& proto, bool reshape = true);
   void ToProto(BlobProto* proto, bool write_diff = false) const;
-
-  /// @brief print the blob data to file, for debug usage.
-  void PrintDataToFile(string blob_name, bool print_norm = true);
-  void PrintDiffToFile(string blob_name);
-  void ReadDataFromFile(string blob_name);
-  void ReadDiffFromFile(string blob_name);
+  void ToTxt(const char* filePath, const bool write_diff = false);
 
   /// @brief Compute the sum of absolute values (L1 norm) of the data.
   Dtype asum_data() const;

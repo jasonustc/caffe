@@ -22,11 +22,19 @@ void DropoutLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   mu_ = this->layer_param_.dropout_param().mu();
   sigma_ = this->layer_param_.dropout_param().sigma();
   //debug only check, not check in non-debug mode
-  DCHECK(threshold_ > 0.);
-  DCHECK(threshold_ < 1.);
-  DCHECK(a_ < b_);
-  DCHECK(sigma_ > 0.);
-  scale_ = 1. / (1. - threshold_);
+  CHECK(threshold_ > 0.);
+  CHECK(threshold_ < 1.);
+  CHECK(a_ < b_);
+  CHECK(sigma_ > 0.);
+  if (drop_type_ == DropoutParameter_DROPTYPE_UNIFORM){
+	  scale_ = 2. / (b_ + a_);
+  }
+  else if (drop_type_ == DropoutParameter_DROPTYPE_GAUSSIAN){
+	  scale_ = 1. / mu_;
+  }
+  else{
+	  scale_ = 1. / (1. - threshold_);
+  }
   uint_thres_ = static_cast<unsigned int>(UINT_MAX * threshold_);
 }
 
@@ -49,21 +57,26 @@ void DropoutLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   if (this->phase_ == TRAIN) {
     // Create random numbers
 	  if (this->drop_type_ == DropoutParameter_DROPTYPE_UNIFORM){
-		caffe_rng_uniform(count, (Dtype)a_, (Dtype)b_, mask);
-		scale_ = 2. / (b_ - a_);
+		  caffe_rng_uniform(count, (Dtype)a_, (Dtype)b_, mask);
+		  scale_ = 2. / (b_ - a_);
 	  }
 	  else if(this->drop_type_ == DropoutParameter_DROPTYPE_GAUSSIAN){
-		caffe_rng_gaussian(count, (Dtype)mu_, (Dtype)sigma_, mask);
-		scale_ = 1. / mu_;
+		  caffe_rng_gaussian(count, (Dtype)mu_, (Dtype)sigma_, mask);
+		  //clip to be in [0,1]
+		  for (int i = 0; i < count; i++){
+			  Dtype m = mask[i];
+			  mask[i] = m < 1 ? (m > 0 ? m : 0) : 1;
+		  }
+		  scale_ = 1. / mu_;
 	  }
 	  else{
-		caffe_rng_bernoulli_c<Dtype>(count, 1. - threshold_, mask);
+		  caffe_rng_bernoulli_c<Dtype>(count, 1. - threshold_, mask);
 	  }
 	  for (int i = 0; i < count; ++i) {
 		  top_data[i] = bottom_data[i] * mask[i] * scale_;
 	  }
   } else {
-    caffe_copy(bottom[0]->count(), bottom_data, top_data);
+	  caffe_copy(bottom[0]->count(), bottom_data, top_data);
   }
 }
 
