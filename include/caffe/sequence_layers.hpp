@@ -761,6 +761,34 @@ protected:
 	int seq_len_;
 };
 
+/*
+ * @brief: get the end h data of sequence
+ * @input1: catened h
+ * @input2: cont, sequence indicator
+ * @output: h_T
+ * but how to determine the #of end hs is still a problem
+ */
+
+template <typename Dtype>
+class SequenceEndLayer : public Layer<Dtype>{
+public:
+	explicit SequenceEndLayer(const LayerParameter& param)
+		: Layer<Dtype>(param){}
+	virtual inline const char* type() const { return "SequenceEnd"; }
+	virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+	virtual void Reshape(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+	virtual inline int ExactNumBottomBlobs() const { return 1; }
+	virtual inline int ExactNumTopBlobs() const { return 1; }
+
+protected:
+	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+	virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+		const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+	virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+	virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+		const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+};
+
 }  // namespace caffe
 
 #endif  // CAFFE_SEQUENCE_LAYERS_HPP_
