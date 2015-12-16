@@ -250,15 +250,15 @@
       <Filter>src\test</Filter>
     </ClCompile>
     <ClCompile Include="..\src\caffe\dmodel_loader.cpp">
-      <Filter>src</Filter>
+      <Filter>src\extract_feat</Filter>
     </ClCompile>
     <ClCompile Include="..\src\caffe\fea_extractor.cpp">
-      <Filter>src</Filter>
+      <Filter>src\extract_feat</Filter>
     </ClCompile>
     <ClCompile Include="..\src\caffe\image_reader.cpp">
-      <Filter>src</Filter>
+      <Filter>src\extract_feat</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\convert_imageset.cpp" />
+    <ClCompile Include="..\tools\check_data_in_db.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
@@ -488,7 +488,6 @@
     <ClInclude Include="..\include\caffe\test\test_gradient_check_util.hpp">
       <Filter>include\test</Filter>
     </ClInclude>
-<<<<<<< HEAD
     <ClInclude Include="..\include\dmodel_loader.h">
       <Filter>include\extract_feat</Filter>
     </ClInclude>
@@ -497,7 +496,7 @@
     </ClInclude>
     <ClInclude Include="..\include\image_reader.h">
       <Filter>include\extract_feat</Filter>
-=======
+    </ClInclude>
     <ClInclude Include="..\include\caffe\dmodel_loader.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -506,7 +505,6 @@
     </ClInclude>
     <ClInclude Include="..\include\caffe\image_reader.h">
       <Filter>include</Filter>
->>>>>>> my_dropout_layers
     </ClInclude>
   </ItemGroup>
 </Project>

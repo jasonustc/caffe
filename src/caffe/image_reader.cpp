@@ -1,26 +1,14 @@
-<<<<<<< HEAD
-#include "image_reader.h"
-#include <opencv\highgui.h>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <fstream>
-=======
 #include "caffe/image_reader.h"
 #include <opencv\highgui.h>
 #include <fstream>
 #include "caffe/common.hpp"
->>>>>>> my_dropout_layers
 
 template <typename Dtype>
 ImageReader<Dtype>::ImageReader()
 {
 	image_data_ = NULL;
-<<<<<<< HEAD
-	resize_height_ = 255;
-	resize_width_ = 255;
-=======
 	resize_height_ = 256;
 	resize_width_ = 256;
->>>>>>> my_dropout_layers
 }
 
 template <typename Dtype>
@@ -48,8 +36,6 @@ void ImageReader<Dtype>::Print()
 }
 
 template <typename Dtype>
-<<<<<<< HEAD
-=======
 bool ImageReader<Dtype>::ReadImage(string image_path){
 //	cv::Mat cv_img;
 	cv::Mat cv_img_origin = cv::imread(image_path, CV_LOAD_IMAGE_COLOR);
@@ -125,7 +111,6 @@ bool ImageReader<Dtype>::GetCropImageData(const int crop_type, const bool mirror
 }
 
 template <typename Dtype>
->>>>>>> my_dropout_layers
 bool ImageReader<Dtype>::ReadResizeImage(string image_path)
 {
 	cv::Mat cv_img;
@@ -151,8 +136,6 @@ bool ImageReader<Dtype>::ReadResizeImage(string image_path)
 
 	int h_off = (resize_height_ - crop_height_) / 2;
 	int w_off = (resize_width_ - crop_width_) / 2;
-<<<<<<< HEAD
-=======
 	//here just use the middle crop for feature extraction
 	cv::Rect roi(w_off, h_off, crop_width_, crop_height_);
 	cv::Mat cv_cropped_img = cv_img(roi);
@@ -226,7 +209,6 @@ bool ImageReader<Dtype>::ReadResizeImage(string image_path, int crop_type, bool 
 		LOG(FATAL) << "unkown crop type " << crop_type;
 		break;
 	}
->>>>>>> my_dropout_layers
 	cv::Rect roi(w_off, h_off, crop_width_, crop_height_);
 	cv::Mat cv_cropped_img = cv_img(roi);
 

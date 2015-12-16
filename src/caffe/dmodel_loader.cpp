@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-#include "dmodel_loader.h"
-=======
 #include "caffe/dmodel_loader.h"
->>>>>>> my_dropout_layers
 #include "caffe/proto/caffe.pb.h"
 #include "caffe/util/io.hpp"
 
@@ -20,13 +16,6 @@ DModelLoader<Dtype>::~DModelLoader()
 	std::cout << "model release" << std::endl;
 }
 
-<<<<<<< HEAD
-template <typename Dtype>
-bool DModelLoader<Dtype>::LoadModel(string vgg_mean_path, string vgg_net_path, string vgg_model_path)
-{
-	//::google::InitGoogleLogging("extract vgg");
-	Caffe::set_mode(Caffe::CPU);
-=======
 //allow for both CPU and GPU mode
 template <typename Dtype>
 bool DModelLoader<Dtype>::LoadModel(string vgg_mean_path, string vgg_net_path, string vgg_model_path,
@@ -42,7 +31,6 @@ bool DModelLoader<Dtype>::LoadModel(string vgg_mean_path, string vgg_net_path, s
 		Caffe::SetDevice(device_id);
 		LOG(INFO) << "Using GPU " << device_id;
 	}
->>>>>>> my_dropout_layers
 
 	feature_extraction_net_ = boost::shared_ptr<Net<Dtype> >(new Net<Dtype>(vgg_net_path, caffe::TEST));
 	feature_extraction_net_->CopyTrainedLayersFrom(vgg_model_path);
@@ -57,10 +45,7 @@ bool DModelLoader<Dtype>::LoadModel(string vgg_mean_path, string vgg_net_path, s
 		return false;
 	}
 
-<<<<<<< HEAD
-=======
 	//set the input of the net to data_layer_
->>>>>>> my_dropout_layers
 	data_layer_ = feature_extraction_net_->blob_by_name(data_layer_name_);
 
 	batch_size_ = data_layer_->num();
@@ -100,9 +85,6 @@ void DModelLoader<Dtype>::SubMean(const Dtype *x, const Dtype *y, Dtype *dst)
 				top_index = (c * height_ + h) * width_ + w;
 				mean_index = (c * mean_height_ + h_off + h) * mean_width_ + w_off + w;
 				dst[top_index] = (x[img_index] - y[mean_index]);
-<<<<<<< HEAD
-
-=======
 				img_index++;
 			}
 		}
@@ -164,17 +146,13 @@ void DModelLoader<Dtype>::SubMean(const Dtype *x, const Dtype *y, Dtype *dst,
 				}
 				mean_index = (c * mean_height_ + h_off + h) * mean_width_ + w_off + w;
 				dst[top_index] = (x[img_index] - y[mean_index]);
->>>>>>> my_dropout_layers
 				img_index++;
 			}
 		}
 	}
 }
 
-<<<<<<< HEAD
-=======
 //TODO: refine to deal with multi-crops
->>>>>>> my_dropout_layers
 template <typename Dtype>
 void DModelLoader<Dtype>::Forward(const Dtype *image_data)
 {
@@ -187,8 +165,6 @@ void DModelLoader<Dtype>::Forward(const Dtype *image_data)
 }
 
 template <typename Dtype>
-<<<<<<< HEAD
-=======
 void DModelLoader<Dtype>::Forward(const Dtype *image_data, int crop_type, bool mirror)
 {
 	std::vector<Blob<Dtype>*> input_vec;
@@ -201,7 +177,6 @@ void DModelLoader<Dtype>::Forward(const Dtype *image_data, int crop_type, bool m
 }
 
 template <typename Dtype>
->>>>>>> my_dropout_layers
 bool DModelLoader<Dtype>::GetFeatures(Dtype *fea, const char *layer_name)
 {
 	if (!feature_extraction_net_->has_blob(layer_name))

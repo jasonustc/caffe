@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-#include "fea_extractor.h"
-=======
 #include "caffe/fea_extractor.h"
->>>>>>> my_dropout_layers
 
 bool CreateHandle(FeaExtractor<float>* &fea_extractor)
 {
@@ -30,13 +26,6 @@ bool LoadDModel(
 	string mean_path,    // mean.binaryproto
 	string net_path,    // net.txt
 	string model_path, // model
-<<<<<<< HEAD
-	string layer_name     // layer_name can be "fc6", "fc7", "fc8", "prob"
-	)
-{
-	FeaExtractor<float> *ptr = (FeaExtractor<float> *)fea_extractor;
-	return ptr->LoadModel(mean_path, net_path, model_path, layer_name);
-=======
 	string layer_name,     // layer_name can be "fc6", "fc7", "fc8", "prob"
 	Caffe::Brew device,
 	const int device_id
@@ -44,7 +33,6 @@ bool LoadDModel(
 {
 	FeaExtractor<float> *ptr = (FeaExtractor<float> *)fea_extractor;
 	return ptr->LoadModel(mean_path, net_path, model_path, layer_name, device, device_id);
->>>>>>> my_dropout_layers
 }
 
 bool ExtractFeaturesByPath(void *fea_extractor, string image_path)
@@ -53,8 +41,6 @@ bool ExtractFeaturesByPath(void *fea_extractor, string image_path)
 	return ptr->ExtractFea(image_path);
 }
 
-<<<<<<< HEAD
-=======
 bool ExtractCropFeaturesByPath(void *fea_extractor, string image_path, const int dim)
 {
 	FeaExtractor<float> *ptr = (FeaExtractor<float> *)fea_extractor;
@@ -68,7 +54,6 @@ bool ExtractFeaturesByPath(void *fea_extractor, string image_path,
 	return ptr->ExtractFea(image_path, crop_type, mirror);
 }
 
->>>>>>> my_dropout_layers
 bool ExtractFeaturesByData(
 	void *fea_extractor, 
 	void *scan0, 
@@ -117,24 +102,16 @@ bool FeaExtractor<Dtype>::LoadModel(
 	string mean_path,    // vgg_mean.binaryproto
 	string net_path,    // vgg_net.txt
 	string model_path, // vgg.model
-<<<<<<< HEAD
-	string layer_name     // layer_name can be "fc6", "fc7", "fc8", "prob"
-=======
 	string layer_name,     // layer_name can be "fc6", "fc7", "fc8", "prob"
 	Caffe::Brew device,
 	const int device_id
->>>>>>> my_dropout_layers
 	)
 {
 	layer_name_ = layer_name;
 
 	// load vgg model
 	std::cout << "begin to load model" << std::endl;
-<<<<<<< HEAD
-	bool succ = dmodel_loader_.LoadModel(mean_path, net_path, model_path);
-=======
 	bool succ = dmodel_loader_.LoadModel(mean_path, net_path, model_path, device, device_id);
->>>>>>> my_dropout_layers
 	if (!succ) 
 	{ 
 		std::cout << "error, failed to load model" << std::endl;
@@ -193,8 +170,6 @@ bool FeaExtractor<Dtype>::ExtractFea(string image_path)
 }
 
 template <typename Dtype>
-<<<<<<< HEAD
-=======
 bool FeaExtractor<Dtype>::ExtractFea(string image_path, int crop_type, bool mirror)
 {
 	bool succ = image_reader_.ReadResizeImage(image_path, crop_type, mirror); // read and transform image
@@ -273,7 +248,6 @@ bool FeaExtractor<Dtype>::ExtractCropFea(string image_path, const int dim)
 }
 
 template <typename Dtype>
->>>>>>> my_dropout_layers
 bool FeaExtractor<Dtype>::ExtractFea(void *scan0, int width, int height, int stride, int channel)
 {
 	bool succ = image_reader_.ReadResizeImage(scan0, width, height, stride, channel); // read and transform image
