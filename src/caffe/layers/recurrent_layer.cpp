@@ -177,24 +177,13 @@ void RecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 	this->param_propagate_down_.clear();
 	this->param_propagate_down_.resize(this->blobs_.size(), true);
 
-	// here since they are not bottom of any other layer, so they are top layers
-	// so loss weight is stored in the cpu_diff
-	// loss weight is set to 0 means we don't backpropagate diff of this layer down
 	// Set the diffs of recurrent outputs to 0 -- we can't backpropagate across
 	// batches.
-	// because recur_output_blobs is only the last states of the last sequence,
-	// so we can not let them to back propagation errors accross the whole unrolled 
-	// sequence.
-	// but we still need to store the states of them to pass to the next beginning of 
-	// batch input. Because it may be not the end of a sequence, so we need to pass them 
-	// to be c_0 and h_0 for the next input batch.
-	// but in decoder LSTM we don't need this, because C_T and h_T will be connected
-	// with decoder LSTM units
-	if (!decode_){
-		for (int i = 0; i < recur_output_blobs_.size(); ++i) {
-			caffe_set(recur_output_blobs_[i]->count(), Dtype(0),
-				recur_output_blobs_[i]->mutable_cpu_diff());
-		}
+	// if we use the end to as an independent output layer, we have split 
+	// to make them backward independently
+	for (int i = 0; i < recur_output_blobs_.size(); ++i) {
+		caffe_set(recur_output_blobs_[i]->count(), Dtype(0),
+			recur_output_blobs_[i]->mutable_cpu_diff());
 	}
 }
 

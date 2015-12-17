@@ -12,7 +12,6 @@ namespace caffe{
 	template <typename Dtype>
 	void NormLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
 		const vector<Blob<Dtype>*>& top){
-		LOG(INFO) << "Forward gpu here.";
 		const int count = bottom[0]->count();
 		const int num = bottom[0]->num();
 		const Dtype* bottom_data = bottom[0]->gpu_data();
@@ -39,7 +38,6 @@ namespace caffe{
 	void NormLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
 		const vector<bool>& propagate_down,
 		const vector<Blob<Dtype>*>& bottom){
-		LOG(INFO) << "Backward gpu here.";
 		const int count = bottom[0]->count();
 		const int num = bottom[0]->num();
 		Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();

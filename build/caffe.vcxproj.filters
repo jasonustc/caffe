@@ -294,22 +294,7 @@
     <ClCompile Include="..\src\caffe\layers\gen_rec_loss_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\declstm_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\declstm_unit_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\lstm_layer_decode.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\caffe\layers\lstm_unit_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\recurrent_dlayer_dec.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\recurrent_layer_dec.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
     <ClCompile Include="..\src\caffe\layers\neighbor_contrast_layer.cpp">
@@ -318,7 +303,22 @@
     <ClCompile Include="..\src\caffe\layers\rbm_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\convert_sequence_adding_data.cpp" />
+    <ClCompile Include="..\src\caffe\layers\dec_lstm_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\dec_lstm_unit_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\recurrent_dec_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\recurrent_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\lstm_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tools\caffe.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
@@ -462,22 +462,22 @@
     <CudaCompile Include="..\src\caffe\layers\gen_rec_loss_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\declstm_unit_layer.cu">
-      <Filter>src\layers</Filter>
-    </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\lstm_unit_layer.cu">
-      <Filter>src\layers</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\recurrent_dlayer_dec.cu">
-      <Filter>src\layers</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\recurrent_layer_dec.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\neighbor_contrast_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\rbm_layer.cu">
+      <Filter>src\layers</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\src\caffe\layers\dec_lstm_unit_layer.cu">
+      <Filter>src\layers</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\src\caffe\layers\recurrent_dec_layer.cu">
+      <Filter>src\layers</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\src\caffe\layers\recurrent_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
   </ItemGroup>

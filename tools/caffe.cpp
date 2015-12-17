@@ -192,6 +192,7 @@ int test() {
         caffe_net.blob_loss_weights()[caffe_net.output_blob_indices()[i]];
     std::ostringstream loss_msg_stream;
     const float mean_score = test_score[i] / FLAGS_iterations;
+	//if loss weight is not 0, we output loss
     if (loss_weight) {
       loss_msg_stream << " (* " << loss_weight
                       << " = " << loss_weight * mean_score << " loss)";

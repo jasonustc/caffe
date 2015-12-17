@@ -16,6 +16,7 @@ void MVNLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       1, 1);
   variance_.Reshape(bottom[0]->num(), bottom[0]->channels(),
       1, 1);
+  //mean of each pixel
   temp_.Reshape(bottom[0]->num(), bottom[0]->channels(),
       bottom[0]->height(), bottom[0]->width());
   sum_multiplier_.Reshape(1, 1,
