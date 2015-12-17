@@ -29,7 +29,8 @@ void parse_line_feat(string& line, vector<float>& feat){
 	float feat_i;
 	for (vector<string>::iterator it = strs.begin(); 
 		it != strs.end(); ++it){
-		feat_i = stof(*it);
+		istringstream iss(*it);
+		iss >> feat_i;
 		feat.push_back(feat_i);
 	}
 }

@@ -68,8 +68,9 @@ int main(int argc, char** argv){
 			{
 			case 1:
 			{
-			  cv::MatIterator_<uchar> it, end;
-			  for (it = cv_img.begin<uchar>(); end != cv_img.end<uchar>(); ++it){
+			  //CV_8U in datum
+			  cv::MatIterator_<unsigned int> it, end;
+			  for (it = cv_img.begin<unsigned int>(); end != cv_img.end<unsigned int>(); ++it){
 				  fprintf(output, "%d ", static_cast<unsigned int>(*it));
 			  }
 			  break;
