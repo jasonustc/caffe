@@ -30,10 +30,7 @@ int main(int argc, char** argv) {
 template<typename Dtype>
 int feature_extraction_pipeline(int argc, char** argv) {
 	::google::InitGoogleLogging(argv[0]);
-<<<<<<< HEAD
-=======
 //	::google::SetStderrLogging(0);
->>>>>>> my_dropout_layers
 	const int num_required_args = 6;
 	if (argc < num_required_args) {
 		LOG(ERROR)<<
@@ -41,11 +38,7 @@ int feature_extraction_pipeline(int argc, char** argv) {
 			" extract features of the input data produced by the net.\n"
 			"Usage: extract_features  pretrained_net_param"
 			"  feature_extraction_proto_file  extract_feature_blob_name1[,name2,...]"
-<<<<<<< HEAD
-			"  save_feature_leveldb_name1[,name2,...]  num_mini_batches  [CPU/GPU]"
-=======
 			"  save_feature_file_name1[,name2,...]  num_mini_batches  [CPU/GPU]"
->>>>>>> my_dropout_layers
 			"  [DEVICE_ID=0]\n"
 			"Note: you can extract multiple features in one pass by specifying"
 			" multiple feature blob names and leveldb names seperated by ','."
@@ -134,33 +127,22 @@ int feature_extraction_pipeline(int argc, char** argv) {
 		feature_dbs.push_back(db);
 	}
 
-<<<<<<< HEAD
-	int num_mini_batches = atoi(argv[++arg_pos]);
-
-	LOG(ERROR)<< "Extacting Features";
-=======
 	//num_mini_batches * batch_size = num of test images
 	int num_mini_batches = atoi(argv[++arg_pos]);
 
 	LOG(INFO)<< "Extacting Features";
->>>>>>> my_dropout_layers
-
 	
 	vector<Blob<float>*> input_vec;
 	vector<int> image_indices(num_features, 0);
 	for (int batch_index = 0; batch_index < num_mini_batches; ++batch_index) {
-
 
 		feature_extraction_net->Forward(input_vec);
 		for (int i = 0; i < num_features; ++i) {
 			const boost::shared_ptr<Blob<Dtype> > feature_blob = feature_extraction_net
 				->blob_by_name(blob_names[i]);
 			int batch_size = feature_blob->num();
-<<<<<<< HEAD
-=======
 //			LOG(INFO) << feature_blob->channels() << "\t" << feature_blob->height() 
 //				<< "\t" << feature_blob->width();
->>>>>>> my_dropout_layers
 			int dim_features = feature_blob->count() / batch_size;
 			const Dtype* feature_blob_data;
 			for (int n = 0; n < batch_size; ++n) {
