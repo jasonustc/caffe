@@ -415,7 +415,10 @@ class PoolingLayer : public Layer<Dtype> {
   int pooled_height_, pooled_width_;
   bool global_pooling_;
   Blob<Dtype> rand_idx_;
+  //index of pooled elements
   Blob<int> max_idx_;
+  //index of min pooling
+  Blob<int> min_idx_;
 };
 
 
