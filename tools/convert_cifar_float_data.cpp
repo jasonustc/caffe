@@ -71,13 +71,13 @@ void convert_dataset_float (const string& input_folder, const string& output_fol
 	for (int fileid = 0; fileid < kCIFARTrainBatches; ++fileid) {
 		// Open files
 		LOG(INFO) << "Training Batch " << fileid + 1;
-		sprintf_s(str_buffer, KMaxKeyLength, "/data_batch_binary_%d", fileid + 1);
+		snprintf(str_buffer, KMaxKeyLength, "/data_batch_binary_%d", fileid + 1);
 		std::ifstream data_file((input_folder + str_buffer).c_str(),
 			std::ios::in | std::ios::binary);
 		CHECK(data_file) << "Unable to open train file #" << fileid + 1;
 		for (int itemid = 0; itemid < kCIFARBatchSize; ++itemid) {
 			read_image_float(&data_file, &label, &datum);
-			int length = sprintf_s(str_buffer, KMaxKeyLength, "%05d",
+			int length = snprintf(str_buffer, KMaxKeyLength, "%05d",
 				fileid * kCIFARBatchSize + itemid);
 			string out;
 			CHECK_EQ(datum.float_data_size(), datum.channels() * datum.height() * datum.width()) <<
@@ -99,7 +99,7 @@ void convert_dataset_float (const string& input_folder, const string& output_fol
 	CHECK(data_file) << "Unable to open test file.";
 	for (int itemid = 0; itemid < kCIFARBatchSize; ++itemid) {
 		read_image_float(&data_file, &label, &datum);
-		int length = sprintf_s(str_buffer, KMaxKeyLength, "%05d", itemid);
+		int length = snprintf(str_buffer, KMaxKeyLength, "%05d", itemid);
 		string out;
 		CHECK(datum.SerializeToString(&out));
 		txn->Put(string(str_buffer, length), out);

@@ -119,10 +119,10 @@ int feature_extraction_pipeline(int argc, char** argv) {
 	
 
 	vector<std::ofstream*> feature_dbs;
-	for(int i=0;i<num_features;i++)
+	for(int i = 0;i < num_features;i++)
 	{
-		LOG(INFO)<<"opening feature files:"<<leveldb_names[i];
-		std::ofstream* db=new std::ofstream(leveldb_names[i], std::ios_base::binary|std::ios_base::out);
+		LOG(INFO) << "opening feature files: " << leveldb_names[i];
+		std::ofstream* db=new std::ofstream(leveldb_names[i].c_str(), std::ios_base::binary|std::ios_base::out);
 		feature_dbs.push_back(db);
 	}
 

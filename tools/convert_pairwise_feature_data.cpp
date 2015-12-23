@@ -13,8 +13,8 @@
 
 void read_feature(std::pair<int, int> feature_pair, std::vector<std::string> feature_list, int dim, caffe::Datum& datum) {
 	
-  std::ifstream feature1(feature_list[feature_pair.first], std::ios::in);
-  std::ifstream feature2(feature_list[feature_pair.second], std::ios::in);
+  std::ifstream feature1(feature_list[feature_pair.first].c_str(), std::ios::in);
+  std::ifstream feature2(feature_list[feature_pair.second].c_str(), std::ios::in);
   float value;
   for(int i=0;i<dim;i++)
   {
@@ -51,7 +51,7 @@ void convert_dataset(const char* feature_list_filename, const char* pair_list_fi
   int index1;
   int index2;
 
-  std::vector<std::pair<int, int>> pair_list;
+  std::vector<std::pair<int, int> > pair_list;
   while(pair_list_in>>index1>>index2)
   {
     pair_list.push_back(std::make_pair(index1, index2));
@@ -97,7 +97,7 @@ void convert_dataset(const char* feature_list_filename, const char* pair_list_fi
     
     datum.set_label(1);
     datum.SerializeToString(&value);
-    _snprintf(key, kMaxKeyLength, "%08d", pairid);
+    snprintf(key, kMaxKeyLength, "%08d", pairid);
     db->Put(leveldb::WriteOptions(), std::string(key), value);
 	if(pairid%100==0)
 		LOG(INFO)<<"pairid:"<<pairid;

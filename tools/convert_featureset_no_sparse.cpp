@@ -45,6 +45,7 @@ int main(int argc, char** argv) {
   if_feature_set.read((char*)&row, sizeof(int));
   if_feature_set.read((char*)&col, sizeof(int));
   if_feature_set.read((char*)&data_type, sizeof(int));
+
   LOG(INFO) << "row: "<<row<<"\ncol: "<<col<<"\ntype: "<<data_type;
   //std::cout << row << '\n' << col << '\n' << data_type;
 
@@ -98,7 +99,7 @@ int main(int argc, char** argv) {
           << datum.float_data().size();
     }
     // sequential
-    _snprintf(key_cstr, kMaxKeyLength, "%08d", line_id);
+    snprintf(key_cstr, kMaxKeyLength, "%08d", line_id);
     string value;
     // get the value
     datum.SerializeToString(&value);

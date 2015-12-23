@@ -4,12 +4,12 @@
 
 #include "caffe/common.hpp"
 #include "caffe/util/rng.hpp"
-#include <process.h>
+//#include <process.h>
 
 //port for Win32
-#ifdef _MSC_VER
-#define getpid _getpid
-#endif
+//#ifdef _MSC_VER
+//#define getpid _getpid
+//#endif
 
 namespace caffe {
 

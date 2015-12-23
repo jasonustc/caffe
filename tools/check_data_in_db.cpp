@@ -7,7 +7,7 @@
 #include "caffe/proto/caffe.pb.h"
 #include "caffe/util/io.hpp"
 #include "caffe/util/db.hpp"
-#include "opencv2\opencv.hpp"
+#include "opencv2/opencv.hpp"
 #include "boost/scoped_ptr.hpp"
 
 using caffe::Datum;

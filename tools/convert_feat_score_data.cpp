@@ -36,7 +36,7 @@ void parse_line_feat(string& line, vector<float>& feat){
 }
 
 void convert_dataset_float (const string& feat_file, const string& db_name) {
-	ifstream in_feat(feat_file);
+	ifstream in_feat(feat_file.c_str());
 	CHECK(in_feat.is_open()) << "Can not open feat file: " << feat_file;
 
 	//create score and feat db
@@ -89,8 +89,8 @@ void convert_dataset_float (const string& feat_file, const string& db_name) {
 		string out_score;
 		feat_datum.SerializeToString(&out_feat);
 		score_datum.SerializeToString(&out_score);
-		int len_feat = sprintf_s(key_cstr_feat, kMaxKeyLength, "%09d", count);
-		int len_score = sprintf_s(key_cstr_score, kMaxKeyLength, "%09d", count);
+		int len_feat = snprintf(key_cstr_feat, kMaxKeyLength, "%09d", count);
+		int len_score = snprintf(key_cstr_score, kMaxKeyLength, "%09d", count);
 		//put into db
 		txn_feat->Put(std::string(key_cstr_feat, len_feat), out_feat);
 		txn_score->Put(std::string(key_cstr_score, len_score), out_score);
