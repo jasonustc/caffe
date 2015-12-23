@@ -27,6 +27,7 @@ DEFINE_double(start_prop, 0, "The start proportion of the data set");
 DEFINE_double(end_prop, 1, "The end proportion of the data set");
 DEFINE_int32(rand_crop_num, 10, "The number of random crops");
 
+cv::Mat RandomCropCVMat(cv::Mat& ori_img, const int resize_width, const int resize_height);
 
 
 void convert_image_data(const string folder_name, const string& img_idx_file_name, const string &db_name,

@@ -101,6 +101,7 @@ namespace caffe{
 }
 
 int main(int argc, char** argv){
+	::google::InitGoogleLogging(*argv);
 	caffe::PoolingLayerTest<float> test;
 	test.TestSetUp();
 	test.TestCPUForward();
