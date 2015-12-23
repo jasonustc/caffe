@@ -27,6 +27,7 @@ DEFINE_double(start_prop, 0, "The start proportion of the data set");
 DEFINE_double(end_prop, 1, "The end proportion of the data set");
 DEFINE_int32(rand_crop_num, 10, "The number of random crops");
 
+cv::Mat RandomCropCVMat(cv::Mat& ori_img, const int resize_width, const int resize_height);
 
 //TODO: implement the random crop function here
 cv::Mat RandomCropCVMat(cv::Mat& ori_img, const int resize_width, 
