@@ -24,13 +24,13 @@ void convert_dataset(const char* video2feature_list_filename, const char* video_
 	CHECK(video_list_in) << "Unable to open file " << video_list_filename;
 
 	//read metadata
-	map<int, vector<string>> video2feature_list;
+	map<int, vector<string> > video2feature_list;
 	int video;
 	string feature;
 	while (video2feature_list_in >> video >> feature)
 	{
 		if (video2feature_list.find(video) == video2feature_list.end())
-			video2feature_list.insert(pair<int, vector<string>>(video, vector<string>()));
+			video2feature_list.insert(pair<int, vector<string> >(video, vector<string>()));
 		video2feature_list[video].push_back(feature);
 	}
 
@@ -81,7 +81,7 @@ void convert_dataset(const char* video2feature_list_filename, const char* video_
 		for (int i = 0; i < feature_list1.size(); i++)
 		{
 			string feature = feature_list1[i]; 
-			std::ifstream feature_in(feature, std::ios::in);
+			std::ifstream feature_in(feature.c_str(), std::ios::in);
 			float value;
 			for (int i = 0; i<feature_dim; i++)
 			{
@@ -91,7 +91,7 @@ void convert_dataset(const char* video2feature_list_filename, const char* video_
 			feature_in.close();
 		}
 		merge_datum.SerializeToString(&out);
-		int length = sprintf_s(key, kMaxKeyLength, "%08d", videoid);
+		int length = snprintf(key, kMaxKeyLength, "%08d", videoid);
 		batch->Put(string(key, length), out);
 		if (videoid% 100 == 0)
 		{

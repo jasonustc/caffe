@@ -29,12 +29,17 @@ DEFINE_int32(rand_crop_num, 10, "The number of random crops");
 
 cv::Mat RandomCropCVMat(cv::Mat& ori_img, const int resize_width, const int resize_height);
 
+//TODO: implement the random crop function here
+cv::Mat RandomCropCVMat(cv::Mat& ori_img, const int resize_width, 
+    const int resize_height){
+    return ori_img;
+}
 
 void convert_image_data(const string folder_name, const string& img_idx_file_name, const string &db_name,
 	std::string& enc, const int rand_N ,const bool gray, const bool shuffle,const int resize_width,
 	const int resize_height, const double start_prop, const double end_prop){
-	std::ifstream infile(img_idx_file_name);
-	std::vector<std::pair<std::string, int>> lines;
+	std::ifstream infile(img_idx_file_name.c_str());
+	std::vector<std::pair<std::string, int> > lines;
 	std::string imgname;
 	int label;
 
@@ -50,7 +55,7 @@ void convert_image_data(const string folder_name, const string& img_idx_file_nam
 		string ext = pos == img_idx_file_name.npos ? img_idx_file_name : img_idx_file_name.substr(pos);
 		string file_name = img_idx_file_name.substr(0, pos);
 		const std::string shuffle_file = file_name + "_shuffled" + ext;
-		std::ofstream outfile(shuffle_file);
+		std::ofstream outfile(shuffle_file.c_str());
 		CHECK(outfile.is_open());
 		for (size_t l = 0; l < lines.size(); l++){
 			outfile << lines[l].first << "\t" << lines[l].second << "\n";
@@ -132,7 +137,7 @@ void convert_image_data(const string folder_name, const string& img_idx_file_nam
 			//sequential
 			string out;
 			pair_datum.SerializeToString(&out);
-			int length = sprintf_s(key_cstr, kMaxKeyLength, "%08d_%03d_%s", line_id, randi,
+			int length = snprintf(key_cstr, kMaxKeyLength, "%08d_%03d_%s", line_id, randi,
 				lines[line_id].first.c_str());
 //			//Put in db
 			leveldb::Status s = db->Put(leveldb::WriteOptions(), std::string(key_cstr, length), out);

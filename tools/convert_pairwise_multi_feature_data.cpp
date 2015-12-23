@@ -17,8 +17,8 @@ using namespace caffe;
 
 void read_feature(std::pair<int, int> feature_pair, std::vector<std::string> video2feature_list, int dim, caffe::Datum& datum) {
 
-	std::ifstream feature1(video2feature_list[feature_pair.first], std::ios::in);
-	std::ifstream feature2(video2feature_list[feature_pair.second], std::ios::in);
+	std::ifstream feature1(video2feature_list[feature_pair.first].c_str(), std::ios::in);
+	std::ifstream feature2(video2feature_list[feature_pair.second].c_str(), std::ios::in);
 	float value;
 	for (int i = 0; i<dim; i++)
 	{
@@ -42,20 +42,20 @@ void convert_dataset(const char* video2feature_list_filename, const char* pair_l
 	CHECK(pair_list_in) << "Unable to open file " << pair_list_filename;
 
 	//read metadata
-	map<int, vector<string>> video2feature_list;
+	map<int, vector<string> > video2feature_list;
 	int video;
 	string feature;
 	while (video2feature_list_in >> video >> feature)
 	{
 		if (video2feature_list.find(video) == video2feature_list.end())
-			video2feature_list.insert(pair<int, vector<string>>(video, vector<string>()));
+			video2feature_list.insert(pair<int, vector<string> >(video, vector<string>()));
 		video2feature_list[video].push_back(feature);
 	}
 
 	int index1;
 	int index2;
 
-	std::vector<std::pair<int, int>> pair_list;
+	std::vector<std::pair<int, int> > pair_list;
 	while (pair_list_in >> index1 >> index2)
 	{
 		pair_list.push_back(std::make_pair(index1, index2));
@@ -103,7 +103,7 @@ void convert_dataset(const char* video2feature_list_filename, const char* pair_l
 		for (int i = 0; i < feature_list1.size(); i++)
 		{
 			string feature = feature_list1[i]; 
-			std::ifstream feature_in(feature, std::ios::in);
+			std::ifstream feature_in(feature.c_str(), std::ios::in);
 			float value;
 			for (int i = 0; i<feature_dim; i++)
 			{
@@ -115,7 +115,7 @@ void convert_dataset(const char* video2feature_list_filename, const char* pair_l
 		for (int i = 0; i < feature_list2.size(); i++)
 		{
 			string feature = feature_list2[i]; 
-			std::ifstream feature_in(feature, std::ios::in);
+			std::ifstream feature_in(feature.c_str(), std::ios::in);
 			float value;
 			for (int i = 0; i<feature_dim; i++)
 			{
@@ -125,7 +125,7 @@ void convert_dataset(const char* video2feature_list_filename, const char* pair_l
 			feature_in.close();
 		}
 		merge_datum.SerializeToString(&out);
-		int length = sprintf_s(key, kMaxKeyLength, "%08d", pairid);
+		int length = snprintf(key, kMaxKeyLength, "%08d", pairid);
 		batch->Put(string(key, length), out);
 		if (pairid % 100 == 0)
 		{

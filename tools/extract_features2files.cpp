@@ -123,7 +123,7 @@ int feature_extraction_pipeline(int argc, char** argv) {
 	for(int i=0;i<num_features;i++)
 	{
 		LOG(INFO)<<"opening feature files:"<<leveldb_names[i];
-		std::ofstream* db=new std::ofstream(leveldb_names[i]);
+		std::ofstream* db=new std::ofstream(leveldb_names[i].c_str());
 		feature_dbs.push_back(db);
 	}
 

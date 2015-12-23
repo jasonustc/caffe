@@ -87,7 +87,7 @@ float* GetMutableFeaPtr(void *fea_extractor)
 template <typename Dtype>
 FeaExtractor<Dtype>::FeaExtractor()
 {
-	fea_ = NULL;
+//	fea_ = NULL;
 	dim_ = -1;
 }
 

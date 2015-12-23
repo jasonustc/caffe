@@ -4,13 +4,13 @@
 
 #include "glog/logging.h"
 #include "google/protobuf/text_format.h"
-#include "leveldb\db.h"
+#include "leveldb/db.h"
 #include "stdint.h"
 #include "caffe/util/io.hpp"
 #include "caffe/proto/caffe.pb.h"
-#include "caffe\util\math_functions.hpp"
-#include "boost\scoped_ptr.hpp"
-#include "opencv2\core\core.hpp"
+#include "caffe/util/math_functions.hpp"
+#include "boost/scoped_ptr.hpp"
+#include "opencv2/core/core.hpp"
 
 using namespace std;
 using namespace caffe;
@@ -33,7 +33,7 @@ bool is_good(const string& image){
 }
 
 void get_image_list(const string& index_file, bool shuffle, 
-	std::vector<std::pair<std::string, std::string>>& lines){
+	std::vector<std::pair<std::string, std::string> >& lines){
 	lines.clear();
 	ifstream in_file(index_file.c_str());
 	CHECK(in_file.is_open()) << "Can not open index image file: " << index_file;
@@ -51,7 +51,7 @@ void get_image_list(const string& index_file, bool shuffle,
 		string ext = pos == index_file.npos ? index_file : index_file.substr(pos);
 		string file_name = index_file.substr(0, pos);
 		const std::string shuffle_file = file_name + "_shuffled" + ext;
-		std::ofstream outfile(shuffle_file);
+		std::ofstream outfile(shuffle_file.c_str());
 		CHECK(outfile.is_open()) << "can not open shuffling file: " << shuffle_file;
 		for (size_t l = 0; l < lines.size(); l++){
 			outfile << lines[l].first << "\t" << lines[l].second << "\n";
@@ -65,7 +65,7 @@ void get_image_list(const string& index_file, bool shuffle,
 void create_db(const string& index_file, const string& db_name,
 	std::string& enc, const bool gray, const bool shuffle, const int resize_width,
 	const int resize_height, const int start_id, const int end_id, 
-	std::vector<std::pair<string, string>>& lines){
+	std::vector<std::pair<string, string> >& lines){
 
 	//create new db
 	leveldb::DB* db;
@@ -138,7 +138,7 @@ void create_db(const string& index_file, const string& db_name,
 		//sequential 
 		string out;
 		pair_datum.SerializeToString(&out);
-		int length = sprintf_s(key_cstr, kMaxKeyLength, "%08d_%s_%s", line_id, 
+		int length = snprintf(key_cstr, kMaxKeyLength, "%08d_%s_%s", line_id, 
 			good_image_path.c_str(), bad_image_path.c_str());
 		//put into db
 		leveldb::Status s = db->Put(leveldb::WriteOptions(), std::string(key_cstr, length), out);
@@ -159,7 +159,7 @@ void convert_image_data(const string& index_file, const string& db_name,
 	std::string& enc, const bool gray, const bool shuffle, const int resize_width,
 	const int resize_height, const bool split_valid = false, const float train_prop = 1.){
 	//read index image paths
-	std::vector<std::pair<string, string>> lines;
+	std::vector<std::pair<string, string> > lines;
 	get_image_list(index_file, shuffle, lines);
 	//db proportion
 	const int train_end = split_valid == true ? int(train_prop * lines.size()) : lines.size();

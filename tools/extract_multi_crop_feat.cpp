@@ -8,7 +8,7 @@ using namespace std;
 
 void load_file_list(const string& file_path, vector<string>& imgList){
 	imgList.clear();
-	ifstream inImages(file_path);
+	ifstream inImages(file_path.c_str());
 	if (!inImages.is_open()){
 		LOG(FATAL) << "can not load indexes from file " << file_path;
 	}
@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
 //			load_coeffs(coeff_path, coeffs, dim);
 //			NormalizeFeat(dim, fea, coeffs);
 			string out_feat_path = img_list[i] + ".feat";
-			ofstream outfile(out_feat_path);
+			ofstream outfile(out_feat_path.c_str());
 
 			for (int j = 0; j < dim; j++)
 			{
@@ -112,7 +112,7 @@ int main(int argc, char** argv) {
 	}
 	else{
 		string output_path = img_path + ".feat";
-		ofstream outfile(output_path);
+		ofstream outfile(output_path.c_str());
 		ExtractFeaturesByPath(fea_extractor, img_path);
 		float *fea = GetMutableFeaPtr(fea_extractor);
 		load_coeffs(coeff_path, coeffs, dim);

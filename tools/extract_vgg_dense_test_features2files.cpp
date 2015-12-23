@@ -130,7 +130,7 @@ int feature_extraction_pipeline(int argc, char** argv) {
 	for(int i=0;i<num_features;i++)
 	{
 		LOG(ERROR)<<"opening feature files:"<<leveldb_names[i];
-		std::ofstream* db=new std::ofstream(leveldb_names[i]);
+		std::ofstream* db=new std::ofstream(leveldb_names[i].c_str());
 		feature_dbs.push_back(db);
 	}
 
@@ -187,7 +187,7 @@ int feature_extraction_pipeline(int argc, char** argv) {
 						break;
 					case 2:
 						//max pooling
-						pool_feat = FLT_MIN;
+						pool_feat = 1e-8;
 						for (int s = 0; s < spatial_dim; s++){
 							if (feature_blob_data[s] > pool_feat){
 								pool_feat = feature_blob_data[s];

@@ -1,5 +1,5 @@
 #include "caffe/image_reader.h"
-#include <opencv\highgui.h>
+#include <opencv/highgui.h>
 #include <fstream>
 #include "caffe/common.hpp"
 

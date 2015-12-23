@@ -279,7 +279,7 @@ void convert_dataset_raw(const char* folder_name, const char* db_path,
 		string idx_str(index_cstr);
 		string zcn_str("--zcn");
 		string image_filename = folder_name + path_gap + batch_prefix + idx_str;
-		std::ifstream image_file(image_filename, std::ios::in);
+		std::ifstream image_file(image_filename.c_str(), std::ios::in);
 		CHECK(image_file) << "Unable to open file " << image_filename;
 		LOG(INFO) << "load data in " << image_filename;
 		string value;

@@ -511,7 +511,7 @@ void Blob<Dtype>::ToTxt(const char* filePath, const bool write_diff){
 		CHECK(this->cpu_diff());
 		string diff_file(filePath);
 		diff_file += "_diff";
-		std::ofstream out_diff(diff_file);
+		std::ofstream out_diff(diff_file.c_str());
 		CHECK(out_diff.is_open()) << "can not open " << diff_file << " for writing data";
 		out_diff << num << "\t";
 		out_diff << channels << "\t";

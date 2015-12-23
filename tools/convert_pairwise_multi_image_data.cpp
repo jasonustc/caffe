@@ -16,8 +16,8 @@ using namespace caffe;
 
 void read_feature(std::pair<int, int> feature_pair, std::vector<std::string> video2img_list, int dim, caffe::Datum& datum) {
 	
-  std::ifstream feature1(video2img_list[feature_pair.first], std::ios::in);
-  std::ifstream feature2(video2img_list[feature_pair.second], std::ios::in);
+  std::ifstream feature1(video2img_list[feature_pair.first].c_str(), std::ios::in);
+  std::ifstream feature2(video2img_list[feature_pair.second].c_str(), std::ios::in);
   float value;
   for(int i=0;i<dim;i++)
   {
@@ -41,20 +41,20 @@ void convert_dataset(const char* video2img_list_filename, const char* pair_list_
   CHECK(pair_list_in) << "Unable to open file " << pair_list_filename;
   
   //read metadata
-  map<int, vector<string>> video2img_list;
+  map<int, vector<string> > video2img_list;
   int video;
   string img;
-  while(video2img_list_in>>video>>img)
+  while(video2img_list_in >> video >> img)
   {
 	  if (video2img_list.find(video) == video2img_list.end())
-		  video2img_list.insert(pair<int, vector<string>>(video, vector<string>()));
+		  video2img_list.insert(pair<int, vector<string> >(video, vector<string>()));
 	  video2img_list[video].push_back(img);
   }
 
   int index1;
   int index2;
 
-  std::vector<std::pair<int, int>> pair_list;
+  std::vector<std::pair<int, int> > pair_list;
   while(pair_list_in>>index1>>index2)
   {
     pair_list.push_back(std::make_pair(index1, index2));
@@ -127,7 +127,7 @@ void convert_dataset(const char* video2img_list_filename, const char* pair_list_
 	  CHECK(buffer.size() == merge_datum.channels()*merge_datum.width()*merge_datum.height()) << "buffer != merge_datum\n";
 	  merge_datum.set_data(buffer);
 	  merge_datum.SerializeToString(&value);
-	  int length = sprintf_s(key, kMaxKeyLength, "%08d", pairid);
+	  int length = snprintf(key, kMaxKeyLength, "%08d", pairid);
 	  db->Put(leveldb::WriteOptions(), string(key, length), value);
 	  if (pairid % 100==0)
 		  LOG(INFO) << "pairid:" << pairid;

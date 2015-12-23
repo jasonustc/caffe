@@ -14,7 +14,7 @@ DEFINE_bool(multi_crop, false, "if we test by 10 crops or center crop only.");
 
 void load_file_list(const string& file_path, vector<string>& imgList){
 	imgList.clear();
-	ifstream inImages(file_path);
+	ifstream inImages(file_path.c_str());
 	if (!inImages.is_open()){
 		LOG(FATAL) << "can not load indexes from file " << file_path;
 	}
@@ -25,10 +25,10 @@ void load_file_list(const string& file_path, vector<string>& imgList){
 	LOG(INFO) << "Load " << imgList.size() << " images.";
 }
 
-void load_file_list(const string& file_path, vector<pair<string, int>>& imgList,
+void load_file_list(const string& file_path, vector<pair<string, int> >& imgList,
 	string folder_path){
 	imgList.clear();
-	ifstream inImages(file_path);
+	ifstream inImages(file_path.c_str());
 	if (!inImages.is_open()){
 		LOG(FATAL) << "can not load indexes from file " << file_path;
 	}
@@ -74,13 +74,13 @@ void NormalizeFeat(const int count, float* feat, const float* coeffs){
 }
 
 bool isTruePred(const int count, const float* feat, const int label, const int top_k){
-	std::vector<std::pair<float, int>> feat_data;
+	std::vector<std::pair<float, int> > feat_data;
 	for (int i = 0; i < count; i++){
 		feat_data.push_back(
 			std::make_pair(feat[i], i));
 	}
 	std::partial_sort(feat_data.begin(), feat_data.begin() + top_k,
-		feat_data.end(), std::greater<std::pair<float, int>>());
+		feat_data.end(), std::greater<std::pair<float, int> >());
 	//check if true label is in the top k predictions
 	for (int k = 0; k < top_k; k++){
 		if (label == feat_data[k].second){
@@ -114,8 +114,8 @@ int main(int argc, char** argv) {
 	string layer_name = argv[4];
 	string img_path = argv[5];
 	string folder_path = argv[6];
-	int top_k = stoi(argv[7]);
-	vector<std::pair<string, int>> img_list;
+	int top_k = atoi(argv[7]);
+	vector<std::pair<string, int> > img_list;
 	bool txt = is_txt(img_path);
 	if (txt){
 		load_file_list(img_path, img_list, folder_path);
