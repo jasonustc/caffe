@@ -19,7 +19,7 @@ namespace caffe{
 		}
 		~PoolingLayerTest(){ delete input_map_; delete output_map_; }
 		void TestSetUp(){
-			shared_ptr<Layer<Dtype>> layer(new PoolingLayer<Dtype>(layer_param_));
+			shared_ptr<Layer<Dtype> > layer(new PoolingLayer<Dtype>(layer_param_));
 			Caffe::set_mode(Caffe::CPU);
 			layer->SetUp(bottom_, top_);
 			bottom_[0]->ToTxt("bottom_data");
@@ -29,7 +29,7 @@ namespace caffe{
 			CHECK_EQ(top_[0]->width(), 2);
 		}
 		void TestCPUForward(){
-			shared_ptr<Layer<Dtype>> layer(new PoolingLayer<Dtype>(layer_param_));
+			shared_ptr<Layer<Dtype> >  layer(new PoolingLayer<Dtype>(layer_param_));
 			Caffe::set_mode(Caffe::CPU);
 			layer->SetUp(bottom_, top_);
 			layer->Forward(bottom_, top_);
@@ -48,7 +48,7 @@ namespace caffe{
 			checker.CheckGradientExhaustive(&layer, bottom_, top_);
 		}
 		void TestGPUForward(){
-			shared_ptr<Layer<Dtype>> layer(new PoolingLayer<Dtype>(layer_param_));
+			shared_ptr<Layer<Dtype> > layer(new PoolingLayer<Dtype>(layer_param_));
 			Caffe::set_mode(Caffe::GPU);
 			layer->SetUp(bottom_, top_);
 			layer->Forward(bottom_, top_);
