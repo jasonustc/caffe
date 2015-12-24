@@ -237,15 +237,6 @@
     <ClCompile Include="..\src\caffe\layers\drop_connect_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\local_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\local_adaptive_dropout_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\local_dropconnect_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\gtest\gtest-all.cpp">
       <Filter>src\test</Filter>
     </ClCompile>
@@ -259,7 +250,9 @@
       <Filter>src\extract_feat</Filter>
     </ClCompile>
     <ClCompile Include="..\tools\caffe.cpp" />
-    <ClCompile Include="..\tools\convert_pairwise_multi_image_data_xushen.cpp" />
+    <ClCompile Include="..\src\caffe\layers\norm_loss_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
@@ -379,13 +372,7 @@
     <CudaCompile Include="..\src\caffe\layers\drop_connect_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\local_layer.cu">
-      <Filter>src\layers</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\local_adaptive_dropout_layer.cu">
-      <Filter>src\layers</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\local_dropconnect_layer.cu">
+    <CudaCompile Include="..\src\caffe\layers\norm_loss_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
   </ItemGroup>

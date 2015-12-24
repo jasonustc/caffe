@@ -1,0 +1,63 @@
+#include <algorithm>
+#include <cfloat>
+#include <vector>
+
+#include "caffe/layer.hpp"
+#include "caffe/layer_factory.hpp"
+#include "caffe/util/math_functions.hpp"
+#include "caffe/vision_layers.hpp"
+
+namespace caffe{
+
+	template <typename Dtype>
+	void NormLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top){
+		const int count = bottom[0]->count();
+		const int num = bottom[0]->num();
+		const Dtype* bottom_data = bottom[0]->gpu_data();
+		Dtype* top_data = top[0]->mutable_gpu_data();
+		const Dtype scale = 1. / Dtype(num);
+		Dtype asum;
+		switch (norm_type_){
+		case NormLossParameter_NormType_L1:
+			caffe_gpu_asum(count, bottom_data, &asum);
+			asum *= scale;
+			top[0]->mutable_cpu_data()[0] = asum;
+			break;
+		case NormLossParameter_NormType_L2:
+			caffe_gpu_dot(count, bottom_data, bottom_data, &asum);
+			asum *= scale * Dtype(0.5);
+			top[0]->mutable_cpu_data()[0] = asum;
+			break;
+		default:
+			LOG(FATAL) << "Unkown Norm Type.";
+		}
+	}
+
+	template <typename Dtype>
+	void NormLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
+		const vector<bool>& propagate_down,
+		const vector<Blob<Dtype>*>& bottom){
+		const int count = bottom[0]->count();
+		const int num = bottom[0]->num();
+		Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
+		const Dtype* bottom_data = bottom[0]->gpu_data();
+		const Dtype loss_weight = top[0]->cpu_diff()[0];
+		Dtype alpha = loss_weight / num;
+		switch (norm_type_)
+		{
+		case NormLossParameter_NormType_L1:
+			caffe_gpu_sign(count, bottom_data, bottom_diff);
+			caffe_gpu_scal(count, alpha, bottom_diff);
+			break;
+		case NormLossParameter_NormType_L2:
+			caffe_gpu_axpby(count, alpha, bottom_data, Dtype(0), bottom_diff);
+			break;
+		default:
+			LOG(FATAL) << "Unkown Norm Type.";
+		}
+	}
+
+	INSTANTIATE_LAYER_GPU_FUNCS(NormLossLayer);
+}
+

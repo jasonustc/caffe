@@ -11,7 +11,9 @@
 #include "caffe/blob.hpp"
 #include "caffe/common.hpp"
 #include "caffe/proto/caffe.pb.h"
-//#include "mkstemp.h"
+#ifdef _MSC_VER
+#include "mkstemp.h"
+#endif
 
 #define HDF5_NUM_DIMS 4
 

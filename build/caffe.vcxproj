@@ -58,15 +58,13 @@
     <ClCompile Include="..\src\caffe\layers\image_data_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\infogain_loss_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\inner_product_layer.cpp" />
-    <ClCompile Include="..\src\caffe\layers\local_adaptive_dropout_layer.cpp" />
-    <ClCompile Include="..\src\caffe\layers\local_dropconnect_layer.cpp" />
-    <ClCompile Include="..\src\caffe\layers\local_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\loss_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\lrn_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\memory_data_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\multinomial_logistic_loss_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\mvn_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\neuron_layer.cpp" />
+    <ClCompile Include="..\src\caffe\layers\norm_loss_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\pooling_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\power_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\relu_layer.cpp" />
@@ -94,7 +92,6 @@
     <ClCompile Include="..\src\caffe\util\upgrade_proto.cpp" />
     <ClCompile Include="..\src\gtest\gtest-all.cpp" />
     <ClCompile Include="..\tools\caffe.cpp" />
-    <ClCompile Include="..\tools\convert_pairwise_multi_image_data_xushen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu" />
@@ -120,11 +117,9 @@
     <CudaCompile Include="..\src\caffe\layers\hdf5_output_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\im2col_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\inner_product_layer.cu" />
-    <CudaCompile Include="..\src\caffe\layers\local_adaptive_dropout_layer.cu" />
-    <CudaCompile Include="..\src\caffe\layers\local_dropconnect_layer.cu" />
-    <CudaCompile Include="..\src\caffe\layers\local_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\lrn_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\mvn_layer.cu" />
+    <CudaCompile Include="..\src\caffe\layers\norm_loss_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\pooling_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\power_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\relu_layer.cu" />

@@ -334,9 +334,7 @@ message LayerParameter {
   optional WindowDataParameter window_data_param = 129;
   optional DropConnectParameter drop_connect_param = 131;
   optional AdaptiveDropoutParameter adaptive_dropout_param = 132;
-  optional LocalParameter local_param = 133;
-  optional LocalAdaptiveDropoutParameter local_adaptive_dropout_param = 134;
-  optional LocalDropConnectParameter local_dropconnect_param = 135;
+  optional NormLossParameter norm_loss_param = 133;
 }
 
 // Message that stores parameters used to apply transformation
@@ -358,6 +356,15 @@ message TransformationParameter {
   // or can be repeated the same number of times as channels
   // (would subtract them from the corresponding channel)
   repeated float mean_value = 5;
+}
+
+//Message that stores parameters used to calculate l1/l2 loss
+message NormLossParameter{
+    enum NormType{
+        L1 = 1;
+        L2 = 2;
+    }
+    optional NormType norm_type = 1[default = L1]; //norm type
 }
 
 // Message that stores parameters shared by loss layers
