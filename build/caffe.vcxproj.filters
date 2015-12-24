@@ -259,6 +259,7 @@
       <Filter>src\extract_feat</Filter>
     </ClCompile>
     <ClCompile Include="..\tools\caffe.cpp" />
+    <ClCompile Include="..\tools\convert_pairwise_multi_image_data_xushen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
