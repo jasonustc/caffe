@@ -167,6 +167,7 @@ int test() {
         caffe_net.Forward(bottom_vec, &iter_loss);
     loss += iter_loss;
     int idx = 0;
+	LOG(INFO) << "Batch " << i << ", " << "loss = " << iter_loss;
     for (int j = 0; j < result.size(); ++j) {
       const float* result_vec = result[j]->cpu_data();
       for (int k = 0; k < result[j]->count(); ++k, ++idx) {

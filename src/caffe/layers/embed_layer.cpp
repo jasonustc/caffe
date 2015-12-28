@@ -78,6 +78,9 @@ void EmbedLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     DCHECK_GE(index, 0);
     DCHECK_LT(index, K_);
     DCHECK_EQ(static_cast<Dtype>(index), bottom_data[n]) << "non-integer input";
+	//the other dim is 0, so it's equal that we just copy
+	//the index row of weight to the output
+	//just the same as innerproduct
     caffe_copy(N_, weight + index * N_, top_data + n * N_);
   }
   if (bias_term_) {

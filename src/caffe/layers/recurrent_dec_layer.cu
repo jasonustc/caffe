@@ -1,3 +1,10 @@
+/********************************************************************************
+** Copyright(c) 2015 USTC Reserved.
+** auth: Xu Shen
+** mail: shenxu@mail.ustc.edu.cn
+** date: 2015/10/4
+** desc: DecodingRecurrentLayer(GPU)
+*********************************************************************************/
 #include <vector>
 
 #include "caffe/blob.hpp"

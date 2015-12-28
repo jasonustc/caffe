@@ -46,6 +46,7 @@ class NetState;
 class NetStateRule;
 class ParamSpec;
 class LayerParameter;
+class BLEUParameter;
 class RBMParameter;
 class NormLossParameter;
 class NoiseParameter;
@@ -3027,6 +3028,15 @@ class LayerParameter : public ::google::protobuf::Message {
   inline ::caffe::ConvRecurrentParameter* release_conv_recurrent_param();
   inline void set_allocated_conv_recurrent_param(::caffe::ConvRecurrentParameter* conv_recurrent_param);
 
+  // optional .caffe.BLEUParameter bleu_param = 148;
+  inline bool has_bleu_param() const;
+  inline void clear_bleu_param();
+  static const int kBleuParamFieldNumber = 148;
+  inline const ::caffe::BLEUParameter& bleu_param() const;
+  inline ::caffe::BLEUParameter* mutable_bleu_param();
+  inline ::caffe::BLEUParameter* release_bleu_param();
+  inline void set_allocated_bleu_param(::caffe::BLEUParameter* bleu_param);
+
   // @@protoc_insertion_point(class_scope:caffe.LayerParameter)
  private:
   inline void set_has_name();
@@ -3131,6 +3141,8 @@ class LayerParameter : public ::google::protobuf::Message {
   inline void clear_has_rbm_param();
   inline void set_has_conv_recurrent_param();
   inline void clear_has_conv_recurrent_param();
+  inline void set_has_bleu_param();
+  inline void clear_has_bleu_param();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -3192,6 +3204,7 @@ class LayerParameter : public ::google::protobuf::Message {
   ::caffe::NormLossParameter* norm_loss_param_;
   ::caffe::RBMParameter* rbm_param_;
   ::caffe::ConvRecurrentParameter* conv_recurrent_param_;
+  ::caffe::BLEUParameter* bleu_param_;
   int phase_;
   mutable int _cached_size_;
   friend void  protobuf_AddDesc_caffe_2eproto();
@@ -3200,6 +3213,75 @@ class LayerParameter : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static LayerParameter* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class BLEUParameter : public ::google::protobuf::Message {
+ public:
+  BLEUParameter();
+  virtual ~BLEUParameter();
+
+  BLEUParameter(const BLEUParameter& from);
+
+  inline BLEUParameter& operator=(const BLEUParameter& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const BLEUParameter& default_instance();
+
+  void Swap(BLEUParameter* other);
+
+  // implements Message ----------------------------------------------
+
+  BLEUParameter* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const BLEUParameter& from);
+  void MergeFrom(const BLEUParameter& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:caffe.BLEUParameter)
+ private:
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  friend void  protobuf_AddDesc_caffe_2eproto();
+  friend void protobuf_AssignDesc_caffe_2eproto();
+  friend void protobuf_ShutdownFile_caffe_2eproto();
+
+  void InitAsDefaultInstance();
+  static BLEUParameter* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -7555,6 +7637,20 @@ class RecurrentParameter : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 sequence_length() const;
   inline void set_sequence_length(::google::protobuf::uint32 value);
 
+  // optional bool reverse = 11 [default = false];
+  inline bool has_reverse() const;
+  inline void clear_reverse();
+  static const int kReverseFieldNumber = 11;
+  inline bool reverse() const;
+  inline void set_reverse(bool value);
+
+  // optional bool copy = 12 [default = false];
+  inline bool has_copy() const;
+  inline void clear_copy();
+  static const int kCopyFieldNumber = 12;
+  inline bool copy() const;
+  inline void set_copy(bool value);
+
   // @@protoc_insertion_point(class_scope:caffe.RecurrentParameter)
  private:
   inline void set_has_num_output();
@@ -7569,6 +7665,10 @@ class RecurrentParameter : public ::google::protobuf::Message {
   inline void clear_has_decode();
   inline void set_has_sequence_length();
   inline void clear_has_sequence_length();
+  inline void set_has_reverse();
+  inline void clear_has_reverse();
+  inline void set_has_copy();
+  inline void clear_has_copy();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -7577,9 +7677,11 @@ class RecurrentParameter : public ::google::protobuf::Message {
   ::caffe::FillerParameter* weight_filler_;
   ::caffe::FillerParameter* bias_filler_;
   ::google::protobuf::uint32 num_output_;
+  ::google::protobuf::uint32 sequence_length_;
   bool debug_info_;
   bool decode_;
-  ::google::protobuf::uint32 sequence_length_;
+  bool reverse_;
+  bool copy_;
   friend void  protobuf_AddDesc_caffe_2eproto();
   friend void protobuf_AssignDesc_caffe_2eproto();
   friend void protobuf_ShutdownFile_caffe_2eproto();
@@ -15585,6 +15687,51 @@ inline void LayerParameter::set_allocated_conv_recurrent_param(::caffe::ConvRecu
   // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.conv_recurrent_param)
 }
 
+// optional .caffe.BLEUParameter bleu_param = 148;
+inline bool LayerParameter::has_bleu_param() const {
+  return (_has_bits_[1] & 0x04000000u) != 0;
+}
+inline void LayerParameter::set_has_bleu_param() {
+  _has_bits_[1] |= 0x04000000u;
+}
+inline void LayerParameter::clear_has_bleu_param() {
+  _has_bits_[1] &= ~0x04000000u;
+}
+inline void LayerParameter::clear_bleu_param() {
+  if (bleu_param_ != NULL) bleu_param_->::caffe::BLEUParameter::Clear();
+  clear_has_bleu_param();
+}
+inline const ::caffe::BLEUParameter& LayerParameter::bleu_param() const {
+  // @@protoc_insertion_point(field_get:caffe.LayerParameter.bleu_param)
+  return bleu_param_ != NULL ? *bleu_param_ : *default_instance_->bleu_param_;
+}
+inline ::caffe::BLEUParameter* LayerParameter::mutable_bleu_param() {
+  set_has_bleu_param();
+  if (bleu_param_ == NULL) bleu_param_ = new ::caffe::BLEUParameter;
+  // @@protoc_insertion_point(field_mutable:caffe.LayerParameter.bleu_param)
+  return bleu_param_;
+}
+inline ::caffe::BLEUParameter* LayerParameter::release_bleu_param() {
+  clear_has_bleu_param();
+  ::caffe::BLEUParameter* temp = bleu_param_;
+  bleu_param_ = NULL;
+  return temp;
+}
+inline void LayerParameter::set_allocated_bleu_param(::caffe::BLEUParameter* bleu_param) {
+  delete bleu_param_;
+  bleu_param_ = bleu_param;
+  if (bleu_param) {
+    set_has_bleu_param();
+  } else {
+    clear_has_bleu_param();
+  }
+  // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.bleu_param)
+}
+
+// -------------------------------------------------------------------
+
+// BLEUParameter
+
 // -------------------------------------------------------------------
 
 // RBMParameter
@@ -20214,6 +20361,54 @@ inline void RecurrentParameter::set_sequence_length(::google::protobuf::uint32 v
   set_has_sequence_length();
   sequence_length_ = value;
   // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.sequence_length)
+}
+
+// optional bool reverse = 11 [default = false];
+inline bool RecurrentParameter::has_reverse() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void RecurrentParameter::set_has_reverse() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void RecurrentParameter::clear_has_reverse() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void RecurrentParameter::clear_reverse() {
+  reverse_ = false;
+  clear_has_reverse();
+}
+inline bool RecurrentParameter::reverse() const {
+  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.reverse)
+  return reverse_;
+}
+inline void RecurrentParameter::set_reverse(bool value) {
+  set_has_reverse();
+  reverse_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.reverse)
+}
+
+// optional bool copy = 12 [default = false];
+inline bool RecurrentParameter::has_copy() const {
+  return (_has_bits_[0] & 0x00000080u) != 0;
+}
+inline void RecurrentParameter::set_has_copy() {
+  _has_bits_[0] |= 0x00000080u;
+}
+inline void RecurrentParameter::clear_has_copy() {
+  _has_bits_[0] &= ~0x00000080u;
+}
+inline void RecurrentParameter::clear_copy() {
+  copy_ = false;
+  clear_has_copy();
+}
+inline bool RecurrentParameter::copy() const {
+  // @@protoc_insertion_point(field_get:caffe.RecurrentParameter.copy)
+  return copy_;
+}
+inline void RecurrentParameter::set_copy(bool value) {
+  set_has_copy();
+  copy_ = value;
+  // @@protoc_insertion_point(field_set:caffe.RecurrentParameter.copy)
 }
 
 // -------------------------------------------------------------------

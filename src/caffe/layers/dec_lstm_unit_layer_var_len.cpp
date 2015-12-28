@@ -1,0 +1,157 @@
+#include <algorithm>
+#include <cmath>
+#include <vector>
+
+#include "caffe/layer.hpp"
+#include "caffe/sequence_layers.hpp"
+
+namespace caffe {
+
+template <typename Dtype>
+inline Dtype sigmoid(Dtype x) {
+  return 1. / (1. + exp(-x));
+}
+
+template <typename Dtype>
+inline Dtype tanh(Dtype x) {
+  return 2. * sigmoid(2. * x) - 1.;
+}
+
+/*
+ * This layer is to let the decoding lstm compatible 
+ * with various length of sequence input, which is 
+ * indicated by "cont" input
+ */
+/*
+ * input: bottom[0]: c_dec, bottom[1]: gate_input_dec, bottom[2]: h_enc,
+ * bottom[3]: c_enc, bottom[3]: cont
+ */
+template <typename Dtype>
+void DLSTMUnitLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
+    const vector<Blob<Dtype>*>& top) {
+	this->copy_ = this->layer_param_.recurrent_param().copy();
+	for (int i = 0; i < bottom.size(); ++i) {
+		CHECK_EQ(3, bottom[i]->num_axes());
+		CHECK_EQ(1, bottom[i]->shape(0));
+	}
+	const int num_instances = bottom[0]->shape(1);
+	hidden_dim_ = bottom[0]->shape(2);
+	CHECK_EQ(num_instances, bottom[1]->shape(1));
+	CHECK_EQ(4 * hidden_dim_, bottom[1]->shape(2));
+	CHECK_EQ(bottom.size(), 4) << "we need 3 bottoms(x, h, c, cont) to train decoding lstm";
+	//  CHECK_EQ(1, bottom[2]->shape(1));
+	//  CHECK_EQ(num_instances, bottom[2]->shape(2));
+	top[0]->ReshapeLike(*bottom[0]);
+	top[1]->ReshapeLike(*bottom[0]);
+	X_acts_.ReshapeLike(*bottom[1]);
+}
+
+/*
+ * if cont[i] == 0(begin of a sequence), we input h_enc[i](encoding) and c_enc[i]
+ * if cont[i] == 1(other of a sequence), we input gate_input_dec[i - 1] and c_dec[i]
+ */
+//TODO: double check the begin of a sequence
+template <typename Dtype>
+void DLSTMUnitLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+    const vector<Blob<Dtype>*>& top) {
+  const int num = bottom[0]->shape(1);
+  const int x_dim = hidden_dim_ * 4;
+  const Dtype* C_prev = bottom[0]->cpu_data();
+  const Dtype* X = bottom[1]->cpu_data();
+  const Dtype* H_enc = bottom[2]->cpu_data();
+  const Dtype* C_enc = bottom[3]->cpu_data();
+  const Dtype* cont = bottom[4]->cpu_data();
+  Dtype* C = top[0]->mutable_cpu_data();
+  Dtype* H = top[1]->mutable_cpu_data();
+  for (int n = 0; n < num; ++n) {
+	  if (cont[n] == 0){
+		  caffe_copy(hidden_dim_, H_enc, H);
+		  caffe_copy(hidden_dim_, C_enc, C);
+	  }
+	  else{
+		  for (int d = 0; d < hidden_dim_; ++d) {
+			  const Dtype i = sigmoid(X[d]);
+			  const Dtype f = sigmoid(X[1 * hidden_dim_ + d]);
+			  const Dtype o = sigmoid(X[2 * hidden_dim_ + d]);
+			  const Dtype g = tanh(X[3 * hidden_dim_ + d]);
+			  const Dtype c_prev = C_prev[d];
+			  const Dtype c = f * c_prev + i * g;
+			  C[d] = c;
+			  const Dtype tanh_c = tanh(c);
+			  H[d] = o * tanh_c;
+		  }
+	  }
+    C_prev += hidden_dim_;
+    X += x_dim;
+    C += hidden_dim_;
+    H += hidden_dim_;
+  }
+}
+
+//TODO: double check the begin of a sequence
+template <typename Dtype>
+void DLSTMUnitLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
+    const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
+  if (!propagate_down[0] && !propagate_down[1]) { return; }
+
+  const int num = bottom[0]->shape(1);
+  const int x_dim = hidden_dim_ * 4;
+  const Dtype* C_prev = bottom[0]->cpu_data();
+  const Dtype* X = bottom[1]->cpu_data();
+  const Dtype* C = top[0]->cpu_data();
+  const Dtype* H = top[1]->cpu_data();
+  const Dtype* C_diff = top[0]->cpu_diff();
+  const Dtype* H_diff = top[1]->cpu_diff();
+  const Dtype* cont = bottom[4]->cpu_data();
+  Dtype* C_prev_diff = bottom[0]->mutable_cpu_diff();
+  Dtype* X_diff = bottom[1]->mutable_cpu_diff();
+  Dtype* H_enc_diff = bottom[2]->mutable_cpu_diff();
+  Dtype* C_enc_diff = bottom[3]->mutable_cpu_diff();
+  for (int n = 0; n < num; ++n) {
+	  if (cont[n] == 0){
+		  //copy or add, here need to have a check
+		  caffe_copy(hidden_dim_, C_diff, C_enc_diff);
+		  caffe_copy(hidden_dim_, H_diff, H_enc_diff);
+	  }
+	  else{
+		  for (int d = 0; d < hidden_dim_; ++d) {
+			  const Dtype i = sigmoid(X[d]);
+			  const Dtype f = sigmoid(X[1 * hidden_dim_ + d]);
+			  const Dtype o = sigmoid(X[2 * hidden_dim_ + d]);
+			  const Dtype g = tanh(X[3 * hidden_dim_ + d]);
+			  const Dtype c_prev = C_prev[d];
+			  const Dtype c = C[d];
+			  const Dtype tanh_c = tanh(c);
+			  Dtype* c_prev_diff = C_prev_diff + d;
+			  Dtype* i_diff = X_diff + d;
+			  Dtype* f_diff = X_diff + 1 * hidden_dim_ + d;
+			  Dtype* o_diff = X_diff + 2 * hidden_dim_ + d;
+			  Dtype* g_diff = X_diff + 3 * hidden_dim_ + d;
+			  const Dtype c_term_diff =
+				  C_diff[d] + H_diff[d] * o * (1 - tanh_c * tanh_c);
+			  *c_prev_diff = c_term_diff * f;
+			  *i_diff = c_term_diff * g * i * (1 - i);
+			  *f_diff = c_term_diff * c_prev * f * (1 - f);
+			  *o_diff = H_diff[d] * tanh_c * o * (1 - o);
+			  *g_diff = c_term_diff * i * (1 - g * g);
+		  }
+	  }
+	  C_prev += hidden_dim_;
+	  X += x_dim;
+	  C += hidden_dim_;
+	  H += hidden_dim_;
+	  C_diff += hidden_dim_;
+	  H_diff += hidden_dim_;
+	  X_diff += x_dim;
+	  C_prev_diff += hidden_dim_;
+  }
+}
+
+#ifdef CPU_ONLY
+STUB_GPU(DLSTMUnitLayer);
+#endif
+
+INSTANTIATE_CLASS(DLSTMUnitLayer);
+REGISTER_LAYER_CLASS(DLSTMUnit);
+
+}  // namespace caffe

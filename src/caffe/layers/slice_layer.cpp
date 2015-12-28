@@ -42,30 +42,30 @@ void SliceLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   slice_size_ = bottom[0]->count(slice_axis_ + 1);
   int count = 0;
   if (slice_point_.size() != 0) {
-    CHECK_EQ(slice_point_.size(), top.size() - 1);
-    CHECK_LE(top.size(), bottom_slice_axis);
-    int prev = 0;
-    vector<int> slices;
-    for (int i = 0; i < slice_point_.size(); ++i) {
-      CHECK_GT(slice_point_[i], prev);
-      slices.push_back(slice_point_[i] - prev);
-      prev = slice_point_[i];
-    }
-    slices.push_back(bottom_slice_axis - prev);
-    for (int i = 0; i < top.size(); ++i) {
-      top_shape[slice_axis_] = slices[i];
-      top[i]->Reshape(top_shape);
-      count += top[i]->count();
-    }
+	  CHECK_EQ(slice_point_.size(), top.size() - 1);
+	  CHECK_LE(top.size(), bottom_slice_axis);
+	  int prev = 0;
+	  vector<int> slices;
+	  for (int i = 0; i < slice_point_.size(); ++i) {
+		  CHECK_GT(slice_point_[i], prev);
+		  slices.push_back(slice_point_[i] - prev);
+		  prev = slice_point_[i];
+	  }
+	  slices.push_back(bottom_slice_axis - prev);
+	  for (int i = 0; i < top.size(); ++i) {
+		  top_shape[slice_axis_] = slices[i];
+		  top[i]->Reshape(top_shape);
+		  count += top[i]->count();
+	  }
   } else {
-    CHECK_EQ(bottom_slice_axis % top.size(), 0)
-        << "Number of top blobs (" << top.size() << ") should evenly "
-        << "divide input slice axis (" << bottom_slice_axis << ")";
-    top_shape[slice_axis_] = bottom_slice_axis / top.size();
-    for (int i = 0; i < top.size(); ++i) {
-      top[i]->Reshape(top_shape);
-      count += top[i]->count();
-    }
+	  CHECK_EQ(bottom_slice_axis % top.size(), 0)
+		  << "Number of top blobs (" << top.size() << ") should evenly "
+		  << "divide input slice axis (" << bottom_slice_axis << ")";
+	  top_shape[slice_axis_] = bottom_slice_axis / top.size();
+	  for (int i = 0; i < top.size(); ++i) {
+		  top[i]->Reshape(top_shape);
+		  count += top[i]->count();
+	  }
   }
   CHECK_EQ(count, bottom[0]->count());
 }

@@ -1,3 +1,10 @@
+/********************************************************************************
+** Copyright(c) 2015 USTC Reserved.
+** auth: Xu Shen
+** mail: shenxu@mail.ustc.edu.cn
+** date: 2015/10/4
+** desc: DecodingRecurrentLayer(CPU)
+*********************************************************************************/
 #include <string>
 #include <vector>
 
@@ -170,10 +177,15 @@ void DRecurrentLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 	}
 
 	//connect input of recurrent net with bottom blobs
+	x_input_blob_->ReshapeLike(*bottom[0]);
 	x_input_blob_->ShareData(*bottom[0]);
 	x_input_blob_->ShareDiff(*bottom[0]);
+
+	h_input_blob_->ReshapeLike(*bottom[1]);
 	h_input_blob_->ShareData(*bottom[1]);
 	h_input_blob_->ShareDiff(*bottom[1]);
+
+	c_input_blob_->ReshapeLike(*bottom[2]);
 	c_input_blob_->ShareData(*bottom[2]);
 	c_input_blob_->ShareDiff(*bottom[2]);
 

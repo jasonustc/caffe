@@ -858,6 +858,11 @@ message RecurrentParameter {
   //the sequence length
   optional uint32 sequence_length = 9;
 
+  //if we reverse the sequence to produce the output
+  optional bool reverse = 11[default = false];
+
+  //if we directly copy c_T and h_T to decoder LSTM
+  optional bool copy = 12[default = false];
 }
 
 // Message that stores parameters used by ConvRecurrentLayer

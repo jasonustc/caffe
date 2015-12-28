@@ -126,7 +126,7 @@ int main(int argc, char** argv){
 			"format used as input for caffe.\n"
 			"usage: \n"
 			" EXE [FLAGS] INPUT_FEAT_FILE DB_NAME\n");
-		gflags::ShowUsageWithFlags(argv[0]);
+		gflags::ShowUsageWithFlagsRestrict(argv[0], "tools/convert_sequence_wmt_data");
 		return 1;
 	}
 

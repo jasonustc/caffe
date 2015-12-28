@@ -2,7 +2,7 @@
 ** Copyright(c) 2015 USTC Reserved.
 ** auth: Xu Shen
 ** mail: shenxu@mail.ustc.edu.cn
-** date: 2015/10/4
+** date: 2015/12/29
 ** desc: DecodingLSTMLayer(CPU)
 ** TODO: here I just deal with fixed sequence length decoding(like Action Recognition)
 **       we need to extend it to deal with various length
@@ -28,10 +28,7 @@ namespace caffe{
 	template <typename Dtype>
 	void DLSTMLayer<Dtype>::FillUnrolledNet(NetParameter* net_param) const{
 		const int num_output = this->layer_param_.recurrent_param().num_output();
-		const int seq_len = this->layer_param_.recurrent_param().sequence_length();
 		const bool reverse = this->layer_param_.recurrent_param().reverse();
-		CHECK_GT(seq_len, 0) << "sequence length must be positive";
-		CHECK(this->T_ % seq_len == 0) << "T_ must be divided by sequence length";
 		CHECK_GT(num_output, 0) << "num_output must be positive";
 		//must share weights with LSTM layer
 		const FillerParameter& weight_filler =
@@ -126,32 +123,23 @@ namespace caffe{
 		x_slice_param->add_bottom("W_xc_x");
 		x_slice_param->set_name("W_xc_x_slice");
 
-		int num_seq = this->T_ / seq_len;
-		for (int n = 0; n < num_seq; n++){
-			string ns = this->int_to_str(n);
-			h_slice_param->add_top("h_" + ns + "_0");
-			c_slice_param->add_top("c_" + ns + "_0");
-		}
-
 		/* if reverse, reverse input x in within sequence;
 		 * else, just input x in original sequence order
 		 */
 		if (reverse){
-			for (int n = 0; n < num_seq; n++){
-				for (int s = seq_len; s >= 1; s--){
-					string ns = this->int_to_str(n);
-					string ss = this->int_to_str(s);
-					x_slice_param->add_top("W_xc_x_" + ns + "_" + ss);
-				}
+			for (int t = this->T_; t > 0; t--){
+				string ts = this->int_to_str(t);
+				x_slice_param->add_top("W_xc_x_" + ts);
+				h_slice_param->add_top("h_enc_" + ts);
+				c_slice_param->add_top("c_enc_" + ts);
 			}
 		}
 		else{
-			for (int n = 0; n < num_seq; n++){
-				for (int s = 1 ; s <= seq_len; s++){
-					string ns = this->int_to_str(n);
-					string ss = this->int_to_str(s);
-					x_slice_param->add_top("W_xc_x_" + ns + "_" + ss);
-				}
+			for (int t = 1; t <= this->T_; t++){
+				string ts = this->int_to_str(t);
+				x_slice_param->add_top("W_xc_x_" + ts);
+				h_slice_param->add_top("h_enc_" + ts);
+				c_slice_param->add_top("c_enc_" + ts);
 			}
 		}
 
@@ -163,91 +151,64 @@ namespace caffe{
 		output_concat_layer.mutable_concat_param()->set_axis(0);
 
 		//save parameter for every time step
-		for (int n = 0; n < num_seq; n++){
-			for (int s = 1; s <= seq_len; s++){
-				string ns = this->int_to_str(n);
-				string ss = this->int_to_str(s);
-				string units = ns + "_" + ss;
-				string unitm1s = ns + "_" + this->int_to_str(s - 1);
-				if (s == 1){
-					//for the first element in the decoding lstm, we just copy
-					//c_T and h_T
-					{
-						LayerParameter* h_param = net_param->add_layer();
-						h_param->set_type("Split");
-						h_param->add_bottom("h_" + unitm1s);
-						h_param->add_top("h_" + units);
-						h_param->set_name("unit_h_" + units);
+		for (int t = 1; t <= this->T_; t++){
+			string ts = this->int_to_str(t);
+			string tm1s = this->int_to_str(t - 1);
+			//TODO: check if this work for t == 1
+			//Add layer to compute
+			//   W_hc_h_{t-1} := W_hc * h_{t-1}
+			{
+				LayerParameter* w_param = net_param->add_layer();
+				w_param->CopyFrom(hidden_param);
+				w_param->set_name("transform_" + ts);
+				w_param->add_param()->set_name("W_hc");
+				w_param->add_bottom("h_" + tm1s);
+				w_param->add_top("W_hc_h_" + tm1s);
+				//sum along streams and times
+				w_param->mutable_inner_product_param()->set_axis(2);
+			}
 
-						LayerParameter* c_param = net_param->add_layer();
-						c_param->set_type("Split");
-						c_param->add_bottom("c_" + unitm1s);
-						c_param->add_top("c_" + units);
-						c_param->set_name("unit_c_" + units);
-					}
-					continue;
+			//Add the outputs of the linear transformations to compute the gate input.
+			//      gate_input_t := W_hc * h_conted_{t-1} + W_xc * x_t + b_c
+			//                    = W_hc_h_{t-1} + W_xc_x_t + b_C
+			//to do prediction, first input is zero
+			{
+				LayerParameter* input_sum_layer = net_param->add_layer();
+				input_sum_layer->CopyFrom(sum_param);
+				input_sum_layer->set_name("gate_input_" + ts);
+				input_sum_layer->add_bottom("W_hc_h_" + tm1s);
+				input_sum_layer->add_bottom("W_xc_x_" + tm1s);
+				if (this->static_input_){
+					input_sum_layer->add_bottom("W_xc_x_static");
 				}
-				//Add layer to compute
-				//   W_hc_h_{t-1} := W_hc * h_{t-1}
-				{
-					LayerParameter* w_param = net_param->add_layer();
-					w_param->CopyFrom(hidden_param);
-					w_param->set_name("transform_" + units);
-					w_param->add_param()->set_name("W_hc");
-					w_param->add_bottom("h_" + unitm1s);
-					w_param->add_top("W_hc_h_" + unitm1s);
-					//sum along streams and times
-					w_param->mutable_inner_product_param()->set_axis(2);
-				}
+				input_sum_layer->add_top("gate_input_" + ts);
+			}
 
-				//Add the outputs of the linear transformations to compute the gate input.
-				//      gate_input_t := W_hc * h_conted_{t-1} + W_xc * x_t + b_c
-				//                    = W_hc_h_{t-1} + W_xc_x_t + b_C
-				//to do prediction, first input is zero
-				{
-					LayerParameter* input_sum_layer = net_param->add_layer();
-//					if (s == 1){
-//						//split layer: if only has one top, just copy
-//						//if have more than two output, copy data, accumulate diffs
-//						input_sum_layer->set_type("Split");
-//						input_sum_layer->set_name("gate_input_" + units);
-//						input_sum_layer->add_bottom("W_hc_h_" + unitm1s);
-//						input_sum_layer->add_top("gate_input_" + units);
-//					}
-//					else{
-						input_sum_layer->CopyFrom(sum_param);
-						input_sum_layer->set_name("gate_input_" + units);
-						input_sum_layer->add_bottom("W_hc_h_" + unitm1s);
-						input_sum_layer->add_bottom("W_xc_x_" + unitm1s);
-						if (this->static_input_){
-							input_sum_layer->add_bottom("W_xc_x_static");
-						}
-						input_sum_layer->add_top("gate_input_" + units);
-//					}
-				}
-
-				//Add LSTMUnit layer to compute the cell & hidden vectors c_t and h_t.
-				// Inputs: c_{t-1}, gate_input_t = {i_t, f_t, o_t, g_t), cont_t
-				// Outputs: c_t, h_t
-				//		[ i_t']
-				//		[ f_t']  := gate_input_t
-				//		[ o_t'] 
-				//		[ g_t']
-				//				i_t := \sigmoid[i_t']
-				//				f_t := \sigmoid[f_t']
-				//				o_t := \sigmoid[o_t']
-				//				g_t := \tanh[g_t']
-				//				c_t := cont_t * (f_t .* c_{t-1}) + (i_t .* g_t)
-				//				h_t := o_t .* \tanh[c_t]
-				{
-					LayerParameter* dlstm_unit_param = net_param->add_layer();
-					dlstm_unit_param->set_type("DLSTMUnit");
-					dlstm_unit_param->add_bottom("c_" + unitm1s);
-					dlstm_unit_param->add_bottom("gate_input_" + units);
-					dlstm_unit_param->add_top("c_" + units);
-					dlstm_unit_param->add_top("h_" + units);
-					dlstm_unit_param->set_name("unit_" + units);
-				}
+			//Add LSTMUnit layer to compute the cell & hidden vectors c_t and h_t.
+			// Inputs: c_{t-1}, gate_input_t = {i_t, f_t, o_t, g_t), cont_t
+			// Outputs: c_t, h_t
+			//		[ i_t']
+			//		[ f_t']  := gate_input_t
+			//		[ o_t'] 
+			//		[ g_t']
+			//				i_t := \sigmoid[i_t']
+			//				f_t := \sigmoid[f_t']
+			//				o_t := \sigmoid[o_t']
+			//				g_t := \tanh[g_t']
+			//				c_t := cont_t * (f_t .* c_{t-1}) + (i_t .* g_t)
+			//				h_t := o_t .* \tanh[c_t]
+			{
+				LayerParameter* dlstm_unit_param = net_param->add_layer();
+				dlstm_unit_param->set_type("DLSTMUnit");
+				dlstm_unit_param->add_bottom("c_" + tm1s);
+				dlstm_unit_param->add_bottom("gate_input_" + ts);
+				dlstm_unit_param->add_bottom("h_enc_" + tm1s);
+				dlstm_unit_param->add_bottom("c_enc_" + tm1s);
+				//TODO: check we should use cont_t or cont all
+				dlstm_unit_param->add_bottom("cont");
+				dlstm_unit_param->add_top("c_" + ts);
+				dlstm_unit_param->add_top("h_" + ts);
+				dlstm_unit_param->set_name("unit_" + ts);
 			}
 		}
 
@@ -255,23 +216,15 @@ namespace caffe{
 		 * else, just output h in original sequence order
 		 */
 		if (reverse){
-			for (int n = 0; n < num_seq; n++){
-				for (int s = seq_len; s >= 1; s--){
-					string ss = this->int_to_str(s);
-					string ns = this->int_to_str(n);
-					string units = ns + "_" + ss;
-					output_concat_layer.add_bottom("h_" + units);
-				}
+			for (int t = this->T_; t > 0; t--){
+				string ts = this->int_to_str(t);
+				output_concat_layer.add_bottom("h_" + ts);
 			}
 		}
 		else{
-			for (int n = 0; n < num_seq; n++){
-				for (int s = 1; s <= seq_len; s++){
-					string ss = this->int_to_str(s);
-					string ns = this->int_to_str(n);
-					string units = ns + "_" + ss;
-					output_concat_layer.add_bottom("h_" + units);
-				}
+			for (int t = 1; t <= this->T_; t++){
+				string ts = this->int_to_str(t);
+				output_concat_layer.add_bottom("h_" + ts);
 			}
 		}
 		net_param->add_layer()->CopyFrom(output_concat_layer);

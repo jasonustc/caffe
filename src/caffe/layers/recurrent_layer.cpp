@@ -63,7 +63,7 @@ void RecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
 	input_shape.Clear();
 	input_shape.add_dim(1);
-	//#streams
+	//cont data
 	for (int i = 0; i < bottom[1]->num_axes(); ++i) {
 		input_shape.add_dim(bottom[1]->shape(i));
 	}
@@ -126,7 +126,8 @@ void RecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 			CHECK_NOTNULL(unrolled_net_->blob_by_name(recur_output_names[i]).get());
 	}
 
-	//deal with decoding situations
+	//deal with decoding situations: we need to independently output
+	//end of sequence if it is true
 	if (decode_){
 		vector<string> seq_end_output_names;
 		ConcatSeqEndBlobNames(&seq_end_output_names);
@@ -158,6 +159,8 @@ void RecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 	// This layer's parameters are any parameters in the layers of the unrolled
 	// net. We only want one copy of each parameter, so check that the parameter
 	// is "owned" by the layer, rather than shared with another.
+	// NOTE: I think we can allow for param sharing between different LSTMs 
+	//       by setting param name here
 	this->blobs_.clear();
 	for (int i = 0; i < unrolled_net_->params().size(); ++i) {
 		if (unrolled_net_->param_owners()[i] == -1) {
@@ -196,7 +199,7 @@ void RecurrentLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 		top[i]->ShareData(*output_blobs_[i]);
 		top[i]->ShareDiff(*output_blobs_[i]);
 	}
-	//added by xu shen: to get the all h_Ts and c_Ts as output
+	//to get the all h_Ts and c_Ts as output
 	if (top.size() > output_blobs_.size() && decode_){
 		for (size_t r = output_blobs_.size(); r < top.size(); r++){
 			//allocate memory 
@@ -206,10 +209,15 @@ void RecurrentLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 		}
 	}
 
+//	x_input_blob_->ReshapeLike(*bottom[0]);
 	x_input_blob_->ShareData(*bottom[0]);
 	x_input_blob_->ShareDiff(*bottom[0]);
+
+//	cont_input_blob_->ReshapeLike(*bottom[1]);
 	cont_input_blob_->ShareData(*bottom[1]);
+
 	if (static_input_) {
+//		x_static_input_blob_->ReshapeLike(*bottom[2]);
 		x_static_input_blob_->ShareData(*bottom[2]);
 		x_static_input_blob_->ShareDiff(*bottom[2]);
 	}

@@ -625,10 +625,21 @@ protected:
 };
 
 /**
-* @brief A helper for LSTMLayer: computes a single timestep of the
-*        non-linearity of the LSTM, producing the updated cell and hidden
-*        states.
-*/
+ * @brief A helper for DLSTMLayer: computes a single timestep of the
+ *        non-linearity of the DLSTM, producing the updated cell and hidden
+ *        states.
+ *
+ * This layer is to let the decoding lstm compatible 
+ * with various length of sequence input, which is 
+ * indicated by "cont" input
+ * input: bottom[0]: c_dec, bottom[1]: gate_input_dec, bottom[2]: h_enc,
+ * bottom[3]: c_enc, bottom[3]: cont
+ *
+ * if cont[i] == 0(begin of a sequence), we input h_enc[i](encoding) and c_enc[i]
+ * if cont[i] == 1(other of a sequence), we input gate_input_dec[i - 1] and c_dec[i]
+ *
+ * TODO: maybe we can input x^pred[i] here
+ **/
 template <typename Dtype>
 class DLSTMUnitLayer : public Layer<Dtype> {
 public:
@@ -636,8 +647,13 @@ public:
 	virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
 		const vector<Blob<Dtype>*>& top);
 
+	/*
+	 * For decoding LSTM, in time0, the h_1 and c_1 is just the copy of decoding 
+	 * h_T and c_T, but in time t(t > 0), the input should be the inverse order
+	 * of input frames, so we have 3 input here: (c_T, h_T, x_is)
+	 */
 	virtual inline const char* type() const { return "DecodeLSTMUnit"; }
-	virtual inline int ExactNumBottomBlobs() const { return 2; }
+	virtual inline int MinBottomBlobs() const { return 2; }
 	virtual inline int ExactNumTopBlobs() const { return 2; }
 
 protected:
@@ -706,6 +722,8 @@ protected:
 	int hidden_dim_;
 	Blob<Dtype> X_acts_;
 
+	/// @brief if we directly copy c_T and h_T to decoder LSTM
+	bool copy_;
 };
 
 /**
@@ -759,34 +777,6 @@ protected:
 
 	//the sequence length of the video
 	int seq_len_;
-};
-
-/*
- * @brief: get the end h data of sequence
- * @input1: catened h
- * @input2: cont, sequence indicator
- * @output: h_T
- * but how to determine the #of end hs is still a problem
- */
-
-template <typename Dtype>
-class SequenceEndLayer : public Layer<Dtype>{
-public:
-	explicit SequenceEndLayer(const LayerParameter& param)
-		: Layer<Dtype>(param){}
-	virtual inline const char* type() const { return "SequenceEnd"; }
-	virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
-	virtual void Reshape(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
-	virtual inline int ExactNumBottomBlobs() const { return 1; }
-	virtual inline int ExactNumTopBlobs() const { return 1; }
-
-protected:
-	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
-	virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
-		const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
-	virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
-	virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
-		const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
 };
 
 }  // namespace caffe

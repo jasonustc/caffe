@@ -18,6 +18,8 @@ inline Dtype tanh(Dtype x) {
 }
 
 //only have input: c and gate_input, no cont needed
+//bottom[0]: c, [num, #instances, hidden_dim]
+//bottom[1]: gate_input, [num, #instances, 4 * hidden_dim]
 template <typename Dtype>
 void DLSTMUnitLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
@@ -49,7 +51,7 @@ void DLSTMUnitLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   for (int n = 0; n < num; ++n) {
     for (int d = 0; d < hidden_dim_; ++d) {
       const Dtype i = sigmoid(X[d]);
-      const Dtype f = (sigmoid(X[1 * hidden_dim_ + d]));
+      const Dtype f = sigmoid(X[1 * hidden_dim_ + d]);
       const Dtype o = sigmoid(X[2 * hidden_dim_ + d]);
       const Dtype g = tanh(X[3 * hidden_dim_ + d]);
       const Dtype c_prev = C_prev[d];
@@ -83,7 +85,7 @@ void DLSTMUnitLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   for (int n = 0; n < num; ++n) {
     for (int d = 0; d < hidden_dim_; ++d) {
       const Dtype i = sigmoid(X[d]);
-      const Dtype f = (sigmoid(X[1 * hidden_dim_ + d]));
+      const Dtype f = sigmoid(X[1 * hidden_dim_ + d]);
       const Dtype o = sigmoid(X[2 * hidden_dim_ + d]);
       const Dtype g = tanh(X[3 * hidden_dim_ + d]);
       const Dtype c_prev = C_prev[d];
