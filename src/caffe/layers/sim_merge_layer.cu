@@ -1,3 +1,12 @@
+
+/********************************************************************************
+** Copyright(c) 2016 USTC Reserved.
+** auth: Xu Shen
+** mail: shenxu@mail.ustc.edu.cn
+** date: 2016/1/1
+** desc: SimMergeLayer(GPU), merge similar feature maps and re-initialize similar
+**       weights to learn more independent feature maps
+*********************************************************************************/
 #include <vector>
 
 #include "caffe/filler.hpp"
