@@ -23,6 +23,8 @@ class Filler {
   virtual ~Filler() {}
   /// @brief when fill_diff is true, fill diff not data
   virtual void Fill(Blob<Dtype>* blob, bool fill_diff = false) = 0;
+  virtual void Fill(Dtype* data, const int count) {}
+  virtual void Fill_gpu(Dtype* data, const int count) {}
  protected:
   FillerParameter filler_param_;
 };  // class Filler
@@ -52,6 +54,24 @@ class ConstantFiller : public Filler<Dtype> {
 	  CHECK_EQ(this->filler_param_.sparse(), -1)
 		  << "Sparsity not supported by this Filler.";
   }
+
+  virtual void Fill(Dtype* data, const int count) {
+	  const Dtype value = this->filler_param_.value();
+	  CHECK(count);
+	  for (int i = 0; i < count; ++i) {
+		  data[i] = value;
+	  }
+	  CHECK_EQ(this->filler_param_.sparse(), -1)
+		  << "Sparsity not supported by this Filler.";
+  }
+
+  virtual void Fill_gpu(Dtype* data, const int count) {
+	  const Dtype value = this->filler_param_.value();
+	  CHECK(count);
+	  caffe_gpu_set<Dtype>(count, value, data);
+	  CHECK_EQ(this->filler_param_.sparse(), -1)
+		  << "Sparsity not supported by this Filler.";
+  }
 };
 
 /// @brief Fills a Blob with uniformly distributed values @f$ x\sim U(a, b) @f$.
@@ -67,6 +87,22 @@ class UniformFiller : public Filler<Dtype> {
     CHECK_EQ(this->filler_param_.sparse(), -1)
          << "Sparsity not supported by this Filler.";
   }
+
+  virtual void Fill(Dtype* data, const int count) {
+    CHECK(count);
+    caffe_rng_uniform<Dtype>(count, Dtype(this->filler_param_.min()),
+        Dtype(this->filler_param_.max()), data);
+    CHECK_EQ(this->filler_param_.sparse(), -1)
+         << "Sparsity not supported by this Filler.";
+  }
+
+  virtual void Fill_gpu(Dtype* data, const int count) {
+    CHECK(count);
+    caffe_gpu_rng_uniform<Dtype>(count, Dtype(this->filler_param_.min()),
+        Dtype(this->filler_param_.max()), data);
+    CHECK_EQ(this->filler_param_.sparse(), -1)
+         << "Sparsity not supported by this Filler.";
+  }
 };
 
 /// @brief Fills a Blob with Gaussian-distributed values @f$ x = a @f$.
@@ -76,27 +112,45 @@ class GaussianFiller : public Filler<Dtype> {
   explicit GaussianFiller(const FillerParameter& param)
       : Filler<Dtype>(param) {}
   virtual void Fill(Blob<Dtype>* blob, bool fill_diff = false) {
-    Dtype* data = blob->mutable_cpu_data();
-    CHECK(blob->count());
-    caffe_rng_gaussian<Dtype>(blob->count(), Dtype(this->filler_param_.mean()),
-        Dtype(this->filler_param_.std()), blob->mutable_cpu_data());
+	  Dtype* data = blob->mutable_cpu_data();
+	  CHECK(blob->count());
+	  caffe_rng_gaussian<Dtype>(blob->count(), Dtype(this->filler_param_.mean()),
+		  Dtype(this->filler_param_.std()), blob->mutable_cpu_data());
+	  int sparse = this->filler_param_.sparse();
+	  CHECK_GE(sparse, -1);
+	  if (sparse >= 0) {
+		  // Sparse initialization is implemented for "weight" blobs; i.e. matrices.
+		  // These have num == channels == 1; width is number of inputs; height is
+		  // number of outputs.  The 'sparse' variable specifies the mean number
+		  // of non-zero input weights for a given output.
+		  CHECK_GE(blob->num_axes(), 1);
+		  const int num_outputs = blob->shape(0);
+		  Dtype non_zero_probability = Dtype(sparse) / Dtype(num_outputs);
+		  rand_vec_.reset(new SyncedMemory(blob->count() * sizeof(int)));
+		  int* mask = reinterpret_cast<int*>(rand_vec_->mutable_cpu_data());
+		  caffe_rng_bernoulli(blob->count(), non_zero_probability, mask);
+		  for (int i = 0; i < blob->count(); ++i) {
+			  data[i] *= mask[i];
+		  }
+	  }
+  }
+
+  virtual void Fill(Dtype* data, const int count) {
+    CHECK(count);
+    caffe_rng_gaussian<Dtype>(count, Dtype(this->filler_param_.mean()),
+        Dtype(this->filler_param_.std()), data);
+	int sparse = this->filler_param_.sparse();
+    CHECK_EQ(this->filler_param_.sparse(), -1)
+         << "Sparsity not supported by this Filler_gpu.";
+  }
+
+  virtual void Fill_gpu(Dtype* data, const int count) {
+    CHECK(count);
+    caffe_gpu_rng_gaussian<Dtype>(count, Dtype(this->filler_param_.mean()),
+        Dtype(this->filler_param_.std()), data);
     int sparse = this->filler_param_.sparse();
-    CHECK_GE(sparse, -1);
-    if (sparse >= 0) {
-      // Sparse initialization is implemented for "weight" blobs; i.e. matrices.
-      // These have num == channels == 1; width is number of inputs; height is
-      // number of outputs.  The 'sparse' variable specifies the mean number
-      // of non-zero input weights for a given output.
-      CHECK_GE(blob->num_axes(), 1);
-      const int num_outputs = blob->shape(0);
-      Dtype non_zero_probability = Dtype(sparse) / Dtype(num_outputs);
-      rand_vec_.reset(new SyncedMemory(blob->count() * sizeof(int)));
-      int* mask = reinterpret_cast<int*>(rand_vec_->mutable_cpu_data());
-      caffe_rng_bernoulli(blob->count(), non_zero_probability, mask);
-      for (int i = 0; i < blob->count(); ++i) {
-        data[i] *= mask[i];
-      }
-    }
+    CHECK_EQ(this->filler_param_.sparse(), -1)
+         << "Sparsity not supported by this Filler_gpu.";
   }
 
  protected:

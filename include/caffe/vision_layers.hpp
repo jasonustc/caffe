@@ -16,6 +16,69 @@
 
 namespace caffe {
 
+/*
+ * Input: Blob[N, C, H, W]
+ * We must set name to params so that we can reset them
+ * Output: Blob[N, C, H, W]
+ */
+template <typename Dtype>
+class SimMergeLayer : public Layer<Dtype>{
+public: 
+	explicit SimMergeLayer(const LayerParameter& param)
+		: Layer<Dtype>(param){}
+	virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+	virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+	virtual inline const char* type() const { return "SimMerge"; }
+	virtual inline int ExactNumBottomBlobs(){ return 1; }
+	virtual inline int ExactNumTopBlobs(){ return 1; }
+
+private:
+	virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+	virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<Blob<Dtype>*>& top);
+	virtual void Backward_cpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<bool>& propagate_down,
+		const vector<Blob<Dtype>*>& top);
+	virtual void Backward_gpu(const vector<Blob<Dtype>*>& bottom,
+		const vector<bool>& propagate_down,
+		const vector<Blob<Dtype>*>& top);
+	void update_sim_matrix_cpu(const vector<Blob<Dtype>*>& top);
+	void merge_sim_feature_maps_cpu(const vector<Blob<Dtype>*>& top);
+	void merge_two_feature_maps_cpu(const vector<Blob<Dtype>*>& top,
+		const int m, const int n, const Dtype sim);
+	void refresh_weight_cpu(const int j);
+
+	void update_sim_matrix_gpu(const vector<Blob<Dtype>*>& top);
+	void merge_sim_feature_maps_gpu(const vector<Blob<Dtype>*>& top);
+	void merge_two_feature_maps_gpu(const vector<Blob<Dtype>*>& top,
+		const int m, const int n, const Dtype sim);
+	void refresh_weight_gpu(const int j);
+
+	// the number of iterations to be monitored
+	int iter_;
+	// the number of similarities that are accumulated
+	int curr_iter_;
+	// the threshold of similarity to merge two feature map
+	Dtype threshold_;
+
+	//along which axis to merge
+	int axis_;
+
+	bool bias_term_;
+	bool weight_term_;
+	// n x n / 2 matrix to store similarities
+	Blob<Dtype> sim_;
+	//temp blobs to save average top feature maps
+	Blob<Dtype> temp_avg_map_;
+	//weight filler
+	shared_ptr<Filler<Dtype>> weight_filler_;
+	//bias filler
+	shared_ptr<Filler<Dtype>> bias_filler_;
+};
+
 /**
  * @brief Abstract base class that factors out the BLAS code common to
  *        ConvolutionLayer and DeconvolutionLayer.

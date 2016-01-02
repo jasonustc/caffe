@@ -335,6 +335,22 @@ message LayerParameter {
   optional DropConnectParameter drop_connect_param = 131;
   optional AdaptiveDropoutParameter adaptive_dropout_param = 132;
   optional NormLossParameter norm_loss_param = 133;
+  optional SimMergeParameter sim_merge_param = 134;
+}
+
+// Message that stores parameters used to do similarity based feature map
+// merge
+message SimMergeParameter{
+    //number of iterations averaged to evaluate similarity
+    optional int32 iter = 1[default = 1];
+    //threshold to set as similar feature maps
+    optional float threshold = 2[default = 1];
+    //axis larger or equal than axis in blob will considered as a single
+    //feature map
+    optional int32 axis = 3[default = 2];
+    //filler used to reset parameters
+    optional FillerParameter weight_filler = 4;
+    optional FillerParameter bias_filler = 5;
 }
 
 // Message that stores parameters used to apply transformation
