@@ -145,6 +145,8 @@ void DRecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 	// This layer's parameters are any parameters in the layers of the unrolled
 	// net. We only want one copy of each parameter, so check that the parameter
 	// is "owned" by the layer, rather than shared with another.
+	// Here by set name in param should be able to share parameters with other LSTM
+	// because it is corresponding with index in blobs
 	this->blobs_.clear();
 	for (int i = 0; i < unrolled_net_->params().size(); ++i) {
 		if (unrolled_net_->param_owners()[i] == -1) {

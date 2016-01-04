@@ -169,24 +169,24 @@ namespace caffe{
 				string ss = this->int_to_str(s);
 				string units = ns + "_" + ss;
 				string unitm1s = ns + "_" + this->int_to_str(s - 1);
-				if (s == 1){
-					//for the first element in the decoding lstm, we just copy
-					//c_T and h_T
-					{
-						LayerParameter* h_param = net_param->add_layer();
-						h_param->set_type("Split");
-						h_param->add_bottom("h_" + unitm1s);
-						h_param->add_top("h_" + units);
-						h_param->set_name("unit_h_" + units);
+//				if (s == 1){
+//					//for the first element in the decoding lstm, we just copy
+//					//c_T and h_T
+//					{
+//						LayerParameter* h_param = net_param->add_layer();
+//						h_param->set_type("Split");
+//						h_param->add_bottom("h_" + unitm1s);
+//						h_param->add_top("h_" + units);
+//						h_param->set_name("unit_h_" + units);
 
-						LayerParameter* c_param = net_param->add_layer();
-						c_param->set_type("Split");
-						c_param->add_bottom("c_" + unitm1s);
-						c_param->add_top("c_" + units);
-						c_param->set_name("unit_c_" + units);
-					}
-					continue;
-				}
+//						LayerParameter* c_param = net_param->add_layer();
+//						c_param->set_type("Split");
+//						c_param->add_bottom("c_" + unitm1s);
+//						c_param->add_top("c_" + units);
+//						c_param->set_name("unit_c_" + units);
+//					}
+//					continue;
+//				}
 				//Add layer to compute
 				//   W_hc_h_{t-1} := W_hc * h_{t-1}
 				{
@@ -206,15 +206,15 @@ namespace caffe{
 				//to do prediction, first input is zero
 				{
 					LayerParameter* input_sum_layer = net_param->add_layer();
-//					if (s == 1){
-//						//split layer: if only has one top, just copy
-//						//if have more than two output, copy data, accumulate diffs
-//						input_sum_layer->set_type("Split");
-//						input_sum_layer->set_name("gate_input_" + units);
-//						input_sum_layer->add_bottom("W_hc_h_" + unitm1s);
-//						input_sum_layer->add_top("gate_input_" + units);
-//					}
-//					else{
+					if (s == 1){
+						//split layer: if only has one top, just copy
+						//if have more than two output, copy data, accumulate diffs
+						input_sum_layer->set_type("Split");
+						input_sum_layer->set_name("gate_input_" + units);
+						input_sum_layer->add_bottom("W_hc_h_" + unitm1s);
+						input_sum_layer->add_top("gate_input_" + units);
+					}
+					else{
 						input_sum_layer->CopyFrom(sum_param);
 						input_sum_layer->set_name("gate_input_" + units);
 						input_sum_layer->add_bottom("W_hc_h_" + unitm1s);
@@ -223,7 +223,7 @@ namespace caffe{
 							input_sum_layer->add_bottom("W_xc_x_static");
 						}
 						input_sum_layer->add_top("gate_input_" + units);
-//					}
+					}
 				}
 
 				//Add LSTMUnit layer to compute the cell & hidden vectors c_t and h_t.

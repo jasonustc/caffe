@@ -39,6 +39,7 @@ void DLSTMUnitLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 }
 
 //we don't need flush in decoder LSTM
+//TODO: allow static input here
 template <typename Dtype>
 void DLSTMUnitLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
@@ -67,6 +68,7 @@ void DLSTMUnitLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   }
 }
 
+//TODO: allow static input here
 template <typename Dtype>
 void DLSTMUnitLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {

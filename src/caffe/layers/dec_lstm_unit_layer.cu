@@ -50,6 +50,7 @@ __global__ void DLSTMUnitForward(const int nthreads, const int dim,
   }
 }
 
+//TODO: allow static input here
 template <typename Dtype>
 void DLSTMUnitLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
@@ -117,6 +118,7 @@ __global__ void DLSTMActsBackward(const int nthreads, const int dim,
   }
 }
 
+//TODO: allow static input here
 template <typename Dtype>
 void DLSTMUnitLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down,

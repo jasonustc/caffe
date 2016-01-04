@@ -94,11 +94,12 @@ namespace caffe{
 			layer_param.mutable_recurrent_param()->mutable_bias_filler()->set_type("constant");
 			layer_param.mutable_recurrent_param()->mutable_bias_filler()->set_value(0.);
 //			layer_param.mutable_recurrent_param()->set_decode(true);
-			layer_param.mutable_recurrent_param()->set_sequence_length(2);
+//			layer_param.mutable_recurrent_param()->set_sequence_length(2);
 			LSTMLayer<Dtype> layer(layer_param);
 			Caffe::set_mode(Caffe::CPU);
 			layer.SetUp(bottom_, top_);
 			GradientChecker<Dtype> checker(1e-2, 1e-3);
+			//check_bottom, top_id, top_data_id
 			checker.CheckGradientSingle(&layer, bottom_, top_, 0, 0, 0);
 			checker.CheckGradientSingle(&layer, bottom_, top_, 0, 0, 1);
 			checker.CheckGradientSingle(&layer, bottom_, top_, 0, 0, 2);
@@ -114,7 +115,7 @@ namespace caffe{
 			layer_param.mutable_recurrent_param()->mutable_bias_filler()->set_type("constant");
 			layer_param.mutable_recurrent_param()->mutable_bias_filler()->set_value(0.);
 //			layer_param.mutable_recurrent_param()->set_decode(true);
-			layer_param.mutable_recurrent_param()->set_sequence_length(2);
+//			layer_param.mutable_recurrent_param()->set_sequence_length(2);
 			LSTMLayer<Dtype> layer(layer_param);
 			Caffe::set_mode(Caffe::GPU);
 			GradientChecker<Dtype> checker(1e-2, 1e-3);
