@@ -25,6 +25,7 @@ void SimMergeLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 	curr_iter_ = 0;
 	bias_term_ = this->layer_param_.sim_merge_param().has_bias_filler();
 	weight_term_ = this->layer_param_.sim_merge_param().has_weight_filler();
+	const int n = this->layer_param_.param_size();
 	CHECK_EQ(weight_term_ + bias_term_, this->layer_param_.param_size())
 		<< "Number of fillers must be equal to number of shared parameters";
 	//weight filler and bias filler
@@ -39,9 +40,9 @@ void SimMergeLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void SimMergeLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 	const vector<Blob<Dtype>*>& top){
-	top[0]->ReshapeLike(*bottom[0]);
-	top[0]->ShareData(*bottom[0]);
-	top[0]->ShareDiff(*bottom[0]);
+//	top[0]->ReshapeLike(*bottom[0]);
+//	top[0]->ShareData(*bottom[0]);
+//	top[0]->ShareDiff(*bottom[0]);
 	const int channels = bottom[0]->channels();
 	const int height = bottom[0]->height();
 	const int width = bottom[0]->width();
@@ -53,23 +54,23 @@ void SimMergeLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 	this->blobs_.resize(bias_term_ + weight_term_);
 	//maybe here we need to allocate memory first
 	//then share from bottom layer parameter in AppendParam()
-	vector<int> weight_shape;
-	weight_shape.push_back(3);
-	weight_shape.push_back(1);
-	weight_shape.push_back(2);
-	weight_shape.push_back(2);
+//	vector<int> weight_shape;
+//	weight_shape.push_back(3);
+//	weight_shape.push_back(1);
+//	weight_shape.push_back(2);
+//	weight_shape.push_back(2);
 	if (weight_term_){
-		this->blobs_[0].reset(new Blob<Dtype>(weight_shape));
-		this->weight_filler_->Fill(this->blobs_[0].get());
+		this->blobs_[0].reset(new Blob<Dtype>());
+//		this->weight_filler_->Fill(this->blobs_[0].get());
 	}
-	CHECK_EQ(weight_shape[0], count) << "Number of output feature maps "
-		<< "should to equal to number of output dim in weight";
-	vector<int> bias_shape(1, 3);
+//	CHECK_EQ(weight_shape[0], count) << "Number of output feature maps "
+//		<< "should to equal to number of output dim in weight";
+//	vector<int> bias_shape(1, 3);
 	if (bias_term_){
-		this->blobs_[1].reset(new Blob<Dtype>(bias_shape));
-		this->bias_filler_->Fill(this->blobs_[1].get());
-		CHECK_EQ(bias_shape[0], count) << "Number of output feature maps "
-			<< "should to equal to number of output dim in bias";
+		this->blobs_[1].reset(new Blob<Dtype>());
+//		this->bias_filler_->Fill(this->blobs_[1].get());
+//		CHECK_EQ(bias_shape[0], count) << "Number of output feature maps "
+//			<< "should to equal to number of output dim in bias";
 	}
 }
 
@@ -182,6 +183,7 @@ void SimMergeLayer<Dtype>::merge_sim_feature_maps_cpu(const vector<Blob<Dtype>*>
 template <typename Dtype>
 void SimMergeLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
+	LOG(ERROR) << "weight shape: " << this->blobs_[0]->shape_string();
 	if (weight_term_){
 		DCHECK(this->blobs_[0]->count()) << "Please check if the name of weight "
 			<< "parameter is shared by other layer";

@@ -255,7 +255,7 @@
     <ClCompile Include="..\src\caffe\layers\sim_merge_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\test\test_sim_merge_layer.cpp" />
+    <ClCompile Include="..\tools\caffe.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">

@@ -128,6 +128,7 @@ namespace caffe{
 	template <typename Dtype>
 	void SimMergeLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
 		const vector<Blob<Dtype>*>& top) {
+		LOG(ERROR) << "weight shape: " << this->blobs_[0]->shape_string();
 		if (weight_term_){
 			DCHECK(this->blobs_[0]->count()) << "Please check if the name of weight "
 				<< "parameter is shared by other layer";
