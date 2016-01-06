@@ -24,8 +24,8 @@ namespace caffe{
 		const int dim = top[0]->count(axis_ + 1);
 		const Dtype* top_data = top[0]->gpu_data();
 		Dtype* temp_data = this->temp_avg_map_.mutable_gpu_data();
-		//to save memory, put history similarity in diff
-		//and current similarity in data
+		//to save memory, put history similarity in data
+		//and current similarity in diff
 		Dtype* curr_sim_data = this->sim_.mutable_gpu_diff();
 		Dtype* his_sim_data = this->sim_.mutable_gpu_data();
 		int count = 0;
@@ -86,8 +86,6 @@ namespace caffe{
 		Dtype* weight_offset_diff = weight_diff + this->blobs_[0]->offset(j);
 		this->weight_filler_->Fill_gpu(weight_offset_data, dim);
 		caffe_gpu_set(dim, (Dtype)0., weight_offset_diff);
-		Dtype* data_1 = this->blobs_[0]->mutable_cpu_data();
-		Dtype* data_2 = this->blobs_[0]->mutable_gpu_data();
 		if (bias_term_){
 			const int bias_dim = this->blobs_[1]->count(1);
 			Dtype* bias_offset_data = this->blobs_[1]->mutable_gpu_data() + 
@@ -128,22 +126,15 @@ namespace caffe{
 	template <typename Dtype>
 	void SimMergeLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
 		const vector<Blob<Dtype>*>& top) {
-		LOG(ERROR) << "weight shape: " << this->blobs_[0]->shape_string();
-		if (weight_term_){
-			DCHECK(this->blobs_[0]->count()) << "Please check if the name of weight "
-				<< "parameter is shared by other layer";
-		}
-		if (bias_term_){
-			DCHECK(this->blobs_[1]->count()) << "Please check if the name of bias "
-				<< "parameter is shared by other layer";
-		}
-		this->update_sim_matrix_gpu(bottom);
-		this->curr_iter_++;
-		if (this->curr_iter_ % this->iter_ == 0){
-			//reset number of iterations, 
-			//so as to reset similarity matrix to all 0s
-			this->curr_iter_ = 0;
-			this->merge_sim_feature_maps_gpu(bottom);
+		if (this->phase_ == TRAIN){
+			this->update_sim_matrix_gpu(bottom);
+			this->curr_iter_++;
+			if (this->curr_iter_ % this->iter_ == 0){
+				//reset number of iterations, 
+				//so as to reset similarity matrix to all 0s
+				this->curr_iter_ = 0;
+				this->merge_sim_feature_maps_gpu(bottom);
+			}
 		}
 	}
 

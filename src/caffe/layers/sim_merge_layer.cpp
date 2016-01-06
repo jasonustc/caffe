@@ -44,6 +44,11 @@ void SimMergeLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void SimMergeLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 	const vector<Blob<Dtype>*>& top){
+	//In this layer we don't need to generate new output, so just
+	//share data and diffs with its bottom
+	top[0]->ReshapeLike(*bottom[0]);
+	top[0]->ShareData(*bottom[0]);
+	top[0]->ShareDiff(*bottom[0]);
 	const int channels = bottom[0]->channels();
 	const int height = bottom[0]->height();
 	const int width = bottom[0]->width();
@@ -64,7 +69,6 @@ void SimMergeLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 			shape_weight.push_back(weight_shape.dim(i));
 		}
 		this->blobs_[0].reset(new Blob<Dtype>(shape_weight));
-		LOG(INFO) << "weight shape: " << this->blobs_[0]->shape_string();
 	}
 	if (bias_term_){
 		const BlobShape& bias_shape = this->layer_param_.sim_merge_param().bias_shape();
@@ -75,7 +79,6 @@ void SimMergeLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 			shape_bias.push_back(bias_shape.dim(i));
 		}
 		this->blobs_[1].reset(new Blob<Dtype>(shape_bias));
-		LOG(INFO) << "bias shape: " << this->blobs_[1]->shape_string();
 	}
 }
 
@@ -111,12 +114,10 @@ void SimMergeLayer<Dtype>::update_sim_matrix_cpu(const vector<Blob<Dtype>*>& top
 			count++;
 		}
 	}
-	this->sim_.ToTxt("sim_before_merge", true);
 	//update history similarity with current similarity
 	const Dtype curr_iter = 1 + this->curr_iter_;
 	caffe_cpu_axpby(count, (Dtype)1. / (Dtype)curr_iter, curr_sim_data, 
 		(Dtype)this->curr_iter_ / (Dtype)curr_iter, his_sim_data);
-	this->sim_.ToTxt("sim_after_merge", true);
 }
 
 //merge feature map n to feature map m
@@ -190,13 +191,15 @@ void SimMergeLayer<Dtype>::merge_sim_feature_maps_cpu(const vector<Blob<Dtype>*>
 template <typename Dtype>
 void SimMergeLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
-	this->update_sim_matrix_cpu(bottom);
-	this->curr_iter_++;
-	if (this->curr_iter_ % this->iter_ == 0){
-		//reset number of iterations, 
-		//so as to reset similarity matrix to all 0s
-		this->curr_iter_ = 0;
-		this->merge_sim_feature_maps_cpu(bottom);
+	if (this->phase_ == TRAIN){
+		this->update_sim_matrix_cpu(bottom);
+		this->curr_iter_++;
+		if (this->curr_iter_ % this->iter_ == 0){
+			//reset number of iterations, 
+			//so as to reset similarity matrix to all 0s
+			this->curr_iter_ = 0;
+			this->merge_sim_feature_maps_cpu(bottom);
+		}
 	}
 }
 
