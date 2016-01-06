@@ -30,9 +30,13 @@ void SimMergeLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 		<< "Number of fillers must be equal to number of shared parameters";
 	//weight filler and bias filler
 	if (weight_term_){
+		CHECK(this->layer_param_.sim_merge_param().has_weight_shape())
+			<< "specified shape of weight should be provided";
 		this->weight_filler_.reset(GetFiller<Dtype>(this->layer_param_.sim_merge_param().weight_filler()));
 	}
 	if (bias_term_){
+		CHECK(this->layer_param_.sim_merge_param().has_bias_shape())
+			<< "specified shape of bias should be provided";
 		this->bias_filler_.reset(GetFiller<Dtype>(this->layer_param_.sim_merge_param().bias_filler()));
 	}
 }
@@ -40,9 +44,6 @@ void SimMergeLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void SimMergeLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 	const vector<Blob<Dtype>*>& top){
-//	top[0]->ReshapeLike(*bottom[0]);
-//	top[0]->ShareData(*bottom[0]);
-//	top[0]->ShareDiff(*bottom[0]);
 	const int channels = bottom[0]->channels();
 	const int height = bottom[0]->height();
 	const int width = bottom[0]->width();
@@ -54,23 +55,27 @@ void SimMergeLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 	this->blobs_.resize(bias_term_ + weight_term_);
 	//maybe here we need to allocate memory first
 	//then share from bottom layer parameter in AppendParam()
-//	vector<int> weight_shape;
-//	weight_shape.push_back(3);
-//	weight_shape.push_back(1);
-//	weight_shape.push_back(2);
-//	weight_shape.push_back(2);
 	if (weight_term_){
-		this->blobs_[0].reset(new Blob<Dtype>());
-//		this->weight_filler_->Fill(this->blobs_[0].get());
+		const BlobShape& weight_shape = this->layer_param_.sim_merge_param().weight_shape();
+		CHECK_EQ(count, weight_shape.dim(0)) << "number of feature maps should be equal with "
+			<< "number of weights";
+		vector<int> shape_weight;
+		for (int i = 0; i < weight_shape.dim_size(); i++){
+			shape_weight.push_back(weight_shape.dim(i));
+		}
+		this->blobs_[0].reset(new Blob<Dtype>(shape_weight));
+		LOG(INFO) << "weight shape: " << this->blobs_[0]->shape_string();
 	}
-//	CHECK_EQ(weight_shape[0], count) << "Number of output feature maps "
-//		<< "should to equal to number of output dim in weight";
-//	vector<int> bias_shape(1, 3);
 	if (bias_term_){
-		this->blobs_[1].reset(new Blob<Dtype>());
-//		this->bias_filler_->Fill(this->blobs_[1].get());
-//		CHECK_EQ(bias_shape[0], count) << "Number of output feature maps "
-//			<< "should to equal to number of output dim in bias";
+		const BlobShape& bias_shape = this->layer_param_.sim_merge_param().bias_shape();
+		CHECK_EQ(count, bias_shape.dim(0)) << "number of feature maps should be equal with "
+			<< "number of biases";
+		vector<int> shape_bias;
+		for (int i = 0; i < bias_shape.dim_size(); i++){
+			shape_bias.push_back(bias_shape.dim(i));
+		}
+		this->blobs_[1].reset(new Blob<Dtype>(shape_bias));
+		LOG(INFO) << "bias shape: " << this->blobs_[1]->shape_string();
 	}
 }
 
@@ -87,7 +92,7 @@ void SimMergeLayer<Dtype>::update_sim_matrix_cpu(const vector<Blob<Dtype>*>& top
 	//and current similarity in diff
 	Dtype* curr_sim_data = this->sim_.mutable_cpu_diff();
 	Dtype* his_sim_data = this->sim_.mutable_cpu_data();
-	//average through batch
+	//average by batch_size
 	for (int i = 0; i < num; i++){
 		caffe_add(channel * dim, top_data + i * channel * dim, temp_data, temp_data);
 	}
@@ -106,10 +111,12 @@ void SimMergeLayer<Dtype>::update_sim_matrix_cpu(const vector<Blob<Dtype>*>& top
 			count++;
 		}
 	}
+	this->sim_.ToTxt("sim_before_merge", true);
 	//update history similarity with current similarity
 	const Dtype curr_iter = 1 + this->curr_iter_;
-	caffe_cpu_axpby(count, (Dtype)1. / curr_iter, curr_sim_data, 
-		(Dtype)this->curr_iter_ / curr_iter, his_sim_data);
+	caffe_cpu_axpby(count, (Dtype)1. / (Dtype)curr_iter, curr_sim_data, 
+		(Dtype)this->curr_iter_ / (Dtype)curr_iter, his_sim_data);
+	this->sim_.ToTxt("sim_after_merge", true);
 }
 
 //merge feature map n to feature map m
@@ -120,10 +127,10 @@ void SimMergeLayer<Dtype>::merge_two_feature_maps_cpu(const vector<Blob<Dtype>*>
 	const int offset = top[0]->count(this->axis_);
 	const int feat_dim = top[0]->count(this->axis_ + 1);
 	Dtype* top_data = top[0]->mutable_cpu_data();
+	const Dtype denom = 1 + sim;
 	for (int i = 0; i < num; i++){
 		Dtype* map_m_data = top_data + i * offset + m * feat_dim;
 		const Dtype* map_n_data = top_data + i * offset + n * feat_dim;
-		const Dtype denom = 1 + sim;
 		caffe_cpu_axpby(feat_dim, Dtype(sim) / denom, map_n_data, 
 			Dtype(1.) / denom, map_m_data);
 	}
@@ -183,15 +190,6 @@ void SimMergeLayer<Dtype>::merge_sim_feature_maps_cpu(const vector<Blob<Dtype>*>
 template <typename Dtype>
 void SimMergeLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
-	LOG(ERROR) << "weight shape: " << this->blobs_[0]->shape_string();
-	if (weight_term_){
-		DCHECK(this->blobs_[0]->count()) << "Please check if the name of weight "
-			<< "parameter is shared by other layer";
-	}
-	if (bias_term_){
-		DCHECK(this->blobs_[1]->count()) << "Please check if the name of bias "
-			<< "parameter is shared by other layer";
-	}
 	this->update_sim_matrix_cpu(bottom);
 	this->curr_iter_++;
 	if (this->curr_iter_ % this->iter_ == 0){

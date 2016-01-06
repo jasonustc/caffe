@@ -351,6 +351,10 @@ message SimMergeParameter{
     //filler used to reset parameters
     optional FillerParameter weight_filler = 4;
     optional FillerParameter bias_filler = 5;
+    //we need to set the shape and bias, so that we can pass the 
+    //blob share data check
+    optional BlobShape weight_shape = 6;
+    optional BlobShape bias_shape = 7;
 }
 
 // Message that stores parameters used to apply transformation

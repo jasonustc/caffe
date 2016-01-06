@@ -53,8 +53,8 @@ namespace caffe{
 		}
 		//update history similarity with current similarity
 		const Dtype curr_iter = 1 + this->curr_iter_;
-		caffe_gpu_axpby(count, (Dtype)1. / curr_iter, curr_sim_data,
-			(Dtype)this->curr_iter_ / curr_iter, his_sim_data);
+		caffe_gpu_axpby(count, (Dtype)1. / (Dtype)curr_iter, curr_sim_data,
+			(Dtype)this->curr_iter_ / (Dtype)curr_iter, his_sim_data);
 	}
 
 	template <typename Dtype>
@@ -63,10 +63,10 @@ namespace caffe{
 		const int num = top[0]->num();
 		const int offset = top[0]->count(this->axis_);
 		const int feat_dim = top[0]->count(this->axis_ + 1);
+		const Dtype denom = 1. + sim;
 		for (int i = 0; i < num; i++){
 			Dtype* map_m_data = top[0]->mutable_gpu_data() + i * offset + m * feat_dim;
 			const Dtype* map_n_data = top[0]->mutable_gpu_data() + i * offset + n * feat_dim;
-			const Dtype denom = 1. + sim;
 			caffe_gpu_axpby(feat_dim, Dtype(sim) / denom, map_n_data, 
 				Dtype(1.) / denom, map_m_data);
 		}
