@@ -1,7 +1,7 @@
 # all files
-*.sdf
-*.pdb
-*.opensdf
-x64/
-*.suo
-*.prototxt
+*
+#except visual studio related files
+!*.sln
+!*.suo
+!*.vcxproj
+!*.filters
