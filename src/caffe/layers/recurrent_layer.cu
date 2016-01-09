@@ -18,6 +18,21 @@ void RecurrentLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
 	if (this->phase_ == TEST) {
 		unrolled_net_->ShareWeightData();
 	}
+//	LOG(ERROR) << "reshape_l1_norm: " << bottom[0]->asum_data();
+//	LOG(ERROR) << "reshape_l2_norm: " << bottom[0]->sumsq_data();
+
+//	if (top.size() > 1){
+//		LOG(ERROR) << "h_T_l1_norm: " << top[1]->asum_data();
+//		LOG(ERROR) << "h_T_l2_norm: " << top[1]->sumsq_data();
+//		LOG(ERROR) << "c_T_l1_norm: " << top[2]->asum_data();
+//		LOG(ERROR) << "c_T_l2_norm: " << top[2]->sumsq_data();
+//		LOG(ERROR) << "W_xc_l1_norm: " << this->blobs_[0]->asum_data();
+//		LOG(ERROR) << "W_xc_l2_norm: " << this->blobs_[0]->sumsq_data();
+//		LOG(ERROR) << "bc_l1_norm: " << this->blobs_[1]->asum_data();
+//		LOG(ERROR) << "bc_l2_norm: " << this->blobs_[1]->sumsq_data();
+//		LOG(ERROR) << "W_hc_l1_norm: " << this->blobs_[2]->asum_data();
+//		LOG(ERROR) << "W_hc_l2_norm: " << this->blobs_[2]->sumsq_data();
+//	}
 
 	DCHECK_EQ(recur_input_blobs_.size(), recur_output_blobs_.size());
 	for (int i = 0; i < recur_input_blobs_.size(); ++i) {

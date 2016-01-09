@@ -1,4 +1,5 @@
 #include <vector>
+#include <float.h>
 
 #include "caffe/layer.hpp"
 #include "caffe/util/math_functions.hpp"

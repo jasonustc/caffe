@@ -20,21 +20,23 @@ inline Dtype tanh(Dtype x) {
 template <typename Dtype>
 void LSTMUnitLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
-  for (int i = 0; i < bottom.size(); ++i) {
-    CHECK_EQ(3, bottom[i]->num_axes());
-    CHECK_EQ(1, bottom[i]->shape(0));
-  }
-  const int num_instances = bottom[0]->shape(1);
-  hidden_dim_ = bottom[0]->shape(2);
-  CHECK_EQ(num_instances, bottom[1]->shape(1));
-  CHECK_EQ(4 * hidden_dim_, bottom[1]->shape(2));
-  CHECK_EQ(1, bottom[2]->shape(1));
-  CHECK_EQ(num_instances, bottom[2]->shape(2));
-  top[0]->ReshapeLike(*bottom[0]);
-  top[1]->ReshapeLike(*bottom[0]);
-  X_acts_.ReshapeLike(*bottom[1]);
+	const int num_instances = bottom[0]->shape(1);
+	for (int i = 0; i < bottom.size(); ++i) {
+		CHECK_EQ(3, bottom[i]->num_axes());
+		CHECK_EQ(1, bottom[i]->shape(0));
+		CHECK_EQ(num_instances, bottom[i]->shape(1));
+	}
+	hidden_dim_ = bottom[0]->shape(2);
+	CHECK_EQ(num_instances, bottom[1]->shape(1));
+	CHECK_EQ(4 * hidden_dim_, bottom[1]->shape(2));
+	CHECK_EQ(1, bottom[2]->shape(1));
+	CHECK_EQ(num_instances, bottom[2]->shape(2));
+	top[0]->ReshapeLike(*bottom[0]);
+	top[1]->ReshapeLike(*bottom[0]);
+	X_acts_.ReshapeLike(*bottom[1]);
 }
 
+//C_prev, X, cont
 template <typename Dtype>
 void LSTMUnitLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {

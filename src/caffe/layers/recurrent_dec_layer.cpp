@@ -69,7 +69,7 @@ void DRecurrentLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 	for (int i = 0; i < bottom[0]->num_axes(); ++i) {
 		input_shape.add_dim(bottom[0]->shape(i));
 	}
-	//repeated message can be added 
+//	//repeated message can be added 
 	net_param.add_input_shape()->CopyFrom(input_shape);
 
 	input_shape.Clear();
@@ -212,8 +212,6 @@ void DRecurrentLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 template <typename Dtype>
 void DRecurrentLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
-//  CHECK(!propagate_down[1]) << "Cannot backpropagate to sequence indicators.";
-	//if (!propagate_down[0] && !propagate_down[2]) { LOG(INFO) << "NOT BP"; return; }
 
   unrolled_net_->Backward();
 }

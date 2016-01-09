@@ -318,7 +318,7 @@
     <ClCompile Include="..\src\caffe\layers\dec_lstm_unit_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\caffe.cpp" />
+    <ClCompile Include="..\tools\test\test_dlstm_layer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">

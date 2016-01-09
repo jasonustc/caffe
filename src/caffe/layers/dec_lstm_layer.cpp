@@ -4,7 +4,7 @@
 ** mail: shenxu@mail.ustc.edu.cn
 ** date: 2015/10/4
 ** desc: DecodingLSTMLayer(CPU)
-** TODO: here I just deal with fixed sequence length decoding(like Action Recognition)
+** TODO: here I just deal with fixed sequence length decoding
 **       we need to extend it to deal with various length
 *********************************************************************************/
 #include <string>
@@ -169,24 +169,6 @@ namespace caffe{
 				string ss = this->int_to_str(s);
 				string units = ns + "_" + ss;
 				string unitm1s = ns + "_" + this->int_to_str(s - 1);
-//				if (s == 1){
-//					//for the first element in the decoding lstm, we just copy
-//					//c_T and h_T
-//					{
-//						LayerParameter* h_param = net_param->add_layer();
-//						h_param->set_type("Split");
-//						h_param->add_bottom("h_" + unitm1s);
-//						h_param->add_top("h_" + units);
-//						h_param->set_name("unit_h_" + units);
-
-//						LayerParameter* c_param = net_param->add_layer();
-//						c_param->set_type("Split");
-//						c_param->add_bottom("c_" + unitm1s);
-//						c_param->add_top("c_" + units);
-//						c_param->set_name("unit_c_" + units);
-//					}
-//					continue;
-//				}
 				//Add layer to compute
 				//   W_hc_h_{t-1} := W_hc * h_{t-1}
 				{

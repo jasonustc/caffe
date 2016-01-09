@@ -270,6 +270,16 @@ void RecurrentLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   // the parameters do need backward(or Net would have set
   // layer_needs_backward_[i] == false for this layer).
   unrolled_net_->Backward();
+//  LOG(ERROR) << "W_xc_l1_diff: " << this->blobs_[0]->asum_diff();
+//  LOG(ERROR) << "W_xc_l2_diff: " << this->blobs_[0]->sumsq_diff();
+//  LOG(ERROR) << "h_T_l1_diff: " << top[1]->asum_diff();
+//  LOG(ERROR) << "h_T_l2_diff: " << top[1]->sumsq_diff();
+//  LOG(ERROR) << "c_T_l1_diff: " << top[2]->asum_diff();
+//  LOG(ERROR) << "c_T_l2_diff: " << top[2]->sumsq_diff();
+//  LOG(ERROR) << "bc_l1_diff: " << this->blobs_[1]->asum_diff();
+//  LOG(ERROR) << "bc_l2_diff: " << this->blobs_[1]->sumsq_diff();
+//  LOG(ERROR) << "W_hc_l1_diff: " << this->blobs_[2]->asum_diff();
+//  LOG(ERROR) << "W_hc_l2_diff: " << this->blobs_[2]->sumsq_diff();
 }
 
 #ifdef CPU_ONLY
