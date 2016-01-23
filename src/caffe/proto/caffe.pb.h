@@ -4049,6 +4049,13 @@ class AccuracyParameter : public ::google::protobuf::Message {
   inline float denominator() const;
   inline void set_denominator(float value);
 
+  // optional float err_gap = 5 [default = 0];
+  inline bool has_err_gap() const;
+  inline void clear_err_gap();
+  static const int kErrGapFieldNumber = 5;
+  inline float err_gap() const;
+  inline void set_err_gap(float value);
+
   // @@protoc_insertion_point(class_scope:caffe.AccuracyParameter)
  private:
   inline void set_has_top_k();
@@ -4059,6 +4066,8 @@ class AccuracyParameter : public ::google::protobuf::Message {
   inline void clear_has_ignore_label();
   inline void set_has_denominator();
   inline void clear_has_denominator();
+  inline void set_has_err_gap();
+  inline void clear_has_err_gap();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -4068,6 +4077,7 @@ class AccuracyParameter : public ::google::protobuf::Message {
   ::google::protobuf::int32 axis_;
   ::google::protobuf::int32 ignore_label_;
   float denominator_;
+  float err_gap_;
   friend void  protobuf_AddDesc_caffe_2eproto();
   friend void protobuf_AssignDesc_caffe_2eproto();
   friend void protobuf_ShutdownFile_caffe_2eproto();
@@ -16498,6 +16508,30 @@ inline void AccuracyParameter::set_denominator(float value) {
   set_has_denominator();
   denominator_ = value;
   // @@protoc_insertion_point(field_set:caffe.AccuracyParameter.denominator)
+}
+
+// optional float err_gap = 5 [default = 0];
+inline bool AccuracyParameter::has_err_gap() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void AccuracyParameter::set_has_err_gap() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void AccuracyParameter::clear_has_err_gap() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void AccuracyParameter::clear_err_gap() {
+  err_gap_ = 0;
+  clear_has_err_gap();
+}
+inline float AccuracyParameter::err_gap() const {
+  // @@protoc_insertion_point(field_get:caffe.AccuracyParameter.err_gap)
+  return err_gap_;
+}
+inline void AccuracyParameter::set_err_gap(float value) {
+  set_has_err_gap();
+  err_gap_ = value;
+  // @@protoc_insertion_point(field_set:caffe.AccuracyParameter.err_gap)
 }
 
 // -------------------------------------------------------------------

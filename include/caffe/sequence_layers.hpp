@@ -426,7 +426,7 @@ template <typename Dtype>
 class LSTMLayer : public RecurrentLayer<Dtype> {
 public:
 	explicit LSTMLayer(const LayerParameter& param)
-		: decode_(false), RecurrentLayer<Dtype>(param) {}
+		: RecurrentLayer<Dtype>(param), decode_(false) {}
 
 	virtual inline const char* type() const { return "LSTM"; }
 

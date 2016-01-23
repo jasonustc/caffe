@@ -93,6 +93,70 @@ namespace caffe {
 		Dtype denominator_;
 	};
 
+	template <typename Dtype>
+	class MultiLabelAccuracyLayer : public Layer<Dtype>{
+	public:
+		explicit MultiLabelAccuracyLayer(const LayerParameter& param):
+			Layer<Dtype>(param){}
+		virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top){
+			Layer<Dtype>::LayerSetUp(bottom, top);
+		}
+		virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+		virtual inline const char* type() const{ return "MultiLabelAccuracy"; }
+		virtual inline int ExactNumBottomBlobs() const { return 2; }
+		virtual inline int ExactNumTopBlobs() const { return 1; }
+
+	protected:
+		virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+		//@Brief not implemented -- MultiLabelAccuracyLayer can not be used as a loss
+		virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+			const vector<bool>& propagate_down,
+			const vector<Blob<Dtype>*>& bottom){
+			for (int i = 0; i < propagate_down.size(); i++){
+				if (propagate_down[i]){ NOT_IMPLEMENTED; }
+			}
+		}
+	};
+
+	/**
+	 * @brief Computes the classification accuracy for a one-of-many
+	 *        classification task.
+	 */
+	template <typename Dtype>
+	class SoftAccuracyLayer : public Layer<Dtype> {
+	public:
+		explicit SoftAccuracyLayer(const LayerParameter& param)
+			: Layer<Dtype>(param) {}
+		virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+		virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+
+		virtual inline const char* type() const { return "SoftAccuracy"; }
+		virtual inline int ExactNumBottomBlobs() const { return 2; }
+		virtual inline int MinTopBlobs() const { return 1; }
+		virtual inline int MaxTopBlobs() const { return 2; }
+
+	protected:
+		virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+
+
+		/// @brief Not implemented -- SoftAccuracyLayer cannot be used as a loss.
+		virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+			const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
+			for (int i = 0; i < propagate_down.size(); ++i) {
+				if (propagate_down[i]) { NOT_IMPLEMENTED; }
+			}
+		}
+
+		// if |predicted score - score| < err_gap_, the prediction is considered as true
+		Dtype err_gap_;
+	};
+
 	/*
 	 * @brief given word id and predict feature, compute the BLEU score
 	 */
@@ -950,6 +1014,52 @@ namespace caffe {
 		//put buffer into mu_sigma_buffer_ data and mu_sigma_buffer_ diff
 		Blob<Dtype> mu_sigma_buffer_;
 		int num_feats_;
+	};
+
+	/*
+	 * Please refer to https://github.com/BVLC/caffe/pull/523/files for more details
+	 * Takes two inputs of the same number(a and b), and has no output.
+	 * b must be a indicator vector [0, ..., 1, 0, .., -1, ..], 1 means positive,
+	 * 0 means ignore, -1 means negative
+	 * The gradient is propagated to a.
+	 */
+	template <typename Dtype>
+	class MultiLabelLossLayer : public LossLayer<Dtype>{
+	public: 
+		explicit MultiLabelLossLayer(const LayerParameter param)
+		: LossLayer<Dtype>(param){}
+		virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+
+		virtual inline const char* type()const { return "MultiLabelLoss"; }
+
+		virtual inline int MaxTopBlobs() const { return 2; }
+		virtual inline int ExactNumTopBlobs() const { return -1; }
+		//we can not backpropagate to the labels; ignore force_backward for
+		//these inputs.
+		virtual inline bool AllowForceBackward(const int bottom_index) const{
+			return bottom_index != 1;
+		}
+
+	protected:
+		virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+		virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+		virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+			const vector<bool>& propagate_down,
+			const vector<Blob<Dtype>*>& bottom);
+		virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+			const vector<bool>& propagate_down,
+			const vector<Blob<Dtype>*>& bottom);
+
+		//sigmoid Layer
+		shared_ptr<Layer<Dtype> > sigmoid_layer_;
+		//sigmoid output stores the probability of the sigmoid layer.
+		Blob<Dtype> prob_;
+		//Vector holders to call the underlying sigmoid layer forward and backward.
+		vector<Blob<Dtype>*> sigmoid_bottom_vec_;
+		vector<Blob<Dtype>*> sigmoid_top_vec_;
 	};
 
 }  // namespace caffe

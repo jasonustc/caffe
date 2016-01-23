@@ -214,6 +214,14 @@ void DRecurrentLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
 
   unrolled_net_->Backward();
+  LOG(ERROR) << "bottom gradient norm1 " << bottom[0]->asum_diff();
+  LOG(ERROR) << "bottom data norm1 " << bottom[0]->asum_data();
+  LOG(ERROR) << "W_hc gradient norm1 " << this->blobs_[0]->asum_diff();
+  LOG(ERROR) << "W_hc data norm1 " << this->blobs_[0]->asum_data();
+  LOG(ERROR) << "b_c gradient norm1 " << this->blobs_[1]->asum_diff();
+  LOG(ERROR) << "b_c data norm1 " << this->blobs_[1]->asum_data();
+  LOG(ERROR) << "W_xc gradient norm1 " << this->blobs_[2]->asum_diff();
+  LOG(ERROR) << "W_xc data norm1 " << this->blobs_[2]->asum_data();
 }
 
 #ifdef CPU_ONLY

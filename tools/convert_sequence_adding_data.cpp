@@ -83,13 +83,19 @@ void create_db(const string& feat_file, const string& db_name){
 		parse_line_feat(line, feats);
 		//save feat/score data to db
 		//the feat of each data has two dim: data and mask
+		LOG(ERROR) << "feats size: " << feats.size();
 		feat_datum.set_channels((int)feats.size()/2);
+		LOG(ERROR) << "channels: " << feat_datum.channels();
 		feat_datum.clear_float_data();
 		for (int i = 0; i < feats.size() - 1; i++){
+			if (feats[i] == 1){
+				printf("%f, %f\n", feats[i - 1], feats[i]);
+			}
 			feat_datum.add_float_data(feats[i]);
 		}
 		score_datum.clear_float_data();
 		score_datum.add_float_data(feats[feats.size() - 1]);
+		printf("%f \n", feats[feats.size() - 1]);
 		//sequential 
 		string out_feat;
 		string out_score;
@@ -125,7 +131,7 @@ int main(int argc, char** argv){
 			"format used as input for caffe.\n"
 			"usage: \n"
 			" EXE [FLAGS] INPUT_FEAT_FILE DB_NAME\n");
-		gflags::ShowUsageWithFlags(argv[0]);
+		gflags::ShowUsageWithFlagsRestrict(argv[0], "convert_sequence_adding_data");
 		return 1;
 	}
 

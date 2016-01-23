@@ -18,7 +18,7 @@ using namespace caffe;
 using boost::scoped_ptr;
 using std::string;
 
-DEFINE_int32(feat_dim, 160001, "The # of words in the word set");
+DEFINE_int32(feat_dim, 80002, "The # of words in the word set");
 DEFINE_string(backend, "lmdb", "The backend{leveldb/lmdb} for storing the result");
 DEFINE_bool(train, true, "if the dataset is for train(true: train, false: test)");
 
@@ -68,31 +68,23 @@ void create_db(const string& feat_file, const string& db_name){
 	sentence_datum.set_width(dim);
 
 	//build training dataset
-	int num_sentences = 0;
-	const int label = 1;
 	string line;
 	vector<int> feat_ids;
 	while (getline(in_feat, line)){
-		parse_line_feat(line, feat_ids);
+		parse_line_feat(line, feats);
 		//for targeting sequence, we need to add start mark and end 
-		//mark
-		if (!FLAGS_train){
-			//begin mark
-			feat_ids.insert(feat_ids.begin(), FLAGS_feat_dim + 1);
-			//end mark
-			feat_ids.push_back(FLAGS_feat_dim + 2);
-		}
-		sentence_datum.set_channels((int)feat_ids.size());
+		sentence_datum.set_channels((int)feats.size());
 		sentence_datum.clear_float_data();
-		for (int i = 0; i < feat_ids.size(); i++){
-//			cout << feat_ids[i] << "\t";
-			for (int f = 0; f < dim; f++){
-				if (f == feat_ids[i]){
-					sentence_datum.add_float_data(1);
-				}
-				else{
-					sentence_datum.add_float_data(0);
-				}
+		if (FLAGS_train){
+			for (int i = 0; i < feats.size(); i++){
+				sentence_datum.add_float_data(int(feats[i]));
+			}
+		}
+		else{
+			//build a max_words length target sentence
+			for (int i = 0; i < FLAGS_feat_dim; i++){
+				int data = i < feats.size() ? feats[i] : -1;
+				sentence_datum.add_float_data(data);
 			}
 		}
 		//sequential 
@@ -100,15 +92,14 @@ void create_db(const string& feat_file, const string& db_name){
 		sentence_datum.SerializeToString(&out);
 //		LOG(INFO)<< "feat_id size: " << feat_ids.size();
 //		LOG(INFO) << "float data size: " << sentence_datum.float_data_size();
-		int length = sprintf_s(key_cstr, kMaxKeyLength, "%09d", count);
+		int length = sprintf_s(key_cstr, kMaxKeyLength, "%10d", count);
 		//put into db
 		txn->Put(std::string(key_cstr, length), out);
-		num_sentences++;
 		if (++count % 1000 == 0){
 			//commit db
 			txn->Commit();
 			txn.reset(db->NewTransaction());
-			LOG(INFO) << "Processed " << num_sentences << " sentences";
+			LOG(INFO) << "Processed " <<  count << " sentences";
 		}
 	}//while getline
 	//write the last batch

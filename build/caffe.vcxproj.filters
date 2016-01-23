@@ -318,7 +318,16 @@
     <ClCompile Include="..\src\caffe\layers\dec_lstm_unit_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\test\test_dlstm_layer.cpp" />
+    <ClCompile Include="..\src\caffe\layers\soft_accuracy_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\multi_label_loss_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\multi_label_accuracy_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tools\test\test_multi_label_accuracy_layer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
@@ -478,6 +487,9 @@
       <Filter>src\layers</Filter>
     </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\dec_lstm_unit_layer.cu">
+      <Filter>src\layers</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\src\caffe\layers\multi_label_loss_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
   </ItemGroup>

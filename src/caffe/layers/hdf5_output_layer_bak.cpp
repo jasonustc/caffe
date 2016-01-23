@@ -1,8 +1,8 @@
 #include <vector>
-#include<time.h>
+
 #include "hdf5.h"
 #include "hdf5_hl.h"
-#include<sstream>
+
 #include "caffe/blob.hpp"
 #include "caffe/common.hpp"
 #include "caffe/layer.hpp"
@@ -10,44 +10,34 @@
 #include "caffe/vision_layers.hpp"
 
 namespace caffe {
-static int hdf5_out_cnt=0;
+
 template <typename Dtype>
 void HDF5OutputLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
-  hdf5_out_cnt=0;
-//  static int cnt_;
- // cnt_++;
+  file_name_ = this->layer_param_.hdf5_output_param().file_name();
+  file_id_ = H5Fcreate(file_name_.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT,
+                       H5P_DEFAULT);
+  CHECK_GE(file_id_, 0) << "Failed to open HDF5 file" << file_name_;
+  file_opened_ = true;
 }
 
 template <typename Dtype>
 HDF5OutputLayer<Dtype>::~HDF5OutputLayer<Dtype>() {
+  if (file_opened_) {
+    herr_t status = H5Fclose(file_id_);
+    CHECK_GE(status, 0) << "Failed to close HDF5 file " << file_name_;
+  }
 }
 
 template <typename Dtype>
 void HDF5OutputLayer<Dtype>::SaveBlobs() {
   // TODO: no limit on the number of blobs
-  string str_t;
-  stringstream st;
-  st<<hdf5_out_cnt;
-  st>>str_t;
-  hdf5_out_cnt++;
-  file_name_ = this->layer_param_.hdf5_output_param().file_name()+"_"+string(str_t); 
-  file_id_ = H5Fcreate(file_name_.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT,
-                       H5P_DEFAULT);
-  CHECK_GE(file_id_, 0) << "Failed to open HDF5 file" << file_name_;
-  file_opened_ = true;
-
   LOG(INFO) << "Saving HDF5 file " << file_name_;
   CHECK_EQ(data_blob_.num(), label_blob_.num()) <<
       "data blob and label blob must have the same batch size";
   hdf5_save_nd_dataset(file_id_, HDF5_DATA_DATASET_NAME, data_blob_);
   hdf5_save_nd_dataset(file_id_, HDF5_DATA_LABEL_NAME, label_blob_);
   LOG(INFO) << "Successfully saved " << data_blob_.num() << " rows";
-  if (file_opened_) {
-    herr_t status = H5Fclose(file_id_);
-    CHECK_GE(status, 0) << "Failed to close HDF5 file " << file_name_;
-  }
-
 }
 
 template <typename Dtype>
