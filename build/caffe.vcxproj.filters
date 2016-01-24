@@ -258,7 +258,7 @@
     <ClCompile Include="..\src\caffe\image_reader.cpp">
       <Filter>src\extract_feat</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\extract_features2files.cpp" />
+    <ClCompile Include="..\tools\convert_c3d_model_full_convolutional.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">

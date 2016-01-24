@@ -1,10 +1,10 @@
 ﻿
 /********************************************************************************
 ** Copyright(c) 2015 USTC & MSRA All Rights Reserved.
-** auth： Zhaofan Qiu
-** mail： zhaofanqiu@gmail.com
-** date： 2015/9/11
-** desc： convert_c3d_model_and_mean tool
+** auth: Zhaofan Qiu
+** mail: zhaofanqiu@gmail.com
+** date: 2015/9/11
+** desc: convert_c3d_model_and_mean tool
 *********************************************************************************/
 
 #include <glog/logging.h>
