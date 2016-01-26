@@ -29,7 +29,7 @@ void LMDB::Open(const string& source, Mode mode) {
   }
   int flags = 0;
   if (mode == READ) {
-    flags = MDB_RDONLY | MDB_NOTLS;
+    flags = MDB_RDONLY | MDB_NOTLS | MDB_NOLOCK;
   }
   MDB_CHECK(mdb_env_open(mdb_env_, source.c_str(), flags, 0664));
   LOG(INFO) << "Opened lmdb " << source;

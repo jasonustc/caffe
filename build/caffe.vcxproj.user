@@ -5,7 +5,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>vgg_finetune_gaussian_0.0001_iter_43000.caffemodel VGG_16_layers_fully_conv_gaussian.caffemodel</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>D:\data\imageNet\ILSVRC2012_img_val\ imagenet_valid_index_new.txt D:\data\imageNet\test_db  -resize_min_size 256 --crop</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

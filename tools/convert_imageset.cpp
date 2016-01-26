@@ -43,10 +43,11 @@ DEFINE_int32(resize_height, 0, "Height images are resized to");
 DEFINE_int32(resize_min_size, 0, "size of small side of the image");
 DEFINE_bool(check_size, false,
     "When this option is on, check that all the datum have the same size");
-DEFINE_bool(encoded, false,
+DEFINE_bool(encoded, true,
     "When this option is on, the encoded image will be save in datum");
 DEFINE_string(encode_type, "",
     "Optional: What type should we encode the image as ('png','jpg',...).");
+DEFINE_bool(crop, false, "if we need to only keep the center crop as the smaller side");
 
 int main(int argc, char** argv) {
   ::google::InitGoogleLogging(argv[0]);
@@ -133,7 +134,7 @@ int main(int argc, char** argv) {
     }
 	if (resize_min_size > 0){
 		status = ReadImageToDatum(root_folder + lines[line_id].first,
-			lines[line_id].second, resize_min_size, is_color,
+			lines[line_id].second, resize_min_size, is_color, FLAGS_crop,
 			enc, &datum);
 	}
 	else{

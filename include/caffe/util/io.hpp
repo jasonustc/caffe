@@ -107,8 +107,8 @@ bool ReadImageToDatum(const string& filename, const int label,
     const std::string & encoding, Datum* datum);
 
 bool ReadImageToDatum(const string& filename, const int label,
-    const int image_size, const bool is_color,
-    const std::string & encoding, Datum* datum);
+    const int image_size, const bool is_color, const bool crop,
+    const std::string& encoding, Datum* datum);
 
 inline bool ReadImageToDatum(const string& filename, const int label,
     const int height, const int width, const bool is_color, Datum* datum) {
@@ -141,8 +141,12 @@ bool DecodeDatum(Datum* datum, bool is_color);
 
 cv::Mat ReadImageToCVMat(const string& filename,
     const int height, const int width, const bool is_color);
+//added by xu shen, to allow resizing image with smaller side
+//to be image_size
+//crop: if we need to crop the center image with smaller side
+//euqal to image_size
 cv::Mat ReadImageToCVMat(const string& filename,
-    const int image_size, const bool is_color);
+    const int image_size, const bool is_color, const bool crop);
 
 cv::Mat ReadImageToCVMat(const string& filename,
     const int height, const int width);

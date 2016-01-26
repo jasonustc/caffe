@@ -96,30 +96,48 @@ cv::Mat ReadImageToCVMat(const string& filename,
  * do isotropic scaling the make the small side of the image is image_size
  */
 cv::Mat ReadImageToCVMat(const string& filename,
-    const int image_size, const bool is_color) {
-  cv::Mat cv_img;
-  int cv_read_flag = (is_color ? CV_LOAD_IMAGE_COLOR :
-    CV_LOAD_IMAGE_GRAYSCALE);
-  cv::Mat cv_img_origin = cv::imread(filename, cv_read_flag);
-  if (!cv_img_origin.data) {
-    LOG(ERROR) << "Could not open or find file " << filename;
-    return cv_img_origin;
-  }
-  if (image_size > 0) {
-	  int width = cv_img_origin.cols;
-	  int height = cv_img_origin.rows;
-	  int min_size = width > height ? height : width;
-	  float scale = float(image_size) / float(min_size);
-	  if (min_size == width){
-		cv::resize(cv_img_origin, cv_img, cv::Size(image_size, int(height * scale)));
-	  }
-	  else{
-		cv::resize(cv_img_origin, cv_img, cv::Size(int(width * scale), image_size));
-	  }
-  } else {
-    cv_img = cv_img_origin;
-  }
-  return cv_img;
+	const int image_size, const bool is_color, const bool crop = false) {
+	cv::Mat cv_img;
+	int cv_read_flag = (is_color ? CV_LOAD_IMAGE_COLOR :
+		CV_LOAD_IMAGE_GRAYSCALE);
+	cv::Mat cv_img_origin = cv::imread(filename, cv_read_flag);
+	if (!cv_img_origin.data) {
+		LOG(ERROR) << "Could not open or find file " << filename;
+		return cv_img_origin;
+	}
+	if (image_size > 0) {
+		int width = cv_img_origin.cols;
+		int height = cv_img_origin.rows;
+		int min_size = width > height ? height : width;
+		float scale = float(image_size) / float(min_size);
+		if (min_size == width){
+			//avoid float problem
+			int new_height = static_cast<int>(height * scale) + 1;
+			//cv::Size(width, height)
+			cv::resize(cv_img_origin, cv_img, cv::Size(image_size, new_height));
+			if (crop){
+				int h_off = (new_height - image_size) / 2;
+				//get the center crop
+				//cv_img(range(row), range(col))
+				cv_img = cv_img(cv::Range(h_off, h_off + image_size), cv::Range::all());
+			}
+		}
+		else{
+			//avoid float problem
+			int new_width = static_cast<int>(width * scale) + 1;
+			//cv::Size(width, height)
+			cv::resize(cv_img_origin, cv_img, cv::Size(new_width, image_size));
+			if (crop){
+				int w_off = (new_width - image_size) / 2;
+				//get the center image_size * image_size crop
+				cv_img = cv_img(cv::Range::all(), cv::Range(w_off, w_off + image_size));
+			}
+		}
+	}
+	else {
+		cv_img = cv_img_origin;
+	}
+	return cv_img;
 }
 
 cv::Mat ReadImageToCVMat(const string& filename,
@@ -183,9 +201,9 @@ bool ReadImageToDatum(const string& filename, const int label,
  *smallest side of the image is image_size
  */
 bool ReadImageToDatum(const string& filename, const int label,
-    const int image_size, const bool is_color,
+    const int image_size, const bool is_color, const bool crop,
     const std::string & encoding, Datum* datum) {
-  cv::Mat cv_img = ReadImageToCVMat(filename, image_size, is_color);
+  cv::Mat cv_img = ReadImageToCVMat(filename, image_size, is_color, crop);
   if (cv_img.data) {
     if (encoding.size()) {
       if ( (cv_img.channels() == 3) == is_color && !image_size &&
