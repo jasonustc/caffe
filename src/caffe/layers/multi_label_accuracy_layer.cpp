@@ -14,8 +14,13 @@ namespace caffe{
 	template <typename Dtype>
 	void MultiLabelAccuracyLayer<Dtype>::Reshape(
 		const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top){
-		CHECK(bottom[0]->shape() == bottom[1]->shape()) <<
-			"The pred data and labels should have the same shape";
+		CHECK_EQ(bottom[0]->num(), bottom[1]->num()) <<
+			"bottom[0] and bottom[1] should have the same number of samples," <<
+			" bottom[0]: " << bottom[0]->num() << ", bottom[1]: " << bottom[1]->num();
+		CHECK(bottom[0]->count(1) == bottom[1]->count(1)) <<
+			"The pred data and labels should have the same dim," << 
+			" bottom[0]->count(1): " << bottom[0]->count(1) << 
+			", bottom[1]->count(1): " << bottom[1]->count(1);
 		// Top will contain:
 		// top[0] = Sensitivity or Recall (TP / P),
 		// top[1] = Specificity (TN / N),
@@ -47,7 +52,7 @@ namespace caffe{
 				false_negative += (bottom_data[i] < 0);
 				count_pos++;
 			}
-			if (label < 0){
+			else if (label < 0){
 				//Update Negative accuracy and count
 				true_negative += (bottom_data[i] < 0);
 				false_positive += (bottom_data[i] >= 0);

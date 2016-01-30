@@ -352,6 +352,17 @@ message LayerParameter {
   optional RBMParameter rbm_param = 146;
   optional ConvRecurrentParameter conv_recurrent_param = 147;
   optional BLEUParameter bleu_param = 148;
+  optional MultiLabelLossParameter multi_label_loss_param = 149;
+}
+
+//Message that stores parameters used to calculate multi label loss
+message MultiLabelLossParameter{
+    enum ProbType{
+        SOFTMAX = 1;
+        SIGMOID = 2;
+    }
+    //use which layer type to get the probability of each class
+    optional ProbType prob_type = 1[default = SIGMOID];
 }
 
 //Message that stores parameters used to calculate bleu score

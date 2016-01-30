@@ -189,16 +189,16 @@ int test() {
   for (int i = 0; i < test_score.size(); ++i) {
     const std::string& output_name = caffe_net.blob_names()[
         caffe_net.output_blob_indices()[test_score_output_id[i]]];
-    const float loss_weight =
-        caffe_net.blob_loss_weights()[caffe_net.output_blob_indices()[i]];
+//    const float loss_weight =
+//        caffe_net.blob_loss_weights()[caffe_net.output_blob_indices()[i]];
     std::ostringstream loss_msg_stream;
     const float mean_score = test_score[i] / FLAGS_iterations;
 	//if loss weight is not 0, we output loss
-    if (loss_weight) {
-      loss_msg_stream << " (* " << loss_weight
-                      << " = " << loss_weight * mean_score << " loss)";
-    }
-    LOG(INFO) << output_name << " = " << mean_score << loss_msg_stream.str();
+//    if (loss_weight) {
+//      loss_msg_stream << " (* " << loss_weight
+//                      << " = " << loss_weight * mean_score << " loss)";
+//    }
+    LOG(INFO) << output_name << i <<  " = " << mean_score << loss_msg_stream.str();
   }
 
   return 0;

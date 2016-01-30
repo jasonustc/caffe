@@ -81,9 +81,9 @@ namespace caffe{
 			pred_->mutable_cpu_data()[0] = -1;
 			pred_->mutable_cpu_data()[5] = -0.5;
 			label_->mutable_cpu_data()[0] = 1;
-			label_->mutable_cpu_data()[3] = 1;
+			label_->mutable_cpu_data()[3] = 0;
 			label_->mutable_cpu_data()[6] = 1;
-			label_->mutable_cpu_data()[7] = 1;
+			label_->mutable_cpu_data()[7] = 0;
 			bottom_.push_back(pred_);
 			bottom_.push_back(label_);
 			top_.push_back(loss_);
@@ -107,9 +107,9 @@ namespace caffe{
 int main(int argc, char** argv){
 	caffe::MultiLabelLossTest<float> test;
 	test.TestSetUp();
-	test.TestForward(caffe::Caffe::CPU);
+//	test.TestForward(caffe::Caffe::CPU);
 	test.TestBackward(caffe::Caffe::CPU);
-	test.TestForward(caffe::Caffe::GPU);
+//	test.TestForward(caffe::Caffe::GPU);
 	test.TestBackward(caffe::Caffe::GPU);
 	return 0;
 }

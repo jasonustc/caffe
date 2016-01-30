@@ -46,6 +46,7 @@ class NetState;
 class NetStateRule;
 class ParamSpec;
 class LayerParameter;
+class MultiLabelLossParameter;
 class BLEUParameter;
 class RBMParameter;
 class NormLossParameter;
@@ -155,6 +156,25 @@ inline bool ParamSpec_DimCheckMode_Parse(
     const ::std::string& name, ParamSpec_DimCheckMode* value) {
   return ::google::protobuf::internal::ParseNamedEnum<ParamSpec_DimCheckMode>(
     ParamSpec_DimCheckMode_descriptor(), name, value);
+}
+enum MultiLabelLossParameter_ProbType {
+  MultiLabelLossParameter_ProbType_SOFTMAX = 1,
+  MultiLabelLossParameter_ProbType_SIGMOID = 2
+};
+bool MultiLabelLossParameter_ProbType_IsValid(int value);
+const MultiLabelLossParameter_ProbType MultiLabelLossParameter_ProbType_ProbType_MIN = MultiLabelLossParameter_ProbType_SOFTMAX;
+const MultiLabelLossParameter_ProbType MultiLabelLossParameter_ProbType_ProbType_MAX = MultiLabelLossParameter_ProbType_SIGMOID;
+const int MultiLabelLossParameter_ProbType_ProbType_ARRAYSIZE = MultiLabelLossParameter_ProbType_ProbType_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* MultiLabelLossParameter_ProbType_descriptor();
+inline const ::std::string& MultiLabelLossParameter_ProbType_Name(MultiLabelLossParameter_ProbType value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    MultiLabelLossParameter_ProbType_descriptor(), value);
+}
+inline bool MultiLabelLossParameter_ProbType_Parse(
+    const ::std::string& name, MultiLabelLossParameter_ProbType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<MultiLabelLossParameter_ProbType>(
+    MultiLabelLossParameter_ProbType_descriptor(), name, value);
 }
 enum RBMParameter_SampleType {
   RBMParameter_SampleType_BERNOULLI = 1,
@@ -3037,6 +3057,15 @@ class LayerParameter : public ::google::protobuf::Message {
   inline ::caffe::BLEUParameter* release_bleu_param();
   inline void set_allocated_bleu_param(::caffe::BLEUParameter* bleu_param);
 
+  // optional .caffe.MultiLabelLossParameter multi_label_loss_param = 149;
+  inline bool has_multi_label_loss_param() const;
+  inline void clear_multi_label_loss_param();
+  static const int kMultiLabelLossParamFieldNumber = 149;
+  inline const ::caffe::MultiLabelLossParameter& multi_label_loss_param() const;
+  inline ::caffe::MultiLabelLossParameter* mutable_multi_label_loss_param();
+  inline ::caffe::MultiLabelLossParameter* release_multi_label_loss_param();
+  inline void set_allocated_multi_label_loss_param(::caffe::MultiLabelLossParameter* multi_label_loss_param);
+
   // @@protoc_insertion_point(class_scope:caffe.LayerParameter)
  private:
   inline void set_has_name();
@@ -3143,6 +3172,8 @@ class LayerParameter : public ::google::protobuf::Message {
   inline void clear_has_conv_recurrent_param();
   inline void set_has_bleu_param();
   inline void clear_has_bleu_param();
+  inline void set_has_multi_label_loss_param();
+  inline void clear_has_multi_label_loss_param();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -3205,6 +3236,7 @@ class LayerParameter : public ::google::protobuf::Message {
   ::caffe::RBMParameter* rbm_param_;
   ::caffe::ConvRecurrentParameter* conv_recurrent_param_;
   ::caffe::BLEUParameter* bleu_param_;
+  ::caffe::MultiLabelLossParameter* multi_label_loss_param_;
   int phase_;
   mutable int _cached_size_;
   friend void  protobuf_AddDesc_caffe_2eproto();
@@ -3213,6 +3245,109 @@ class LayerParameter : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static LayerParameter* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class MultiLabelLossParameter : public ::google::protobuf::Message {
+ public:
+  MultiLabelLossParameter();
+  virtual ~MultiLabelLossParameter();
+
+  MultiLabelLossParameter(const MultiLabelLossParameter& from);
+
+  inline MultiLabelLossParameter& operator=(const MultiLabelLossParameter& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const MultiLabelLossParameter& default_instance();
+
+  void Swap(MultiLabelLossParameter* other);
+
+  // implements Message ----------------------------------------------
+
+  MultiLabelLossParameter* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const MultiLabelLossParameter& from);
+  void MergeFrom(const MultiLabelLossParameter& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  typedef MultiLabelLossParameter_ProbType ProbType;
+  static const ProbType SOFTMAX = MultiLabelLossParameter_ProbType_SOFTMAX;
+  static const ProbType SIGMOID = MultiLabelLossParameter_ProbType_SIGMOID;
+  static inline bool ProbType_IsValid(int value) {
+    return MultiLabelLossParameter_ProbType_IsValid(value);
+  }
+  static const ProbType ProbType_MIN =
+    MultiLabelLossParameter_ProbType_ProbType_MIN;
+  static const ProbType ProbType_MAX =
+    MultiLabelLossParameter_ProbType_ProbType_MAX;
+  static const int ProbType_ARRAYSIZE =
+    MultiLabelLossParameter_ProbType_ProbType_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  ProbType_descriptor() {
+    return MultiLabelLossParameter_ProbType_descriptor();
+  }
+  static inline const ::std::string& ProbType_Name(ProbType value) {
+    return MultiLabelLossParameter_ProbType_Name(value);
+  }
+  static inline bool ProbType_Parse(const ::std::string& name,
+      ProbType* value) {
+    return MultiLabelLossParameter_ProbType_Parse(name, value);
+  }
+
+  // accessors -------------------------------------------------------
+
+  // optional .caffe.MultiLabelLossParameter.ProbType prob_type = 1 [default = SIGMOID];
+  inline bool has_prob_type() const;
+  inline void clear_prob_type();
+  static const int kProbTypeFieldNumber = 1;
+  inline ::caffe::MultiLabelLossParameter_ProbType prob_type() const;
+  inline void set_prob_type(::caffe::MultiLabelLossParameter_ProbType value);
+
+  // @@protoc_insertion_point(class_scope:caffe.MultiLabelLossParameter)
+ private:
+  inline void set_has_prob_type();
+  inline void clear_has_prob_type();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  int prob_type_;
+  friend void  protobuf_AddDesc_caffe_2eproto();
+  friend void protobuf_AssignDesc_caffe_2eproto();
+  friend void protobuf_ShutdownFile_caffe_2eproto();
+
+  void InitAsDefaultInstance();
+  static MultiLabelLossParameter* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -15738,6 +15873,76 @@ inline void LayerParameter::set_allocated_bleu_param(::caffe::BLEUParameter* ble
   // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.bleu_param)
 }
 
+// optional .caffe.MultiLabelLossParameter multi_label_loss_param = 149;
+inline bool LayerParameter::has_multi_label_loss_param() const {
+  return (_has_bits_[1] & 0x08000000u) != 0;
+}
+inline void LayerParameter::set_has_multi_label_loss_param() {
+  _has_bits_[1] |= 0x08000000u;
+}
+inline void LayerParameter::clear_has_multi_label_loss_param() {
+  _has_bits_[1] &= ~0x08000000u;
+}
+inline void LayerParameter::clear_multi_label_loss_param() {
+  if (multi_label_loss_param_ != NULL) multi_label_loss_param_->::caffe::MultiLabelLossParameter::Clear();
+  clear_has_multi_label_loss_param();
+}
+inline const ::caffe::MultiLabelLossParameter& LayerParameter::multi_label_loss_param() const {
+  // @@protoc_insertion_point(field_get:caffe.LayerParameter.multi_label_loss_param)
+  return multi_label_loss_param_ != NULL ? *multi_label_loss_param_ : *default_instance_->multi_label_loss_param_;
+}
+inline ::caffe::MultiLabelLossParameter* LayerParameter::mutable_multi_label_loss_param() {
+  set_has_multi_label_loss_param();
+  if (multi_label_loss_param_ == NULL) multi_label_loss_param_ = new ::caffe::MultiLabelLossParameter;
+  // @@protoc_insertion_point(field_mutable:caffe.LayerParameter.multi_label_loss_param)
+  return multi_label_loss_param_;
+}
+inline ::caffe::MultiLabelLossParameter* LayerParameter::release_multi_label_loss_param() {
+  clear_has_multi_label_loss_param();
+  ::caffe::MultiLabelLossParameter* temp = multi_label_loss_param_;
+  multi_label_loss_param_ = NULL;
+  return temp;
+}
+inline void LayerParameter::set_allocated_multi_label_loss_param(::caffe::MultiLabelLossParameter* multi_label_loss_param) {
+  delete multi_label_loss_param_;
+  multi_label_loss_param_ = multi_label_loss_param;
+  if (multi_label_loss_param) {
+    set_has_multi_label_loss_param();
+  } else {
+    clear_has_multi_label_loss_param();
+  }
+  // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.multi_label_loss_param)
+}
+
+// -------------------------------------------------------------------
+
+// MultiLabelLossParameter
+
+// optional .caffe.MultiLabelLossParameter.ProbType prob_type = 1 [default = SIGMOID];
+inline bool MultiLabelLossParameter::has_prob_type() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void MultiLabelLossParameter::set_has_prob_type() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void MultiLabelLossParameter::clear_has_prob_type() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void MultiLabelLossParameter::clear_prob_type() {
+  prob_type_ = 2;
+  clear_has_prob_type();
+}
+inline ::caffe::MultiLabelLossParameter_ProbType MultiLabelLossParameter::prob_type() const {
+  // @@protoc_insertion_point(field_get:caffe.MultiLabelLossParameter.prob_type)
+  return static_cast< ::caffe::MultiLabelLossParameter_ProbType >(prob_type_);
+}
+inline void MultiLabelLossParameter::set_prob_type(::caffe::MultiLabelLossParameter_ProbType value) {
+  assert(::caffe::MultiLabelLossParameter_ProbType_IsValid(value));
+  set_has_prob_type();
+  prob_type_ = value;
+  // @@protoc_insertion_point(field_set:caffe.MultiLabelLossParameter.prob_type)
+}
+
 // -------------------------------------------------------------------
 
 // BLEUParameter
@@ -24992,6 +25197,11 @@ template <> struct is_proto_enum< ::caffe::ParamSpec_DimCheckMode> : ::google::p
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::caffe::ParamSpec_DimCheckMode>() {
   return ::caffe::ParamSpec_DimCheckMode_descriptor();
+}
+template <> struct is_proto_enum< ::caffe::MultiLabelLossParameter_ProbType> : ::google::protobuf::internal::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::caffe::MultiLabelLossParameter_ProbType>() {
+  return ::caffe::MultiLabelLossParameter_ProbType_descriptor();
 }
 template <> struct is_proto_enum< ::caffe::RBMParameter_SampleType> : ::google::protobuf::internal::true_type {};
 template <>

@@ -9,15 +9,26 @@
 namespace caffe{
 	template <typename Dtype>
 	__global__ void MultiLabelLossForwardGPU(const int nthreads,
-		const Dtype* input_data, const Dtype* prob_data, const Dtype* label, Dtype* loss){
+		const Dtype* input_data, const Dtype* prob_data, const Dtype* label, Dtype* loss,
+		caffe::MultiLabelLossParameter_ProbType prob_type){
 		CUDA_KERNEL_LOOP(index, nthreads){
 			const int label_value = static_cast<int>(label[index]);
-			if (label_value != 0){
-				loss[index] = log(1 + exp(input_data[index] - 2 * input_data[index] * (input_data[index] >= 0)))
-					- (input_data[index] * ((label_value > 0) - (input_data[index] >= 0)));
+			if (prob_type == caffe::MultiLabelLossParameter_ProbType_SIGMOID){
+				if (label_value != 0){
+					loss[index] = log(1 + exp(input_data[index] - 2 * input_data[index] * (input_data[index] >= 0)))
+						- (input_data[index] * ((label_value > 0) - (input_data[index] >= 0)));
+				}
+				else{
+					loss[index] = 0;
+				}
 			}
 			else{
-				loss[index] = 0;
+				if (label_value == 1){
+					loss[index] = -log(max(prob_data[index], Dtype(FLT_MIN)));
+				}
+				else{
+					loss[index] = 0;
+				}
 			}
 		}
 	}
@@ -39,7 +50,8 @@ namespace caffe{
 		//intermediate results in the kernel.
 		Dtype* loss_data = bottom[0]->mutable_gpu_diff();
 		MultiLabelLossForwardGPU<Dtype> << <CAFFE_GET_BLOCKS(count),
-			CAFFE_CUDA_NUM_THREADS >> >(count, input_data, prob_data, label, loss_data);
+			CAFFE_CUDA_NUM_THREADS >> >(count, input_data, prob_data, 
+			label, loss_data, this->prob_type_);
 		Dtype loss;
 		//because -log(prob) is always positive, so we can use asum here
 		//to get the summation of the loss
@@ -50,16 +62,28 @@ namespace caffe{
 		}
 	}
 
+	//TODO: the gradient for multi-label softmax is not right here
 	template <typename Dtype>
 	__global__ void MultiLabelLossBackwardGPU(const int count,
-		const Dtype* prob_data, const Dtype* label, Dtype* bottom_diff){
+		const Dtype* prob_data, const Dtype* label, Dtype* bottom_diff,
+		caffe::MultiLabelLossParameter_ProbType prob_type){
 		CUDA_KERNEL_LOOP(index, count){
 			const int label_value = static_cast<int>(label[index]);
-			if (label_value != 0){
-				bottom_diff[index] = prob_data[index] - (label_value > 0);
+			if (prob_type == caffe::MultiLabelLossParameter_ProbType_SIGMOID){
+				if (label_value != 0){
+					bottom_diff[index] = prob_data[index] - (label_value > 0);
+				}
+				else{
+					bottom_diff[index] = 0;
+				}
 			}
 			else{
-				bottom_diff[index] = 0;
+				if (label_value == 1){
+					bottom_diff[index] = prob_data[index] - 1;
+				}
+				else{
+					bottom_diff[index] = prob_data[index];
+				}
 			}
 		}
 	}
@@ -78,7 +102,7 @@ namespace caffe{
 			const Dtype* input_data = bottom[0]->gpu_data();
 			const Dtype* label = bottom[1]->gpu_data();
 			MultiLabelLossBackwardGPU<Dtype><< <CAFFE_GET_BLOCKS(count), 
-				CAFFE_CUDA_NUM_THREADS>> >(count, prob_data, label, bottom_diff);
+				CAFFE_CUDA_NUM_THREADS>> >(count, prob_data, label, bottom_diff, this->prob_type_);
 		}
 		const int num = bottom[0]->num();
 		const Dtype loss_weight = top[0]->cpu_diff()[0] / num;

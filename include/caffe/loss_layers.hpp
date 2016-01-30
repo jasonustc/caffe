@@ -1031,10 +1031,13 @@ namespace caffe {
 		virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 			const vector<Blob<Dtype>*>& top);
 
+		virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+			const vector<Blob<Dtype>*>& top);
+
 		virtual inline const char* type()const { return "MultiLabelLoss"; }
 
 		virtual inline int MaxTopBlobs() const { return 2; }
-		virtual inline int ExactNumTopBlobs() const { return -1; }
+		virtual inline int ExactNumTopBlobs() const { return 1; }
 		//we can not backpropagate to the labels; ignore force_backward for
 		//these inputs.
 		virtual inline bool AllowForceBackward(const int bottom_index) const{
@@ -1060,6 +1063,7 @@ namespace caffe {
 		//Vector holders to call the underlying sigmoid layer forward and backward.
 		vector<Blob<Dtype>*> sigmoid_bottom_vec_;
 		vector<Blob<Dtype>*> sigmoid_top_vec_;
+		MultiLabelLossParameter_ProbType prob_type_;
 	};
 
 }  // namespace caffe

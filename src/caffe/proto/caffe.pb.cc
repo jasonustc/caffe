@@ -59,6 +59,10 @@ const ::google::protobuf::EnumDescriptor* ParamSpec_DimCheckMode_descriptor_ = N
 const ::google::protobuf::Descriptor* LayerParameter_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   LayerParameter_reflection_ = NULL;
+const ::google::protobuf::Descriptor* MultiLabelLossParameter_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  MultiLabelLossParameter_reflection_ = NULL;
+const ::google::protobuf::EnumDescriptor* MultiLabelLossParameter_ProbType_descriptor_ = NULL;
 const ::google::protobuf::Descriptor* BLEUParameter_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   BLEUParameter_reflection_ = NULL;
@@ -485,7 +489,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       sizeof(ParamSpec));
   ParamSpec_DimCheckMode_descriptor_ = ParamSpec_descriptor_->enum_type(0);
   LayerParameter_descriptor_ = file->message_type(11);
-  static const int LayerParameter_offsets_[59] = {
+  static const int LayerParameter_offsets_[60] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LayerParameter, name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LayerParameter, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LayerParameter, bottom_),
@@ -545,6 +549,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LayerParameter, rbm_param_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LayerParameter, conv_recurrent_param_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LayerParameter, bleu_param_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LayerParameter, multi_label_loss_param_),
   };
   LayerParameter_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -557,7 +562,23 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(LayerParameter));
-  BLEUParameter_descriptor_ = file->message_type(12);
+  MultiLabelLossParameter_descriptor_ = file->message_type(12);
+  static const int MultiLabelLossParameter_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MultiLabelLossParameter, prob_type_),
+  };
+  MultiLabelLossParameter_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      MultiLabelLossParameter_descriptor_,
+      MultiLabelLossParameter::default_instance_,
+      MultiLabelLossParameter_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MultiLabelLossParameter, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MultiLabelLossParameter, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(MultiLabelLossParameter));
+  MultiLabelLossParameter_ProbType_descriptor_ = MultiLabelLossParameter_descriptor_->enum_type(0);
+  BLEUParameter_descriptor_ = file->message_type(13);
   static const int BLEUParameter_offsets_[1] = {
   };
   BLEUParameter_reflection_ =
@@ -571,7 +592,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(BLEUParameter));
-  RBMParameter_descriptor_ = file->message_type(13);
+  RBMParameter_descriptor_ = file->message_type(14);
   static const int RBMParameter_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RBMParameter, num_output_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RBMParameter, weight_filler_),
@@ -592,7 +613,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(RBMParameter));
   RBMParameter_SampleType_descriptor_ = RBMParameter_descriptor_->enum_type(0);
-  NormLossParameter_descriptor_ = file->message_type(14);
+  NormLossParameter_descriptor_ = file->message_type(15);
   static const int NormLossParameter_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(NormLossParameter, norm_type_),
   };
@@ -608,7 +629,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(NormLossParameter));
   NormLossParameter_NormType_descriptor_ = NormLossParameter_descriptor_->enum_type(0);
-  NoiseParameter_descriptor_ = file->message_type(15);
+  NoiseParameter_descriptor_ = file->message_type(16);
   static const int NoiseParameter_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(NoiseParameter, noise_type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(NoiseParameter, alpha_),
@@ -628,7 +649,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       sizeof(NoiseParameter));
   NoiseParameter_NoiseType_descriptor_ = NoiseParameter_descriptor_->enum_type(0);
   NoiseParameter_ApplyType_descriptor_ = NoiseParameter_descriptor_->enum_type(1);
-  TransformationParameter_descriptor_ = file->message_type(16);
+  TransformationParameter_descriptor_ = file->message_type(17);
   static const int TransformationParameter_offsets_[10] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TransformationParameter, scale_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TransformationParameter, mirror_),
@@ -652,7 +673,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TransformationParameter));
-  LossParameter_descriptor_ = file->message_type(17);
+  LossParameter_descriptor_ = file->message_type(18);
   static const int LossParameter_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LossParameter, ignore_label_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LossParameter, normalize_),
@@ -668,7 +689,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(LossParameter));
-  AccuracyParameter_descriptor_ = file->message_type(18);
+  AccuracyParameter_descriptor_ = file->message_type(19);
   static const int AccuracyParameter_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AccuracyParameter, top_k_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AccuracyParameter, axis_),
@@ -687,7 +708,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(AccuracyParameter));
-  ArgMaxParameter_descriptor_ = file->message_type(19);
+  ArgMaxParameter_descriptor_ = file->message_type(20);
   static const int ArgMaxParameter_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ArgMaxParameter, out_max_val_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ArgMaxParameter, top_k_),
@@ -703,7 +724,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ArgMaxParameter));
-  AxisPoolingParameter_descriptor_ = file->message_type(20);
+  AxisPoolingParameter_descriptor_ = file->message_type(21);
   static const int AxisPoolingParameter_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AxisPoolingParameter, axis_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AxisPoolingParameter, pool_),
@@ -720,7 +741,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(AxisPoolingParameter));
   AxisPoolingParameter_PoolMethod_descriptor_ = AxisPoolingParameter_descriptor_->enum_type(0);
-  ConcatParameter_descriptor_ = file->message_type(21);
+  ConcatParameter_descriptor_ = file->message_type(22);
   static const int ConcatParameter_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ConcatParameter, axis_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ConcatParameter, concat_dim_),
@@ -736,7 +757,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ConcatParameter));
-  ConstrainIPParameter_descriptor_ = file->message_type(22);
+  ConstrainIPParameter_descriptor_ = file->message_type(23);
   static const int ConstrainIPParameter_offsets_[7] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ConstrainIPParameter, num_output_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ConstrainIPParameter, bias_term_),
@@ -757,7 +778,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ConstrainIPParameter));
-  ContrastiveLossParameter_descriptor_ = file->message_type(23);
+  ContrastiveLossParameter_descriptor_ = file->message_type(24);
   static const int ContrastiveLossParameter_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ContrastiveLossParameter, margin_),
   };
@@ -772,7 +793,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ContrastiveLossParameter));
-  ConvolutionParameter_descriptor_ = file->message_type(24);
+  ConvolutionParameter_descriptor_ = file->message_type(25);
   static const int ConvolutionParameter_offsets_[15] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ConvolutionParameter, num_output_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ConvolutionParameter, bias_term_),
@@ -802,7 +823,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ConvolutionParameter));
   ConvolutionParameter_Engine_descriptor_ = ConvolutionParameter_descriptor_->enum_type(0);
-  DataParameter_descriptor_ = file->message_type(25);
+  DataParameter_descriptor_ = file->message_type(26);
   static const int DataParameter_offsets_[9] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DataParameter, source_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DataParameter, batch_size_),
@@ -826,7 +847,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(DataParameter));
   DataParameter_DB_descriptor_ = DataParameter_descriptor_->enum_type(0);
-  DropoutParameter_descriptor_ = file->message_type(26);
+  DropoutParameter_descriptor_ = file->message_type(27);
   static const int DropoutParameter_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DropoutParameter, dropout_ratio_),
   };
@@ -841,7 +862,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(DropoutParameter));
-  DummyDataParameter_descriptor_ = file->message_type(27);
+  DummyDataParameter_descriptor_ = file->message_type(28);
   static const int DummyDataParameter_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DummyDataParameter, data_filler_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DummyDataParameter, shape_),
@@ -861,7 +882,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(DummyDataParameter));
-  EltwiseParameter_descriptor_ = file->message_type(28);
+  EltwiseParameter_descriptor_ = file->message_type(29);
   static const int EltwiseParameter_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EltwiseParameter, operation_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EltwiseParameter, coeff_),
@@ -880,7 +901,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(EltwiseParameter));
   EltwiseParameter_EltwiseOp_descriptor_ = EltwiseParameter_descriptor_->enum_type(0);
-  EmbedParameter_descriptor_ = file->message_type(29);
+  EmbedParameter_descriptor_ = file->message_type(30);
   static const int EmbedParameter_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EmbedParameter, num_output_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EmbedParameter, input_dim_),
@@ -899,7 +920,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(EmbedParameter));
-  ExpParameter_descriptor_ = file->message_type(30);
+  ExpParameter_descriptor_ = file->message_type(31);
   static const int ExpParameter_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ExpParameter, base_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ExpParameter, scale_),
@@ -916,7 +937,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ExpParameter));
-  FramesRollParameter_descriptor_ = file->message_type(31);
+  FramesRollParameter_descriptor_ = file->message_type(32);
   static const int FramesRollParameter_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FramesRollParameter, frames_per_video_),
   };
@@ -931,7 +952,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(FramesRollParameter));
-  HDF5DataParameter_descriptor_ = file->message_type(32);
+  HDF5DataParameter_descriptor_ = file->message_type(33);
   static const int HDF5DataParameter_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HDF5DataParameter, source_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HDF5DataParameter, batch_size_),
@@ -948,7 +969,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(HDF5DataParameter));
-  HDF5OutputParameter_descriptor_ = file->message_type(33);
+  HDF5OutputParameter_descriptor_ = file->message_type(34);
   static const int HDF5OutputParameter_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HDF5OutputParameter, file_name_),
   };
@@ -963,7 +984,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(HDF5OutputParameter));
-  HingeLossParameter_descriptor_ = file->message_type(34);
+  HingeLossParameter_descriptor_ = file->message_type(35);
   static const int HingeLossParameter_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HingeLossParameter, norm_),
   };
@@ -979,7 +1000,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(HingeLossParameter));
   HingeLossParameter_Norm_descriptor_ = HingeLossParameter_descriptor_->enum_type(0);
-  ImageDataParameter_descriptor_ = file->message_type(35);
+  ImageDataParameter_descriptor_ = file->message_type(36);
   static const int ImageDataParameter_offsets_[12] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ImageDataParameter, source_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ImageDataParameter, batch_size_),
@@ -1005,7 +1026,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ImageDataParameter));
-  InfogainLossParameter_descriptor_ = file->message_type(36);
+  InfogainLossParameter_descriptor_ = file->message_type(37);
   static const int InfogainLossParameter_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(InfogainLossParameter, source_),
   };
@@ -1020,7 +1041,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(InfogainLossParameter));
-  InnerProductParameter_descriptor_ = file->message_type(37);
+  InnerProductParameter_descriptor_ = file->message_type(38);
   static const int InnerProductParameter_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(InnerProductParameter, num_output_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(InnerProductParameter, bias_term_),
@@ -1039,7 +1060,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(InnerProductParameter));
-  LRNParameter_descriptor_ = file->message_type(38);
+  LRNParameter_descriptor_ = file->message_type(39);
   static const int LRNParameter_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LRNParameter, local_size_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(LRNParameter, alpha_),
@@ -1059,7 +1080,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(LRNParameter));
   LRNParameter_NormRegion_descriptor_ = LRNParameter_descriptor_->enum_type(0);
-  MemoryDataParameter_descriptor_ = file->message_type(39);
+  MemoryDataParameter_descriptor_ = file->message_type(40);
   static const int MemoryDataParameter_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MemoryDataParameter, batch_size_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MemoryDataParameter, channels_),
@@ -1077,7 +1098,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(MemoryDataParameter));
-  MVNParameter_descriptor_ = file->message_type(40);
+  MVNParameter_descriptor_ = file->message_type(41);
   static const int MVNParameter_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MVNParameter, normalize_variance_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MVNParameter, across_channels_),
@@ -1093,7 +1114,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(MVNParameter));
-  PairwiseRankingHingeLossParameter_descriptor_ = file->message_type(41);
+  PairwiseRankingHingeLossParameter_descriptor_ = file->message_type(42);
   static const int PairwiseRankingHingeLossParameter_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PairwiseRankingHingeLossParameter, margin_),
   };
@@ -1108,7 +1129,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PairwiseRankingHingeLossParameter));
-  PartSortParameter_descriptor_ = file->message_type(42);
+  PartSortParameter_descriptor_ = file->message_type(43);
   static const int PartSortParameter_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PartSortParameter, axis_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PartSortParameter, first_element_),
@@ -1124,7 +1145,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PartSortParameter));
-  PoolingParameter_descriptor_ = file->message_type(43);
+  PoolingParameter_descriptor_ = file->message_type(44);
   static const int PoolingParameter_offsets_[12] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PoolingParameter, pool_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PoolingParameter, pad_),
@@ -1152,7 +1173,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       sizeof(PoolingParameter));
   PoolingParameter_PoolMethod_descriptor_ = PoolingParameter_descriptor_->enum_type(0);
   PoolingParameter_Engine_descriptor_ = PoolingParameter_descriptor_->enum_type(1);
-  PowerParameter_descriptor_ = file->message_type(44);
+  PowerParameter_descriptor_ = file->message_type(45);
   static const int PowerParameter_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PowerParameter, power_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PowerParameter, scale_),
@@ -1169,7 +1190,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PowerParameter));
-  PythonParameter_descriptor_ = file->message_type(45);
+  PythonParameter_descriptor_ = file->message_type(46);
   static const int PythonParameter_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PythonParameter, module_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PythonParameter, layer_),
@@ -1185,7 +1206,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PythonParameter));
-  RCSParameter_descriptor_ = file->message_type(46);
+  RCSParameter_descriptor_ = file->message_type(47);
   static const int RCSParameter_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RCSParameter, cate_axis_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RCSParameter, weight_filler_),
@@ -1203,7 +1224,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(RCSParameter));
-  ReshapeParameter_descriptor_ = file->message_type(47);
+  ReshapeParameter_descriptor_ = file->message_type(48);
   static const int ReshapeParameter_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReshapeParameter, shape_),
   };
@@ -1218,7 +1239,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ReshapeParameter));
-  RecurrentParameter_descriptor_ = file->message_type(48);
+  RecurrentParameter_descriptor_ = file->message_type(49);
   static const int RecurrentParameter_offsets_[8] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RecurrentParameter, num_output_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RecurrentParameter, weight_filler_),
@@ -1240,7 +1261,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(RecurrentParameter));
-  ConvRecurrentParameter_descriptor_ = file->message_type(49);
+  ConvRecurrentParameter_descriptor_ = file->message_type(50);
   static const int ConvRecurrentParameter_offsets_[16] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ConvRecurrentParameter, num_output_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ConvRecurrentParameter, weight_filler_),
@@ -1271,7 +1292,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ConvRecurrentParameter));
   ConvRecurrentParameter_Engine_descriptor_ = ConvRecurrentParameter_descriptor_->enum_type(0);
-  ReLUParameter_descriptor_ = file->message_type(50);
+  ReLUParameter_descriptor_ = file->message_type(51);
   static const int ReLUParameter_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReLUParameter, negative_slope_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReLUParameter, engine_),
@@ -1288,7 +1309,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ReLUParameter));
   ReLUParameter_Engine_descriptor_ = ReLUParameter_descriptor_->enum_type(0);
-  SigmoidParameter_descriptor_ = file->message_type(51);
+  SigmoidParameter_descriptor_ = file->message_type(52);
   static const int SigmoidParameter_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SigmoidParameter, engine_),
   };
@@ -1304,7 +1325,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(SigmoidParameter));
   SigmoidParameter_Engine_descriptor_ = SigmoidParameter_descriptor_->enum_type(0);
-  SliceParameter_descriptor_ = file->message_type(52);
+  SliceParameter_descriptor_ = file->message_type(53);
   static const int SliceParameter_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SliceParameter, axis_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SliceParameter, slice_point_),
@@ -1321,7 +1342,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(SliceParameter));
-  SoftmaxParameter_descriptor_ = file->message_type(53);
+  SoftmaxParameter_descriptor_ = file->message_type(54);
   static const int SoftmaxParameter_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SoftmaxParameter, engine_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SoftmaxParameter, axis_),
@@ -1338,7 +1359,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(SoftmaxParameter));
   SoftmaxParameter_Engine_descriptor_ = SoftmaxParameter_descriptor_->enum_type(0);
-  SortParameter_descriptor_ = file->message_type(54);
+  SortParameter_descriptor_ = file->message_type(55);
   static const int SortParameter_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SortParameter, axis_),
   };
@@ -1353,7 +1374,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(SortParameter));
-  SSDParameter_descriptor_ = file->message_type(55);
+  SSDParameter_descriptor_ = file->message_type(56);
   static const int SSDParameter_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SSDParameter, cate_axis_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SSDParameter, weight_filler_),
@@ -1373,7 +1394,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(SSDParameter));
-  TanHParameter_descriptor_ = file->message_type(56);
+  TanHParameter_descriptor_ = file->message_type(57);
   static const int TanHParameter_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TanHParameter, engine_),
   };
@@ -1389,7 +1410,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TanHParameter));
   TanHParameter_Engine_descriptor_ = TanHParameter_descriptor_->enum_type(0);
-  ThresholdParameter_descriptor_ = file->message_type(57);
+  ThresholdParameter_descriptor_ = file->message_type(58);
   static const int ThresholdParameter_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ThresholdParameter, threshold_),
   };
@@ -1404,7 +1425,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ThresholdParameter));
-  VideoUnrollParameter_descriptor_ = file->message_type(58);
+  VideoUnrollParameter_descriptor_ = file->message_type(59);
   static const int VideoUnrollParameter_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(VideoUnrollParameter, frame_channels_),
   };
@@ -1419,7 +1440,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(VideoUnrollParameter));
-  WindowDataParameter_descriptor_ = file->message_type(59);
+  WindowDataParameter_descriptor_ = file->message_type(60);
   static const int WindowDataParameter_offsets_[13] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(WindowDataParameter, source_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(WindowDataParameter, scale_),
@@ -1446,7 +1467,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(WindowDataParameter));
-  V1LayerParameter_descriptor_ = file->message_type(60);
+  V1LayerParameter_descriptor_ = file->message_type(61);
   static const int V1LayerParameter_offsets_[43] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(V1LayerParameter, bottom_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(V1LayerParameter, top_),
@@ -1505,7 +1526,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       sizeof(V1LayerParameter));
   V1LayerParameter_LayerType_descriptor_ = V1LayerParameter_descriptor_->enum_type(0);
   V1LayerParameter_DimCheckMode_descriptor_ = V1LayerParameter_descriptor_->enum_type(1);
-  V0LayerParameter_descriptor_ = file->message_type(61);
+  V0LayerParameter_descriptor_ = file->message_type(62);
   static const int V0LayerParameter_offsets_[38] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(V0LayerParameter, name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(V0LayerParameter, type_),
@@ -1558,7 +1579,7 @@ void protobuf_AssignDesc_caffe_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(V0LayerParameter));
   V0LayerParameter_PoolMethod_descriptor_ = V0LayerParameter_descriptor_->enum_type(0);
-  PReLUParameter_descriptor_ = file->message_type(62);
+  PReLUParameter_descriptor_ = file->message_type(63);
   static const int PReLUParameter_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PReLUParameter, filler_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PReLUParameter, channel_shared_),
@@ -1611,6 +1632,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
     ParamSpec_descriptor_, &ParamSpec::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     LayerParameter_descriptor_, &LayerParameter::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    MultiLabelLossParameter_descriptor_, &MultiLabelLossParameter::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     BLEUParameter_descriptor_, &BLEUParameter::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
@@ -1744,6 +1767,8 @@ void protobuf_ShutdownFile_caffe_2eproto() {
   delete ParamSpec_reflection_;
   delete LayerParameter::default_instance_;
   delete LayerParameter_reflection_;
+  delete MultiLabelLossParameter::default_instance_;
+  delete MultiLabelLossParameter_reflection_;
   delete BLEUParameter::default_instance_;
   delete BLEUParameter_reflection_;
   delete RBMParameter::default_instance_;
@@ -1916,7 +1941,7 @@ void protobuf_AddDesc_caffe_2eproto() {
     "hare_mode\030\002 \001(\0162\035.caffe.ParamSpec.DimChe"
     "ckMode\022\022\n\007lr_mult\030\003 \001(\002:\0011\022\025\n\ndecay_mult"
     "\030\004 \001(\002:\0011\"*\n\014DimCheckMode\022\n\n\006STRICT\020\000\022\016\n"
-    "\nPERMISSIVE\020\001\"\243\025\n\016LayerParameter\022\014\n\004name"
+    "\nPERMISSIVE\020\001\"\344\025\n\016LayerParameter\022\014\n\004name"
     "\030\001 \001(\t\022\014\n\004type\030\002 \001(\t\022\016\n\006bottom\030\003 \003(\t\022\013\n\003"
     "top\030\004 \003(\t\022\033\n\005phase\030\n \001(\0162\014.caffe.Phase\022\023"
     "\n\013loss_weight\030\005 \003(\002\022\037\n\005param\030\006 \003(\0132\020.caf"
@@ -1984,7 +2009,12 @@ void protobuf_AddDesc_caffe_2eproto() {
     "_param\030\222\001 \001(\0132\023.caffe.RBMParameter\022<\n\024co"
     "nv_recurrent_param\030\223\001 \001(\0132\035.caffe.ConvRe"
     "currentParameter\022)\n\nbleu_param\030\224\001 \001(\0132\024."
-    "caffe.BLEUParameter\"\017\n\rBLEUParameter\"\225\002\n"
+    "caffe.BLEUParameter\022\?\n\026multi_label_loss_"
+    "param\030\225\001 \001(\0132\036.caffe.MultiLabelLossParam"
+    "eter\"\204\001\n\027MultiLabelLossParameter\022C\n\tprob"
+    "_type\030\001 \001(\0162\'.caffe.MultiLabelLossParame"
+    "ter.ProbType:\007SIGMOID\"$\n\010ProbType\022\013\n\007SOF"
+    "TMAX\020\001\022\013\n\007SIGMOID\020\002\"\017\n\rBLEUParameter\"\225\002\n"
     "\014RBMParameter\022\022\n\nnum_output\030\001 \001(\005\022-\n\rwei"
     "ght_filler\030\002 \001(\0132\026.caffe.FillerParameter"
     "\022+\n\013bias_filler\030\003 \001(\0132\026.caffe.FillerPara"
@@ -2253,7 +2283,7 @@ void protobuf_AddDesc_caffe_2eproto() {
     "\003MAX\020\000\022\007\n\003AVE\020\001\022\016\n\nSTOCHASTIC\020\002\"W\n\016PReLU"
     "Parameter\022&\n\006filler\030\001 \001(\0132\026.caffe.Filler"
     "Parameter\022\035\n\016channel_shared\030\002 \001(\010:\005false"
-    "*\034\n\005Phase\022\t\n\005TRAIN\020\000\022\010\n\004TEST\020\001", 15870);
+    "*\034\n\005Phase\022\t\n\005TRAIN\020\000\022\010\n\004TEST\020\001", 16070);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "caffe.proto", &protobuf_RegisterTypes);
   BlobShape::default_instance_ = new BlobShape();
@@ -2272,6 +2302,7 @@ void protobuf_AddDesc_caffe_2eproto() {
   NetStateRule::default_instance_ = new NetStateRule();
   ParamSpec::default_instance_ = new ParamSpec();
   LayerParameter::default_instance_ = new LayerParameter();
+  MultiLabelLossParameter::default_instance_ = new MultiLabelLossParameter();
   BLEUParameter::default_instance_ = new BLEUParameter();
   RBMParameter::default_instance_ = new RBMParameter();
   NormLossParameter::default_instance_ = new NormLossParameter();
@@ -2339,6 +2370,7 @@ void protobuf_AddDesc_caffe_2eproto() {
   NetStateRule::default_instance_->InitAsDefaultInstance();
   ParamSpec::default_instance_->InitAsDefaultInstance();
   LayerParameter::default_instance_->InitAsDefaultInstance();
+  MultiLabelLossParameter::default_instance_->InitAsDefaultInstance();
   BLEUParameter::default_instance_->InitAsDefaultInstance();
   RBMParameter::default_instance_->InitAsDefaultInstance();
   NormLossParameter::default_instance_->InitAsDefaultInstance();
@@ -8301,6 +8333,7 @@ const int LayerParameter::kNormLossParamFieldNumber;
 const int LayerParameter::kRbmParamFieldNumber;
 const int LayerParameter::kConvRecurrentParamFieldNumber;
 const int LayerParameter::kBleuParamFieldNumber;
+const int LayerParameter::kMultiLabelLossParamFieldNumber;
 #endif  // !_MSC_VER
 
 LayerParameter::LayerParameter()
@@ -8359,6 +8392,7 @@ void LayerParameter::InitAsDefaultInstance() {
   rbm_param_ = const_cast< ::caffe::RBMParameter*>(&::caffe::RBMParameter::default_instance());
   conv_recurrent_param_ = const_cast< ::caffe::ConvRecurrentParameter*>(&::caffe::ConvRecurrentParameter::default_instance());
   bleu_param_ = const_cast< ::caffe::BLEUParameter*>(&::caffe::BLEUParameter::default_instance());
+  multi_label_loss_param_ = const_cast< ::caffe::MultiLabelLossParameter*>(&::caffe::MultiLabelLossParameter::default_instance());
 }
 
 LayerParameter::LayerParameter(const LayerParameter& from)
@@ -8423,6 +8457,7 @@ void LayerParameter::SharedCtor() {
   rbm_param_ = NULL;
   conv_recurrent_param_ = NULL;
   bleu_param_ = NULL;
+  multi_label_loss_param_ = NULL;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -8488,6 +8523,7 @@ void LayerParameter::SharedDtor() {
     delete rbm_param_;
     delete conv_recurrent_param_;
     delete bleu_param_;
+    delete multi_label_loss_param_;
   }
 }
 
@@ -8676,7 +8712,7 @@ void LayerParameter::Clear() {
       if (norm_loss_param_ != NULL) norm_loss_param_->::caffe::NormLossParameter::Clear();
     }
   }
-  if (_has_bits_[56 / 32] & 117440512) {
+  if (_has_bits_[56 / 32] & 251658240) {
     if (has_rbm_param()) {
       if (rbm_param_ != NULL) rbm_param_->::caffe::RBMParameter::Clear();
     }
@@ -8685,6 +8721,9 @@ void LayerParameter::Clear() {
     }
     if (has_bleu_param()) {
       if (bleu_param_ != NULL) bleu_param_->::caffe::BLEUParameter::Clear();
+    }
+    if (has_multi_label_loss_param()) {
+      if (multi_label_loss_param_ != NULL) multi_label_loss_param_->::caffe::MultiLabelLossParameter::Clear();
     }
   }
   bottom_.Clear();
@@ -9507,6 +9546,19 @@ bool LayerParameter::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
+        if (input->ExpectTag(1194)) goto parse_multi_label_loss_param;
+        break;
+      }
+
+      // optional .caffe.MultiLabelLossParameter multi_label_loss_param = 149;
+      case 149: {
+        if (tag == 1194) {
+         parse_multi_label_loss_param:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_multi_label_loss_param()));
+        } else {
+          goto handle_unusual;
+        }
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -9904,6 +9956,12 @@ void LayerParameter::SerializeWithCachedSizes(
   if (has_bleu_param()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       148, this->bleu_param(), output);
+  }
+
+  // optional .caffe.MultiLabelLossParameter multi_label_loss_param = 149;
+  if (has_multi_label_loss_param()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      149, this->multi_label_loss_param(), output);
   }
 
   if (!unknown_fields().empty()) {
@@ -10341,6 +10399,13 @@ void LayerParameter::SerializeWithCachedSizes(
         148, this->bleu_param(), target);
   }
 
+  // optional .caffe.MultiLabelLossParameter multi_label_loss_param = 149;
+  if (has_multi_label_loss_param()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        149, this->multi_label_loss_param(), target);
+  }
+
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -10730,6 +10795,13 @@ int LayerParameter::ByteSize() const {
           this->bleu_param());
     }
 
+    // optional .caffe.MultiLabelLossParameter multi_label_loss_param = 149;
+    if (has_multi_label_loss_param()) {
+      total_size += 2 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->multi_label_loss_param());
+    }
+
   }
   // repeated string bottom = 3;
   total_size += 1 * this->bottom_size();
@@ -10987,6 +11059,9 @@ void LayerParameter::MergeFrom(const LayerParameter& from) {
     if (from.has_bleu_param()) {
       mutable_bleu_param()->::caffe::BLEUParameter::MergeFrom(from.bleu_param());
     }
+    if (from.has_multi_label_loss_param()) {
+      mutable_multi_label_loss_param()->::caffe::MultiLabelLossParameter::MergeFrom(from.multi_label_loss_param());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -11069,6 +11144,7 @@ void LayerParameter::Swap(LayerParameter* other) {
     std::swap(rbm_param_, other->rbm_param_);
     std::swap(conv_recurrent_param_, other->conv_recurrent_param_);
     std::swap(bleu_param_, other->bleu_param_);
+    std::swap(multi_label_loss_param_, other->multi_label_loss_param_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     std::swap(_has_bits_[1], other->_has_bits_[1]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
@@ -11081,6 +11157,255 @@ void LayerParameter::Swap(LayerParameter* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = LayerParameter_descriptor_;
   metadata.reflection = LayerParameter_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+const ::google::protobuf::EnumDescriptor* MultiLabelLossParameter_ProbType_descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return MultiLabelLossParameter_ProbType_descriptor_;
+}
+bool MultiLabelLossParameter_ProbType_IsValid(int value) {
+  switch(value) {
+    case 1:
+    case 2:
+      return true;
+    default:
+      return false;
+  }
+}
+
+#ifndef _MSC_VER
+const MultiLabelLossParameter_ProbType MultiLabelLossParameter::SOFTMAX;
+const MultiLabelLossParameter_ProbType MultiLabelLossParameter::SIGMOID;
+const MultiLabelLossParameter_ProbType MultiLabelLossParameter::ProbType_MIN;
+const MultiLabelLossParameter_ProbType MultiLabelLossParameter::ProbType_MAX;
+const int MultiLabelLossParameter::ProbType_ARRAYSIZE;
+#endif  // _MSC_VER
+#ifndef _MSC_VER
+const int MultiLabelLossParameter::kProbTypeFieldNumber;
+#endif  // !_MSC_VER
+
+MultiLabelLossParameter::MultiLabelLossParameter()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:caffe.MultiLabelLossParameter)
+}
+
+void MultiLabelLossParameter::InitAsDefaultInstance() {
+}
+
+MultiLabelLossParameter::MultiLabelLossParameter(const MultiLabelLossParameter& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:caffe.MultiLabelLossParameter)
+}
+
+void MultiLabelLossParameter::SharedCtor() {
+  _cached_size_ = 0;
+  prob_type_ = 2;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+MultiLabelLossParameter::~MultiLabelLossParameter() {
+  // @@protoc_insertion_point(destructor:caffe.MultiLabelLossParameter)
+  SharedDtor();
+}
+
+void MultiLabelLossParameter::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void MultiLabelLossParameter::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* MultiLabelLossParameter::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return MultiLabelLossParameter_descriptor_;
+}
+
+const MultiLabelLossParameter& MultiLabelLossParameter::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_caffe_2eproto();
+  return *default_instance_;
+}
+
+MultiLabelLossParameter* MultiLabelLossParameter::default_instance_ = NULL;
+
+MultiLabelLossParameter* MultiLabelLossParameter::New() const {
+  return new MultiLabelLossParameter;
+}
+
+void MultiLabelLossParameter::Clear() {
+  prob_type_ = 2;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool MultiLabelLossParameter::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:caffe.MultiLabelLossParameter)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional .caffe.MultiLabelLossParameter.ProbType prob_type = 1 [default = SIGMOID];
+      case 1: {
+        if (tag == 8) {
+          int value;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          if (::caffe::MultiLabelLossParameter_ProbType_IsValid(value)) {
+            set_prob_type(static_cast< ::caffe::MultiLabelLossParameter_ProbType >(value));
+          } else {
+            mutable_unknown_fields()->AddVarint(1, value);
+          }
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:caffe.MultiLabelLossParameter)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:caffe.MultiLabelLossParameter)
+  return false;
+#undef DO_
+}
+
+void MultiLabelLossParameter::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:caffe.MultiLabelLossParameter)
+  // optional .caffe.MultiLabelLossParameter.ProbType prob_type = 1 [default = SIGMOID];
+  if (has_prob_type()) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      1, this->prob_type(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:caffe.MultiLabelLossParameter)
+}
+
+::google::protobuf::uint8* MultiLabelLossParameter::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:caffe.MultiLabelLossParameter)
+  // optional .caffe.MultiLabelLossParameter.ProbType prob_type = 1 [default = SIGMOID];
+  if (has_prob_type()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      1, this->prob_type(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:caffe.MultiLabelLossParameter)
+  return target;
+}
+
+int MultiLabelLossParameter::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional .caffe.MultiLabelLossParameter.ProbType prob_type = 1 [default = SIGMOID];
+    if (has_prob_type()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::EnumSize(this->prob_type());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void MultiLabelLossParameter::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const MultiLabelLossParameter* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const MultiLabelLossParameter*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void MultiLabelLossParameter::MergeFrom(const MultiLabelLossParameter& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_prob_type()) {
+      set_prob_type(from.prob_type());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void MultiLabelLossParameter::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void MultiLabelLossParameter::CopyFrom(const MultiLabelLossParameter& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool MultiLabelLossParameter::IsInitialized() const {
+
+  return true;
+}
+
+void MultiLabelLossParameter::Swap(MultiLabelLossParameter* other) {
+  if (other != this) {
+    std::swap(prob_type_, other->prob_type_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata MultiLabelLossParameter::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = MultiLabelLossParameter_descriptor_;
+  metadata.reflection = MultiLabelLossParameter_reflection_;
   return metadata;
 }
 
