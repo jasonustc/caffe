@@ -258,7 +258,7 @@
     <ClCompile Include="..\src\caffe\image_reader.cpp">
       <Filter>src\extract_feat</Filter>
     </ClCompile>
-    <ClCompile Include="..\tools\convert_imageset.cpp" />
+    <ClCompile Include="..\tools\check_data_in_db.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">

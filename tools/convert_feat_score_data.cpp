@@ -30,6 +30,10 @@ void parse_line_feat(string& line, vector<float>& feat){
 	for (vector<string>::iterator it = strs.begin(); 
 		it != strs.end(); ++it){
 		istringstream iss(*it);
+		//to skip space input
+		if ((*it).size() == 0){
+			continue;
+		}
 		iss >> feat_i;
 		feat.push_back(feat_i);
 	}
@@ -66,7 +70,7 @@ void convert_dataset_float (const string& feat_file, const string& db_name) {
 	score_datum.set_width(1);
 	score_datum.set_height(1);
 
-	LOG(INFO) << "Loading data";
+	LOG(ERROR) << "Loading data";
 	string line;
 	vector<float> feats;
 	int count = 0;
@@ -95,19 +99,19 @@ void convert_dataset_float (const string& feat_file, const string& db_name) {
 		txn_feat->Put(std::string(key_cstr_feat, len_feat), out_feat);
 		txn_score->Put(std::string(key_cstr_score, len_score), out_score);
 
-		if (++count == 1000){
+		if ((++count) % 1000 == 0){
 			//commit db
 			txn_feat->Commit();
 			txn_score->Commit();
 			txn_feat.reset(feat_db->NewTransaction());
 			txn_score.reset(score_db->NewTransaction());
-			LOG(INFO) << "Processed " << count << " feats";
+			LOG(ERROR) << "Processed " << count << " feats";
 		}
 	}//while getline
 	if (count % 1000 != 0){
 		txn_feat->Commit();
 		txn_score->Commit();
-		LOG(INFO) << "Processed " << count << " feats";
+		LOG(ERROR) << "Processed " << count << " feats";
 	}
 }
 
@@ -121,7 +125,7 @@ int main(int argc, char** argv) {
 			"format used for caffe.\n"
 			"Usage: \n"
 			"EXE [FLAGS] INPUT_FEAT_FILE DB_NAME\n");
-		gflags::ShowUsageWithFlags(argv[0]);
+		gflags::ShowUsageWithFlagsRestrict(argv[0], "convert_feat_score_data");
 		return 1;
 	}
 	else {

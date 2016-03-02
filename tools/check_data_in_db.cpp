@@ -39,23 +39,31 @@ int main(int argc, char** argv){
 	Datum datum;
 	int count = 0;
 
-	LOG(INFO) << "Start Iteration...";
+	LOG(ERROR) << "Start Iteration...";
 	cv::Mat cv_img;
 	for (cursor->SeekToFirst(); cursor->valid(); cursor->Next()){
+		++count;
+		if (count % 1000 == 0){
+			LOG(ERROR) << "Have read: " << count << " files.";
+		}
+		if (count > FLAGS_num){
+			continue;
+		}
 		//just a dummy operation
 		datum.ParseFromString(cursor->value());
 		const std::string& data = datum.data();
 		const int size = datum.encoded() ? datum.data().size() : datum.float_data_size();
-		if (count == 0){
-			LOG(INFO)<< "sample size info:";
-			LOG(INFO) << "channels: " << datum.channels();
-			LOG(INFO) << "width: " << datum.width();
-			LOG(INFO) << "height: " << datum.height();
+		if (count == 1){
+			LOG(ERROR)<< "sample size info:";
+			LOG(ERROR) << "channels: " << datum.channels();
+			LOG(ERROR) << "width: " << datum.width();
+			LOG(ERROR) << "height: " << datum.height();
 		}
 		CHECK_EQ(size, datum.channels() * datum.width() * datum.height());
-		if (count == 0){
+		if (count == 1){
 			fprintf(output, "[C, W, H]: %d %d %d\n", datum.channels(), datum.width(), datum.height());
 		}
+		fprintf(output, "label: %d | ", datum.label());
 
 		//default type of encoded in datum is false
 		if (datum.encoded()){
@@ -96,17 +104,10 @@ int main(int argc, char** argv){
 				fprintf(output, "%f ", static_cast<float>(datum.float_data(i)));
 			}
 		}
-		++count;
-		if (count > FLAGS_num){
-			break;
-		}
-		if (count % 1000 == 0){
-			LOG(ERROR) << "Have read: " << count << " files.";
-		}
 		fprintf(output, "\n");
 	}
 	if (count % 1000 != 0){
-		LOG(INFO) << "Processed " << count << " files.";
+		LOG(ERROR) << "Processed " << count << " files.";
 	}
 	fclose(output);
 	return 0;
