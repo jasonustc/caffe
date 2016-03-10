@@ -42,6 +42,7 @@ void parse_line_feat(string& line, vector<float>& feat){
 void convert_dataset_float (const string& feat_file, const string& db_name) {
 	ifstream in_feat(feat_file);
 	CHECK(in_feat.is_open()) << "Can not open feat file: " << feat_file;
+	LOG(ERROR) << "Load feat and score from file: " << feat_file;
 
 	//create score and feat db
 	string feat_db_name = db_name + "_feat";
@@ -70,7 +71,7 @@ void convert_dataset_float (const string& feat_file, const string& db_name) {
 	score_datum.set_width(1);
 	score_datum.set_height(1);
 
-	LOG(ERROR) << "Loading data";
+	LOG(ERROR) << "Loading data...";
 	string line;
 	vector<float> feats;
 	int count = 0;
