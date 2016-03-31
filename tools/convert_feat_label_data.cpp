@@ -9,122 +9,121 @@
 #include "caffe/proto/caffe.pb.h"
 #include "caffe/util/db.hpp"
 #include "boost/algorithm/string.hpp"
+#include "caffe/util/rng.hpp"
 
 using caffe::Datum;
+using boost::scoped_ptr;
 using namespace std;
 using namespace caffe;
 
-DEFINE_int32(channels, 1, "channels of the image");
-DEFINE_int32(height, 28, "height of the image");
-DEFINE_int32(width, 28, "width of the image");
+DEFINE_int32(channel, 0, "channels of the image");
+DEFINE_int32(height, 0, "height of the image");
+DEFINE_int32(width, 0, "width of the image");
 DEFINE_string(backend, "lmdb", "The backend{leveldb/lmdb} for storing the result");
-DEFINE_int32(db_size, INT_MAX, "number of samples in each db");
+DEFINE_string(spliter, "", "The spliter to split each dim of feat in feat file");
+DEFINE_bool(shuffle, false, "If we need to shuffle the order of feat files");
+DEFINE_string(root_dir, "", "The root folder of feat files");
 
-void parse_line_feat(string& line, vector<float>& feat){
+void parse_file_feat(string& file_path, vector<float>& feat){
 	feat.clear();
 	vector<string> strs;
+	ifstream in_feat(file_path.c_str());
+	CHECK(in_feat.is_open()) << "can not open file " << file_path;
 	//delete spaces in the beginning and ending of the sequence
-	boost::trim(line);
-	boost::split(strs, line, boost::is_any_of(" "));
-	float feat_i;
-	for (vector<string>::iterator it = strs.begin(); 
-		it != strs.end(); ++it){
-		if ((*it).size() == 0){
-			continue;
+	string line;
+	string spliter = FLAGS_spliter.size() > 0 ? FLAGS_spliter : " ";
+	while (getline(in_feat, line)){
+		boost::trim(line);
+		boost::split(strs, line, boost::is_any_of(spliter));
+		float feat_i;
+		for (vector<string>::iterator it = strs.begin();
+			it != strs.end(); ++it){
+			istringstream iss(*it);
+			//to skip space input
+			if ((*it).size() == 0){
+				continue;
+			}
+			iss >> feat_i;
+			feat.push_back(feat_i);
 		}
-		istringstream iss(*it);
-		iss >> feat_i;
-		feat.push_back(feat_i);
 	}
+	in_feat.close();
 }
 
-void convert_dataset_float (const string& feat_file, const string& label_file,
-	const string& db_name) {
-	vector<string> feat_files;
-	vector<string> label_files;
-	vector<string> db_names;
-	boost::split(feat_files, feat_file, boost::is_any_of(","));
-	boost::split(label_files, label_file, boost::is_any_of(","));
-	boost::split(db_names, db_name, boost::is_any_of(","));
-	CHECK_EQ(feat_files.size(), label_files.size()) << "number of feat_files and "
-		<< "label files should be the same";
+void load_file_list(const string& file, vector<std::pair<string, int> >& file_list){
+	ifstream in_list(file.c_str());
+	CHECK(in_list.is_open()) << "Can not open list file: " << file.c_str();
+	string file_path;
+	int label;
+	while (in_list >> file_path >> label){
+		file_path = FLAGS_root_dir + file_path;
+		file_list.push_back(std::make_pair(file_path, label));
+	}
+	if (FLAGS_shuffle){
+		LOG(ERROR) << "shuffling data";
+		shuffle(file_list.begin(), file_list.end());
+	}
+	in_list.close();
+}
+
+void convert_dataset_float (const string& list_file, const string& db_name) {
+	vector<std::pair<string, int> > file_list;
+	load_file_list(list_file, file_list);
+	CHECK(file_list.size() > 0);
 
 	//create db
-	vector<boost::shared_ptr<db::Transaction>> txns;
-	vector<boost::shared_ptr<db::DB>> dbs;
-	for (size_t d = 0; d < db_names.size(); d++){
-		boost::shared_ptr<db::DB> db(db::GetDB(FLAGS_backend));
-		db->Open(db_names[d], db::NEW);
-		boost::shared_ptr<db::Transaction> txn(db->NewTransaction());
-		txns.push_back(txn);
-		dbs.push_back(db);
-	}
+	scoped_ptr<db::DB> db(db::GetDB(FLAGS_backend));
+	db->Open(db_name, db::NEW);
+	scoped_ptr<db::Transaction> txn(db->NewTransaction());
 
 	// Data buffer
 	const int kMaxKeyLength = 256;
 	char key_cstr[kMaxKeyLength];
 	Datum datum;
 
-	CHECK(FLAGS_channels > 0 && FLAGS_height > 0 && FLAGS_width > 0)
+	CHECK(FLAGS_channel > 0 && FLAGS_height > 0 && FLAGS_width > 0)
 		<< "channels, height and width should be positive; while it is set to be "
-		<< FLAGS_channels << "," << FLAGS_height << "," << FLAGS_width;
-	datum.set_channels(FLAGS_channels);
+		<< FLAGS_channel << "," << FLAGS_height << "," << FLAGS_width;
+	datum.set_channels(FLAGS_channel);
 	datum.set_height(FLAGS_height);
 	datum.set_width(FLAGS_width);
 
-	LOG(ERROR) << "Loading data";
+	LOG(ERROR) << "Loading data...";
 	string line;
 	vector<float> feats;
 	int label = -1;
 	int count = 0;
-	int db_index = 0;
-	for (size_t f = 0; f < feat_files.size(); f++){
-		printf("Loading feat from %s, label from %s\n", 
-			feat_files[f].c_str(), label_files[f].c_str());
-		ifstream in_feat(feat_files[f]);
-		CHECK(in_feat.is_open()) << "Can not open feat file: " << feat_files[f];
-		//	string test_line;
-		//	getline(in_feat, test_line);
-		//	vector<float> test_feat;
-		//	parse_line_feat(test_line, test_feat);
-		ifstream in_label(label_files[f]);
-		CHECK(in_label.is_open()) << "Can not open label file: " << label_files[f];
-		while (getline(in_feat, line)){
-			in_label >> label;
-			CHECK_GE(label, 0);
-			datum.set_label(label);
-			parse_line_feat(line, feats);
-			//check feat dim 
-			int feat_dim = FLAGS_channels * FLAGS_height * FLAGS_width;
-			CHECK_EQ(feat_dim, feats.size()) << "Feat dim not match, required: "
-				<< feat_dim << ", get: " << feats.size();
-			//save feat/score data to db
-			datum.clear_float_data();
-			for (int i = 0; i < feats.size(); i++){
-				datum.add_float_data(feats[i]);
-			}
-			//sequential
-			string out;
-			datum.SerializeToString(&out);
-			int len = sprintf_s(key_cstr, kMaxKeyLength, "%09d", count);
-			db_index = count / FLAGS_db_size;
-			CHECK_LT(db_index, db_names.size());
-			//put into db
-			txns[db_index]->Put(std::string(key_cstr, len), out);
-			if ((++count) % 1000 == 0){
-				//commit db
-				txns[db_index]->Commit();
-				txns[db_index].reset(dbs[db_index]->NewTransaction());
-				LOG(ERROR) << "Processed " << count << " feats" <<
-					", DB: " << db_names[db_index];
-			}
-		}//while getline
-		if (count % 1000 != 0){
-			txns[db_index]->Commit();
-			LOG(ERROR) << "Processed " << count << " feats" <<
-				", DB: " << db_names[db_index];
+	for (size_t f = 0; f < file_list.size(); f++){
+		parse_file_feat(file_list[f].first, feats);
+		//check feat dim 
+		int feat_dim = FLAGS_channel * FLAGS_height * FLAGS_width;
+		CHECK_EQ(feat_dim, feats.size()) << "Feat dim not match, required: "
+			<< feat_dim << ", get: " << feats.size() 
+			<< "\nFile: " << file_list[f].first;
+		//save feat/label data to db
+		datum.clear_float_data();
+		for (int i = 0; i < feats.size(); i++){
+			datum.add_float_data(feats[i]);
 		}
-	}//for (size_t f = 0; f < feat_files.size(); f++)
+		datum.set_label(file_list[f].second);
+		//sequential
+		string out;
+		datum.SerializeToString(&out);
+		int len = sprintf_s(key_cstr, kMaxKeyLength, "%09d", count);
+		//put into db
+		txn->Put(std::string(key_cstr, len), out);
+
+		if ((++count) % 1000 == 0){
+			//commit db
+			txn->Commit();
+			txn.reset(db->NewTransaction());
+			LOG(ERROR) << "Processed " << count << " feats";
+		}
+	}
+	if (count % 1000 != 0){
+		txn->Commit();
+		LOG(ERROR) << "Processed " << count << " feats";
+	}
 }
 
 int main(int argc, char** argv) {
@@ -132,18 +131,18 @@ int main(int argc, char** argv) {
 	::google::SetStderrLogging(0);
 	//parse flags
 	::gflags::ParseCommandLineFlags(&argc, &argv, true);
-	if (argc < 4) {
+	if (argc < 3) {
 		gflags::SetUsageMessage("Convert feats and scores by line to lmdb/leveldb\n"
 			"format used for caffe.\n"
 			"Usage: \n"
-			"EXE [FLAGS] INPUT_FEAT_FILEs(,) INPUT_LABEL_FILEs(,) DB_NAMEs(,)\n");
+			"EXE [FLAGS] FEAT_FILE_INDEX(feat_file_index label) DB_NAME\n");
 		gflags::ShowUsageWithFlagsRestrict(argv[0], "convert_feat_label_data");
 		return 1;
 	}
 	else {
-		LOG(INFO) << "Channels: " << FLAGS_channels << ", height: " 
+		LOG(INFO) << "Channels: " << FLAGS_channel << ", height: " 
 			<< FLAGS_height << ", width: " << FLAGS_width;
-		convert_dataset_float(string(argv[1]), string(argv[2]), string(argv[3]));
+		convert_dataset_float(string(argv[1]), string(argv[2]));
 	}
 	return 0;
 }

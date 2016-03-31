@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>D:\code\MNIST\data\mnist_train_data,D:\code\MNIST\data\mnist_valid_data D:\code\MNIST\data\mnist_train_label,D:\code\MNIST\data\mnist_valid_label mnist_all_train</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-channel=6 -height=256 -width=256 -root_dir=D:\DeepLearning\Coop\chaoqun\unnorm-data\traintxt\ -backend=leveldb -spliter=";" train_debug_index.txt train_unnorm_leveldb</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
