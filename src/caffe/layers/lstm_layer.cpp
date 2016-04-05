@@ -1,0 +1,1 @@
+#include "caffe/layers/lstm_layer.hpp"
