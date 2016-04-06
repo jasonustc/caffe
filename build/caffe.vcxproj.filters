@@ -28,6 +28,9 @@
     <Filter Include="src\test">
       <UniqueIdentifier>{3a3cd1ab-ab03-417c-b225-4b91cd9bebb2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\layers">
+      <UniqueIdentifier>{802fafb2-be05-4b9a-94f3-27b9b5cddcb0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\caffe\layers\absval_layer.cpp">
@@ -228,9 +231,6 @@
     <ClCompile Include="..\src\caffe\layers\reshape_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\rnn_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\caffe\layers\video_unroll_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
@@ -294,28 +294,10 @@
     <ClCompile Include="..\src\caffe\layers\gen_rec_loss_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\lstm_unit_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\caffe\layers\neighbor_contrast_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
     <ClCompile Include="..\src\caffe\layers\rbm_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\recurrent_dec_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\recurrent_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\lstm_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\dec_lstm_layer.cpp">
-      <Filter>src\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\caffe\layers\dec_lstm_unit_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
     <ClCompile Include="..\src\caffe\layers\soft_accuracy_layer.cpp">
@@ -328,6 +310,9 @@
       <Filter>src\layers</Filter>
     </ClCompile>
     <ClCompile Include="..\tools\caffe.cpp" />
+    <ClCompile Include="..\src\caffe\layers\lstm_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
@@ -471,22 +456,10 @@
     <CudaCompile Include="..\src\caffe\layers\gen_rec_loss_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\lstm_unit_layer.cu">
-      <Filter>src\layers</Filter>
-    </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\neighbor_contrast_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\rbm_layer.cu">
-      <Filter>src\layers</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\recurrent_dec_layer.cu">
-      <Filter>src\layers</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\recurrent_layer.cu">
-      <Filter>src\layers</Filter>
-    </CudaCompile>
-    <CudaCompile Include="..\src\caffe\layers\dec_lstm_unit_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
     <CudaCompile Include="..\src\caffe\layers\multi_label_loss_layer.cu">
@@ -598,6 +571,9 @@
     </ClInclude>
     <ClInclude Include="..\include\caffe\video_layers.hpp">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\caffe\layers\lstm_layer.hpp">
+      <Filter>include\layers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -43,8 +43,6 @@
     <ClCompile Include="..\src\caffe\layers\cudnn_tanh_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\data_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\deconv_layer.cpp" />
-    <ClCompile Include="..\src\caffe\layers\dec_lstm_layer.cpp" />
-    <ClCompile Include="..\src\caffe\layers\dec_lstm_unit_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\dropout_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\dummy_data_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\eltwise_layer.cpp" />
@@ -66,7 +64,6 @@
     <ClCompile Include="..\src\caffe\layers\loss_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\lrn_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\lstm_layer.cpp" />
-    <ClCompile Include="..\src\caffe\layers\lstm_unit_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\memory_data_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\multinomial_logistic_loss_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\multi_label_accuracy_layer.cpp" />
@@ -83,11 +80,8 @@
     <ClCompile Include="..\src\caffe\layers\prelu_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\rbm_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\rcs_layer.cpp" />
-    <ClCompile Include="..\src\caffe\layers\recurrent_dec_layer.cpp" />
-    <ClCompile Include="..\src\caffe\layers\recurrent_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\relu_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\reshape_layer.cpp" />
-    <ClCompile Include="..\src\caffe\layers\rnn_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\sampling_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\sigmoid_cross_entropy_loss_layer.cpp" />
     <ClCompile Include="..\src\caffe\layers\sigmoid_layer.cpp" />
@@ -135,7 +129,6 @@
     <CudaCompile Include="..\src\caffe\layers\cudnn_softmax_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\cudnn_tanh_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\deconv_layer.cu" />
-    <CudaCompile Include="..\src\caffe\layers\dec_lstm_unit_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\dropout_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\eltwise_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\embed_layer.cu" />
@@ -148,7 +141,6 @@
     <CudaCompile Include="..\src\caffe\layers\inner_product_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\latent_loss_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\lrn_layer.cu" />
-    <CudaCompile Include="..\src\caffe\layers\lstm_unit_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\multi_label_loss_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\mvn_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\neighbor_contrast_layer.cu" />
@@ -159,8 +151,6 @@
     <CudaCompile Include="..\src\caffe\layers\prelu_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\rbm_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\rcs_layer.cu" />
-    <CudaCompile Include="..\src\caffe\layers\recurrent_dec_layer.cu" />
-    <CudaCompile Include="..\src\caffe\layers\recurrent_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\relu_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\sampling_layer.cu" />
     <CudaCompile Include="..\src\caffe\layers\sigmoid_cross_entropy_loss_layer.cu" />
@@ -186,6 +176,7 @@
     <ClInclude Include="..\include\caffe\filler.hpp" />
     <ClInclude Include="..\include\caffe\internal_thread.hpp" />
     <ClInclude Include="..\include\caffe\layer.hpp" />
+    <ClInclude Include="..\include\caffe\layers\lstm_layer.hpp" />
     <ClInclude Include="..\include\caffe\layer_factory.hpp" />
     <ClInclude Include="..\include\caffe\loss_layers.hpp" />
     <ClInclude Include="..\include\caffe\net.hpp" />

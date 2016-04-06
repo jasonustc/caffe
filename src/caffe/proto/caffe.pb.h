@@ -46,6 +46,7 @@ class NetState;
 class NetStateRule;
 class ParamSpec;
 class LayerParameter;
+class LSTMParameter;
 class MultiLabelLossParameter;
 class BLEUParameter;
 class RBMParameter;
@@ -3066,6 +3067,15 @@ class LayerParameter : public ::google::protobuf::Message {
   inline ::caffe::MultiLabelLossParameter* release_multi_label_loss_param();
   inline void set_allocated_multi_label_loss_param(::caffe::MultiLabelLossParameter* multi_label_loss_param);
 
+  // optional .caffe.LSTMParameter lstm_param = 150;
+  inline bool has_lstm_param() const;
+  inline void clear_lstm_param();
+  static const int kLstmParamFieldNumber = 150;
+  inline const ::caffe::LSTMParameter& lstm_param() const;
+  inline ::caffe::LSTMParameter* mutable_lstm_param();
+  inline ::caffe::LSTMParameter* release_lstm_param();
+  inline void set_allocated_lstm_param(::caffe::LSTMParameter* lstm_param);
+
   // @@protoc_insertion_point(class_scope:caffe.LayerParameter)
  private:
   inline void set_has_name();
@@ -3174,6 +3184,8 @@ class LayerParameter : public ::google::protobuf::Message {
   inline void clear_has_bleu_param();
   inline void set_has_multi_label_loss_param();
   inline void clear_has_multi_label_loss_param();
+  inline void set_has_lstm_param();
+  inline void clear_has_lstm_param();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -3237,6 +3249,7 @@ class LayerParameter : public ::google::protobuf::Message {
   ::caffe::ConvRecurrentParameter* conv_recurrent_param_;
   ::caffe::BLEUParameter* bleu_param_;
   ::caffe::MultiLabelLossParameter* multi_label_loss_param_;
+  ::caffe::LSTMParameter* lstm_param_;
   int phase_;
   mutable int _cached_size_;
   friend void  protobuf_AddDesc_caffe_2eproto();
@@ -3245,6 +3258,129 @@ class LayerParameter : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static LayerParameter* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class LSTMParameter : public ::google::protobuf::Message {
+ public:
+  LSTMParameter();
+  virtual ~LSTMParameter();
+
+  LSTMParameter(const LSTMParameter& from);
+
+  inline LSTMParameter& operator=(const LSTMParameter& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const LSTMParameter& default_instance();
+
+  void Swap(LSTMParameter* other);
+
+  // implements Message ----------------------------------------------
+
+  LSTMParameter* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const LSTMParameter& from);
+  void MergeFrom(const LSTMParameter& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional uint32 num_output = 1;
+  inline bool has_num_output() const;
+  inline void clear_num_output();
+  static const int kNumOutputFieldNumber = 1;
+  inline ::google::protobuf::uint32 num_output() const;
+  inline void set_num_output(::google::protobuf::uint32 value);
+
+  // optional float clipping_threshold = 2 [default = 0];
+  inline bool has_clipping_threshold() const;
+  inline void clear_clipping_threshold();
+  static const int kClippingThresholdFieldNumber = 2;
+  inline float clipping_threshold() const;
+  inline void set_clipping_threshold(float value);
+
+  // optional .caffe.FillerParameter weight_filler = 3;
+  inline bool has_weight_filler() const;
+  inline void clear_weight_filler();
+  static const int kWeightFillerFieldNumber = 3;
+  inline const ::caffe::FillerParameter& weight_filler() const;
+  inline ::caffe::FillerParameter* mutable_weight_filler();
+  inline ::caffe::FillerParameter* release_weight_filler();
+  inline void set_allocated_weight_filler(::caffe::FillerParameter* weight_filler);
+
+  // optional .caffe.FillerParameter bias_filler = 4;
+  inline bool has_bias_filler() const;
+  inline void clear_bias_filler();
+  static const int kBiasFillerFieldNumber = 4;
+  inline const ::caffe::FillerParameter& bias_filler() const;
+  inline ::caffe::FillerParameter* mutable_bias_filler();
+  inline ::caffe::FillerParameter* release_bias_filler();
+  inline void set_allocated_bias_filler(::caffe::FillerParameter* bias_filler);
+
+  // optional uint32 batch_size = 5 [default = 1];
+  inline bool has_batch_size() const;
+  inline void clear_batch_size();
+  static const int kBatchSizeFieldNumber = 5;
+  inline ::google::protobuf::uint32 batch_size() const;
+  inline void set_batch_size(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:caffe.LSTMParameter)
+ private:
+  inline void set_has_num_output();
+  inline void clear_has_num_output();
+  inline void set_has_clipping_threshold();
+  inline void clear_has_clipping_threshold();
+  inline void set_has_weight_filler();
+  inline void clear_has_weight_filler();
+  inline void set_has_bias_filler();
+  inline void clear_has_bias_filler();
+  inline void set_has_batch_size();
+  inline void clear_has_batch_size();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 num_output_;
+  float clipping_threshold_;
+  ::caffe::FillerParameter* weight_filler_;
+  ::caffe::FillerParameter* bias_filler_;
+  ::google::protobuf::uint32 batch_size_;
+  friend void  protobuf_AddDesc_caffe_2eproto();
+  friend void protobuf_AssignDesc_caffe_2eproto();
+  friend void protobuf_ShutdownFile_caffe_2eproto();
+
+  void InitAsDefaultInstance();
+  static LSTMParameter* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -15912,6 +16048,205 @@ inline void LayerParameter::set_allocated_multi_label_loss_param(::caffe::MultiL
     clear_has_multi_label_loss_param();
   }
   // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.multi_label_loss_param)
+}
+
+// optional .caffe.LSTMParameter lstm_param = 150;
+inline bool LayerParameter::has_lstm_param() const {
+  return (_has_bits_[1] & 0x10000000u) != 0;
+}
+inline void LayerParameter::set_has_lstm_param() {
+  _has_bits_[1] |= 0x10000000u;
+}
+inline void LayerParameter::clear_has_lstm_param() {
+  _has_bits_[1] &= ~0x10000000u;
+}
+inline void LayerParameter::clear_lstm_param() {
+  if (lstm_param_ != NULL) lstm_param_->::caffe::LSTMParameter::Clear();
+  clear_has_lstm_param();
+}
+inline const ::caffe::LSTMParameter& LayerParameter::lstm_param() const {
+  // @@protoc_insertion_point(field_get:caffe.LayerParameter.lstm_param)
+  return lstm_param_ != NULL ? *lstm_param_ : *default_instance_->lstm_param_;
+}
+inline ::caffe::LSTMParameter* LayerParameter::mutable_lstm_param() {
+  set_has_lstm_param();
+  if (lstm_param_ == NULL) lstm_param_ = new ::caffe::LSTMParameter;
+  // @@protoc_insertion_point(field_mutable:caffe.LayerParameter.lstm_param)
+  return lstm_param_;
+}
+inline ::caffe::LSTMParameter* LayerParameter::release_lstm_param() {
+  clear_has_lstm_param();
+  ::caffe::LSTMParameter* temp = lstm_param_;
+  lstm_param_ = NULL;
+  return temp;
+}
+inline void LayerParameter::set_allocated_lstm_param(::caffe::LSTMParameter* lstm_param) {
+  delete lstm_param_;
+  lstm_param_ = lstm_param;
+  if (lstm_param) {
+    set_has_lstm_param();
+  } else {
+    clear_has_lstm_param();
+  }
+  // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.lstm_param)
+}
+
+// -------------------------------------------------------------------
+
+// LSTMParameter
+
+// optional uint32 num_output = 1;
+inline bool LSTMParameter::has_num_output() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void LSTMParameter::set_has_num_output() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void LSTMParameter::clear_has_num_output() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void LSTMParameter::clear_num_output() {
+  num_output_ = 0u;
+  clear_has_num_output();
+}
+inline ::google::protobuf::uint32 LSTMParameter::num_output() const {
+  // @@protoc_insertion_point(field_get:caffe.LSTMParameter.num_output)
+  return num_output_;
+}
+inline void LSTMParameter::set_num_output(::google::protobuf::uint32 value) {
+  set_has_num_output();
+  num_output_ = value;
+  // @@protoc_insertion_point(field_set:caffe.LSTMParameter.num_output)
+}
+
+// optional float clipping_threshold = 2 [default = 0];
+inline bool LSTMParameter::has_clipping_threshold() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void LSTMParameter::set_has_clipping_threshold() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void LSTMParameter::clear_has_clipping_threshold() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void LSTMParameter::clear_clipping_threshold() {
+  clipping_threshold_ = 0;
+  clear_has_clipping_threshold();
+}
+inline float LSTMParameter::clipping_threshold() const {
+  // @@protoc_insertion_point(field_get:caffe.LSTMParameter.clipping_threshold)
+  return clipping_threshold_;
+}
+inline void LSTMParameter::set_clipping_threshold(float value) {
+  set_has_clipping_threshold();
+  clipping_threshold_ = value;
+  // @@protoc_insertion_point(field_set:caffe.LSTMParameter.clipping_threshold)
+}
+
+// optional .caffe.FillerParameter weight_filler = 3;
+inline bool LSTMParameter::has_weight_filler() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void LSTMParameter::set_has_weight_filler() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void LSTMParameter::clear_has_weight_filler() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void LSTMParameter::clear_weight_filler() {
+  if (weight_filler_ != NULL) weight_filler_->::caffe::FillerParameter::Clear();
+  clear_has_weight_filler();
+}
+inline const ::caffe::FillerParameter& LSTMParameter::weight_filler() const {
+  // @@protoc_insertion_point(field_get:caffe.LSTMParameter.weight_filler)
+  return weight_filler_ != NULL ? *weight_filler_ : *default_instance_->weight_filler_;
+}
+inline ::caffe::FillerParameter* LSTMParameter::mutable_weight_filler() {
+  set_has_weight_filler();
+  if (weight_filler_ == NULL) weight_filler_ = new ::caffe::FillerParameter;
+  // @@protoc_insertion_point(field_mutable:caffe.LSTMParameter.weight_filler)
+  return weight_filler_;
+}
+inline ::caffe::FillerParameter* LSTMParameter::release_weight_filler() {
+  clear_has_weight_filler();
+  ::caffe::FillerParameter* temp = weight_filler_;
+  weight_filler_ = NULL;
+  return temp;
+}
+inline void LSTMParameter::set_allocated_weight_filler(::caffe::FillerParameter* weight_filler) {
+  delete weight_filler_;
+  weight_filler_ = weight_filler;
+  if (weight_filler) {
+    set_has_weight_filler();
+  } else {
+    clear_has_weight_filler();
+  }
+  // @@protoc_insertion_point(field_set_allocated:caffe.LSTMParameter.weight_filler)
+}
+
+// optional .caffe.FillerParameter bias_filler = 4;
+inline bool LSTMParameter::has_bias_filler() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void LSTMParameter::set_has_bias_filler() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void LSTMParameter::clear_has_bias_filler() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void LSTMParameter::clear_bias_filler() {
+  if (bias_filler_ != NULL) bias_filler_->::caffe::FillerParameter::Clear();
+  clear_has_bias_filler();
+}
+inline const ::caffe::FillerParameter& LSTMParameter::bias_filler() const {
+  // @@protoc_insertion_point(field_get:caffe.LSTMParameter.bias_filler)
+  return bias_filler_ != NULL ? *bias_filler_ : *default_instance_->bias_filler_;
+}
+inline ::caffe::FillerParameter* LSTMParameter::mutable_bias_filler() {
+  set_has_bias_filler();
+  if (bias_filler_ == NULL) bias_filler_ = new ::caffe::FillerParameter;
+  // @@protoc_insertion_point(field_mutable:caffe.LSTMParameter.bias_filler)
+  return bias_filler_;
+}
+inline ::caffe::FillerParameter* LSTMParameter::release_bias_filler() {
+  clear_has_bias_filler();
+  ::caffe::FillerParameter* temp = bias_filler_;
+  bias_filler_ = NULL;
+  return temp;
+}
+inline void LSTMParameter::set_allocated_bias_filler(::caffe::FillerParameter* bias_filler) {
+  delete bias_filler_;
+  bias_filler_ = bias_filler;
+  if (bias_filler) {
+    set_has_bias_filler();
+  } else {
+    clear_has_bias_filler();
+  }
+  // @@protoc_insertion_point(field_set_allocated:caffe.LSTMParameter.bias_filler)
+}
+
+// optional uint32 batch_size = 5 [default = 1];
+inline bool LSTMParameter::has_batch_size() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void LSTMParameter::set_has_batch_size() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void LSTMParameter::clear_has_batch_size() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void LSTMParameter::clear_batch_size() {
+  batch_size_ = 1u;
+  clear_has_batch_size();
+}
+inline ::google::protobuf::uint32 LSTMParameter::batch_size() const {
+  // @@protoc_insertion_point(field_get:caffe.LSTMParameter.batch_size)
+  return batch_size_;
+}
+inline void LSTMParameter::set_batch_size(::google::protobuf::uint32 value) {
+  set_has_batch_size();
+  batch_size_ = value;
+  // @@protoc_insertion_point(field_set:caffe.LSTMParameter.batch_size)
 }
 
 // -------------------------------------------------------------------
