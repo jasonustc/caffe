@@ -1,64 +1,122 @@
+﻿
+/********************************************************************************
+** Copyright(c) 2016 USTC & MSRA All Rights Reserved.
+** auth： Zhaofan Qiu
+** mail： zhaofanqiu@gmail.com
+** date： 2016/3/23
+** desc： LSTM layer
+*********************************************************************************/
+
 #ifndef CAFFE_LSTM_LAYER_HPP_
 #define CAFFE_LSTM_LAYER_HPP_
 
+#include <string>
+#include <utility>
 #include <vector>
 
+#include "leveldb/db.h"
+#include "boost/scoped_ptr.hpp"
+
 #include "caffe/blob.hpp"
+#include "caffe/common.hpp"
 #include "caffe/layer.hpp"
 #include "caffe/proto/caffe.pb.h"
+#include "caffe/net.hpp"
 
-namespace caffe{
-	/*
-	 * @brief Long-short term memory layer.
-	 * TODO(dox): thorough documentation for Forward, Backwar, and proto params.
-	 */
+#include "caffe/caption/rnn_base_layer.hpp"
+#include "caffe/caption/lstm_unit_layer.hpp"
+
+#include "caffe/layers/slice_layer.hpp"
+#include "caffe/layers/split_layer.hpp"
+#include "caffe/layers/concat_layer.hpp"
+#include "caffe/layers/scale_layer.hpp"
+#include "caffe/layers/inner_product_layer.hpp"
+
+namespace caffe {
+	/**
+	* @brief Implementation of LSTM
+	*/
 	template <typename Dtype>
-	class LSTMLayer : public Layer<Dtype>{
+	class LSTMLayer : public RNNBaseLayer<Dtype> {
 	public:
 		explicit LSTMLayer(const LayerParameter& param)
-			: Layer<Dtype>(param){}
+			: RNNBaseLayer<Dtype>(param) {}
+
 		virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
-			const vector<Blob<Dtype>*>& top);
-		virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
 			const vector<Blob<Dtype>*>& top);
 
 		virtual inline const char* type() const { return "LSTM"; }
 
+		virtual vector<Blob<Dtype>*> RecurrentOutput()
+		{
+			vector<Blob<Dtype>*> output{
+				H0_.get(),
+				C0_.get()
+			};
+			return output;
+		}
+
 	protected:
-		virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
-			const vector<Blob<Dtype>*>& top);
-		virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
-			const vector<Blob<Dtype>*>& top);
-		virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
-			const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
-		virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
-			const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+		virtual void RecurrentForward(const int t);
+		virtual void RecurrentBackward(const int t);
+		virtual void CopyRecurrentOutput()
+		{
+			if (Caffe::mode() == Caffe::GPU) {
+				caffe_copy(H0_->count(), H_[T_ - 1]->mutable_gpu_data(),
+					H0_->mutable_gpu_data());
+				caffe_copy(H0_->count(), C_[T_ - 1]->mutable_gpu_data(),
+					C0_->mutable_gpu_data());
+			}
+			else
+			{
+				caffe_copy(H0_->count(), H_[T_ - 1]->mutable_cpu_data(),
+					H0_->mutable_cpu_data());
+				caffe_copy(H0_->count(), C_[T_ - 1]->mutable_cpu_data(),
+					C0_->mutable_cpu_data());
+			}
+		}
+		virtual void ShareWeight()
+		{
+			ip_g_->blobs()[0]->ShareData(*(blobs_[0]));
+			ip_g_->blobs()[0]->ShareDiff(*(blobs_[0]));
+			if (bias_term_)
+			{
+				ip_g_->blobs()[1]->ShareData(*(blobs_[1]));
+				ip_g_->blobs()[1]->ShareDiff(*(blobs_[1]));
+			}
+		}
+		virtual int GetHiddenDim()
+		{
+			return this->layer_param_.inner_product_param().num_output();
+		}
 
-		int input_dim_; //input dimension
-		int num_hid_; //number of hidden units
-		int T_; //length of sequence
-		int N_; //batch_size
+		int bias_term_;
+		//Data blobs
+		shared_ptr<Blob<Dtype> > C0_;
+		shared_ptr<Blob<Dtype> > H0_;
+		
+		//Layers
+		// split_h_ layer
+		shared_ptr<SplitLayer<Dtype> > split_h_;
+		vector<shared_ptr<Blob<Dtype> > > H_1_;
+		vector<shared_ptr<Blob<Dtype> > > H_2_;
 
-		//maybe this clipping should be applied to each cell-to-cell
-		//layer, so we need to deal with clipping for each cell
-		//sequentially
-		Dtype clipping_threshold_; //thresold for clipped gradient
-		Blob<Dtype> bias_multiplier_;
+		// scale_h_ layer
+		shared_ptr<ScaleLayer<Dtype> > scale_h_;
+		vector<shared_ptr<Blob<Dtype> > > SH_;
 
-		Blob<Dtype> top_; //output values
-		Blob<Dtype> cell_; //memory cell
-		Blob<Dtype> pre_gate_; //gate values before nonlinearity
-		Blob<Dtype> gate_; //gate values after nonlinearity
+		// concat_h_ layer
+		shared_ptr<ConcatLayer<Dtype> > concat_;
+		vector<shared_ptr<Blob<Dtype> > > XH_;
 
-		Blob<Dtype> c_0_; //previous cell state value
-		Blob<Dtype> h_0_; //previous hidden activation value
-		Blob<Dtype> c_T_; //next cell state value
-		Blob<Dtype> h_T_; //next hidden activation value
+		// ip_g_ layer
+		shared_ptr<InnerProductLayer<Dtype> > ip_g_;
+		vector<shared_ptr<Blob<Dtype> > > G_;
 
-		//intermediate values
-		Blob<Dtype> h_to_gate_;
-		Blob<Dtype> h_to_h_;
+		// lstm_unit_h_ layer
+		shared_ptr<LSTMUnitLayer<Dtype> > lstm_unit_;
+		vector<shared_ptr<Blob<Dtype> > > C_;
 	};
-}
+}  // namespace caffe
 
-#endif
+#endif  // CAFFE_LSTM_LAYER_HPP_

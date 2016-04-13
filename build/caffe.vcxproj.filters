@@ -313,6 +313,12 @@
     <ClCompile Include="..\src\caffe\layers\lstm_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\lstm_unit_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\caffe\layers\rnn_base_layer.cpp">
+      <Filter>src\layers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\caffe\layers\absval_layer.cu">
@@ -465,6 +471,9 @@
     <CudaCompile Include="..\src\caffe\layers\multi_label_loss_layer.cu">
       <Filter>src\layers</Filter>
     </CudaCompile>
+    <CudaCompile Include="..\src\caffe\layers\lstm_unit_layer.cu">
+      <Filter>src\layers</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\caffe\blob.hpp">
@@ -573,6 +582,12 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\caffe\layers\lstm_layer.hpp">
+      <Filter>include\layers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\caffe\layers\lstm_unit_layer.hpp">
+      <Filter>include\layers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\caffe\layers\rnn_base_layer.hpp">
       <Filter>include\layers</Filter>
     </ClInclude>
   </ItemGroup>
